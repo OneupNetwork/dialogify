@@ -9,8 +9,9 @@ Work in progress
 - [ ] implements Alert Confirm Prompt and others...
 - [ ] fixes css
 - [ ] more options
-- [ ] use gulp
+- [x] use gulp
 - [ ] api documents
+- [ ] browser compatibility
 
 # License
 MIT

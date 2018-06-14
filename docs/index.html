@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-blue.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-dark.min.css">
-    <link type="text/css" rel="stylesheet" href="css/dialogify.css">
     <style>
         .content{padding:40px 56px;}
         .mdl-switch{margin:8px;}
@@ -33,19 +32,12 @@
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--5-col-desktop left-col">
                             <h5 class="mdl-typeography--headline">Getting Started</h5>
                             <p>
-                                在頁面加上需要的 css 與 js 即可<br>以下範例可用下面的開關切換樣式主題
+                                在頁面加上 dialogify.min.js 即可
                             </p>
-                            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-dark-theme">
-                                <input type="checkbox" id="switch-dark-theme" class="mdl-switch__input">
-                                <span class="mdl-switch__label">深色主題</span>
-                            </label>
                         </div>
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
                             <pre><code class="html">
-&lt;link type="text/css" rel="stylesheet" href="path/to/dialogify.css"&gt;
-&lt;script src="path/to/jquery.js"&gt;&lt;/script&gt;
-&lt;script src="path/to/dialog-polyfill.js"&gt;&lt;/script&gt;
-&lt;script src="path/to/dialogify.js"&gt;&lt;/script&gt;
+&lt;script src="path/to/dialogify.min.js"&gt;&lt;/script&gt;
                             </code></pre>
                         </div>
                     </div>
@@ -64,13 +56,13 @@
                             <h5 class="mdl-typeography--headline">Code Example</h5>
                             <pre><code class="html">
 &lt;script type="text/template" id="demo1_template"&gt;
-    燈箱內容放這
-    &lt;input type="text" class="form-control" placeholder="title"&gt;
-    &lt;textarea class="form-control" placeholder="content"&gt;&lt;/textarea&gt;
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.
+    &lt;input type="text" class="text-field" placeholder="title"&gt;
+    &lt;textarea class="text-field" placeholder="content"&gt;&lt;/textarea&gt;
 &lt;/script&gt;
 &lt;script&gt;
 let dialogify = new Dialogify('#demo1_template')
-    .title('Hello Dialogify')
+    .title('Dialogify')
     .buttons([
         {
             text: '取消',
@@ -105,8 +97,8 @@ let dialogify = new Dialogify('#demo1_template')
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
                             <h5 class="mdl-typeography--headline">Code Example</h5>
                             <pre><code class="javascript">
-let dialogify = new Dialogify('&lt;b&gt;燈箱內容放這&lt;/b&gt;')
-    .title('Hello Modal Dialogify')
+let dialogify = new Dialogify('&lt;b&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.&lt;/b&gt;')
+    .title('Modal Dialogify')
     .buttons([
         {
             type: Dialogify.BUTTON_DANGER,
@@ -189,20 +181,19 @@ let dialogify = new Dialogify('&lt;b&gt;燈箱內容放這&lt;/b&gt;')
 
 
     <script type="text/template" id="demo1_template">
-        燈箱內容放這
-        <input type="text" class="form-control" placeholder="title">
-        <textarea class="form-control" placeholder="content"></textarea>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.
+        <input type="text" class="text-field" placeholder="title">
+        <textarea class="text-field" placeholder="content"></textarea>
     </script>
 
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-    <script src="js/dialog-polyfill.js"></script>
-    <script src="js/dialogify.js"></script>
+    <script src="js/dialogify.min.js"></script>
     <script>
         $('#demo1').click(function(e){
             let dialogify = new Dialogify('#demo1_template')
-                .title('Hello Dialogify')
+                .title('Dialogify')
                 .buttons([
                     {
                         text: '取消',
@@ -223,8 +214,9 @@ let dialogify = new Dialogify('&lt;b&gt;燈箱內容放這&lt;/b&gt;')
         });
 
         $('#demo2').click(function(){
-            let dialogify = new Dialogify('<b>燈箱內容放這</b>')
-                .title('Hello Modal Dialogify')
+            let html = '<b>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.</b>';
+            let dialogify = new Dialogify(html)
+                .title('Modal Dialogify')
                 .buttons([
                     {
                         type: Dialogify.BUTTON_DANGER,
@@ -235,28 +227,6 @@ let dialogify = new Dialogify('&lt;b&gt;燈箱內容放這&lt;/b&gt;')
                     }
                 ], {position: Dialogify.BUTTON_CENTER})
                 .showModal();
-        });
-
-        $('#switch-dark-theme').change(function(e){
-            if (this.checked) {
-                $('<link>').attr({
-                    'rel': 'stylesheet',
-                    'type': 'text/css',
-                    'href': 'css/dialogify_dark.css'
-                }).insertAfter('link:last');
-            } else {
-                $('link[href="css/dialogify_dark.css"]').remove();
-            }
-        });
-
-        $(function(){
-            if ($('#switch-dark-theme').prop('checked')) {
-                $('<link>').attr({
-                    'rel': 'stylesheet',
-                    'type': 'text/css',
-                    'href': 'css/dialogify_dark.css'
-                }).insertAfter('link:last');
-            }
         });
 
         hljs.initHighlightingOnLoad();

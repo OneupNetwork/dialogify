@@ -1,0 +1,20 @@
+{
+  "name": "dialogify",
+  "version": "0.0.1",
+  "description": "A dialog plugin implements with HTMLDialogElement",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/porksteak/dialogify"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "gulp": "^4.0.0",
+    "gulp-autoprefixer": "^5.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-sass": "^4.0.1",
+    "gulp-size": "^3.0.0",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-uglify": "^3.0.0",
+    "gulp-file-include": "^2.0.1"
+  }
+}
