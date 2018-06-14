@@ -9,7 +9,7 @@ Work in progress
 TODO
 
 # Designed by
-[https://github.com/Phoebe1226](Phoebe)
+[Phoebe](https://github.com/Phoebe1226)
 
 # TODO
 - [ ] implements Alert Confirm Prompt and others...
