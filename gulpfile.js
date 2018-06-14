@@ -39,7 +39,7 @@ gulp.task('js', function() {
         .pipe(size({ gzip: true, showFiles: true }))
         .pipe(concat('dialogify.min.js'))
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(p('dist/js')))
+        .pipe(gulp.dest(p('dist')))
         .pipe(gulp.dest(p('docs/js')));
 });
 
