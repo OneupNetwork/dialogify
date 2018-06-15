@@ -61,7 +61,7 @@
     &lt;textarea class="text-field" placeholder="content"&gt;&lt;/textarea&gt;
 &lt;/script&gt;
 &lt;script&gt;
-let dialogify = new Dialogify('#demo1_template')
+new Dialogify('#demo1_template')
     .title('Dialogify')
     .buttons([
         {
@@ -75,7 +75,7 @@ let dialogify = new Dialogify('#demo1_template')
             text: '確定',
             type: Dialogify.BUTTON_PRIMARY,
             click: function(e){
-                console.log('ok click');
+                console.log('ok click, title value: ' + this.$content.find('input.text-field').val());
             }
         }
     ])
@@ -90,44 +90,73 @@ let dialogify = new Dialogify('#demo1_template')
                             <h5 class="mdl-typeography--headline">Modal Dialogify</h5>
                             <p>
                                 可顯示任意內容，自訂標題與按鈕，加上 backdrop 聚焦顯示<br>
-                                範例改用傳 html 建立 Dialogify 並讓按鈕置中
+                                範例改用傳 html 建立 Dialogify 並讓按鈕置中<br>
+                                第二個按鈕直接使用 html 建立，同時加上各事件監聽
                             </p>
                             <button id="demo2" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
                         </div>
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
                             <h5 class="mdl-typeography--headline">Code Example</h5>
                             <pre><code class="javascript">
-let dialogify = new Dialogify('&lt;b&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.&lt;/b&gt;')
+let html = '&lt;b&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.&lt;/b&gt;';
+let dialogify = new Dialogify(html)
     .title('Modal Dialogify')
     .buttons([
         {
             type: Dialogify.BUTTON_DANGER,
             click: function(e){
-                console.log('danger click');
+                console.log('danger-style button click');
                 this.close();
             }
-        }
-    ], {position: Dialogify.BUTTON_CENTER})
-    .showModal();
+        },
+        '&lt;a class="btn btn-insert" href="javascript:;"&gt;other action&lt;/a&gt;'
+    ], {position: Dialogify.BUTTON_CENTER});
+
+dialogify
+    .on('show', function(){
+        this.button[1].disable();
+        console.log('show');
+    })
+    .on('close', function(){
+        console.log('close');
+    })
+    .on('cancel', function(){
+        console.log('cancel');
+    });
+
+dialogify.showModal();
                             </code></pre>
                         </div>
                     </div>
 
-                    <!--<div class="mdl-grid">
+                    <div class="mdl-grid">
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--5-col-desktop left-col">
                             <h5 class="mdl-typeography--headline">Ajax Dialogify</h5>
                             <p>
-                                用 ajax 載入內容
+                                load content from ajax
                             </p>
                             <button id="demo3" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
                         </div>
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
                             <h5 class="mdl-typeography--headline">Code Example</h5>
                             <pre><code>
+var options = {
+    ajaxPrefix: '',
+    ajaxData: {var1: 'hello world'},
+    ajaxComplete: function(){
+        console.log('ajax complete');
+        this.buttons([{
+            type: Dialogify.BUTTON_PRIMARY
+        }]);
+    }
+};
 
+new Dialogify('./view.html', options)
+    .title('Ajax Dialogify')
+    .show();
                             </code></pre>
                         </div>
-                    </div>-->
+                    </div>
 
                     <div class="mdl-grid">
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--5-col-desktop left-col">
@@ -154,18 +183,19 @@ Dialogify.alert('Alert &lt;i&gt;Message&lt;/i&gt;');
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
                             <h5 class="mdl-typeography--headline">Code Example</h5>
                             <pre><code>
-Dialogify.confirm('Do you like Dialogify ?',
-    function(){
+Dialogify.confirm('Do you like Dialogify ?', {
+    ok: function(){
         Dialogify.alert('Yes, I do');
     },
-    function(){
+    cancel: function(){
         Dialogify.alert('No, I don\'t');
-    });
+    }
+});
                             </code></pre>
                         </div>
                     </div>
 
-                    <!--<div class="mdl-grid">
+                    <div class="mdl-grid">
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--5-col-desktop left-col">
                             <h5 class="mdl-typeography--headline">Prompt Dialogify</h5>
                             <p>
@@ -175,10 +205,18 @@ Dialogify.confirm('Do you like Dialogify ?',
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
                             <h5 class="mdl-typeography--headline">Code Example</h5>
                             <pre><code>
-
+Dialogify.prompt('What\'s your name ?', {
+    placeholder: 'Enter your name',
+    ok: function(val){
+        Dialogify.alert('Hi! ' + val);
+    },
+    cancel: function(){
+        Dialogify.alert('canceled');
+    }
+});
                             </code></pre>
                         </div>
-                    </div>-->
+                    </div>
 
                 </div>
             </div>
@@ -198,7 +236,7 @@ Dialogify.confirm('Do you like Dialogify ?',
     <script src="js/dialogify.min.js"></script>
     <script>
         $('#demo1').click(function(e){
-            let dialogify = new Dialogify('#demo1_template')
+            new Dialogify('#demo1_template')
                 .title('Dialogify')
                 .buttons([
                     {
@@ -212,7 +250,7 @@ Dialogify.confirm('Do you like Dialogify ?',
                         text: '確定',
                         type: Dialogify.BUTTON_PRIMARY,
                         click: function(e){
-                            console.log('ok click');
+                            console.log('ok click, title value: ' + this.$content.find('input.text-field').val());
                         }
                     }
                 ])
@@ -221,18 +259,49 @@ Dialogify.confirm('Do you like Dialogify ?',
 
         $('#demo2').click(function(){
             let html = '<b>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.</b>';
-            let dialogify = new Dialogify(html, {closable: false})
+            let dialogify = new Dialogify(html)
                 .title('Modal Dialogify')
                 .buttons([
                     {
                         type: Dialogify.BUTTON_DANGER,
                         click: function(e){
-                            console.log('danger click');
+                            console.log('danger-style button click');
                             this.close();
                         }
-                    }
-                ], {position: Dialogify.BUTTON_CENTER})
-                .showModal();
+                    },
+                    '<a class="btn btn-insert" href="javascript:;">other action</a>'
+                ], {position: Dialogify.BUTTON_CENTER});
+
+            dialogify
+                .on('show', function(){
+                    this.button[1].disable();
+                    console.log('show');
+                })
+                .on('close', function(){
+                    console.log('close');
+                })
+                .on('cancel', function(){
+                    console.log('cancel');
+                });
+
+            dialogify.showModal();
+        });
+
+        $('#demo3').click(function(){
+            var options = {
+                ajaxPrefix: '',
+                ajaxData: {var1: 'hello world'},
+                ajaxComplete: function(){
+                    console.log('ajax complete');
+                    this.buttons([{
+                        type: Dialogify.BUTTON_PRIMARY
+                    }]);
+                }
+            };
+
+            new Dialogify('./view.html', options)
+                .title('Ajax Dialogify')
+                .show();
         });
 
         $('#demo4').click(function(){
@@ -240,13 +309,26 @@ Dialogify.confirm('Do you like Dialogify ?',
         });
 
         $('#demo5').click(function(){
-            Dialogify.confirm('Do you like Dialogify ?',
-                function(){
+            Dialogify.confirm('Do you like Dialogify ?', {
+                ok: function(){
                     Dialogify.alert('Yes, I do');
                 },
-                function(){
+                cancel: function(){
                     Dialogify.alert('No, I don\'t');
-                });
+                }
+            });
+        });
+
+        $('#demo6').click(function(){
+            Dialogify.prompt('What\'s your name ?', {
+                placeholder: 'Enter your name',
+                ok: function(val){
+                    Dialogify.alert('Hi! ' + val);
+                },
+                cancel: function(){
+                    Dialogify.alert('canceled');
+                }
+            });
         });
 
         hljs.initHighlightingOnLoad();
