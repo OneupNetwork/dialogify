@@ -75,12 +75,13 @@
         this.$content.append(content);
 
         if (ajax) {
-            this.$content.find('.dialogify-ajax-content')
-                .load(source, options.ajaxData || {}, function(){
-                    if (options.ajaxComplete) {
-                        options.ajaxComplete.call(self);
-                    }
-                });
+            $.get(source, options.ajaxData || {}, function(resp){
+                if (options.ajaxComplete) {
+                    options.ajaxComplete.call(self);
+                }
+
+                self.$content.find('.dialogify-ajax-content').html(resp);
+            }, 'html');
         }
 
         this.showModal = function(){
