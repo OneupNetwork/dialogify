@@ -1,5 +1,5 @@
 .dialogify {
-    display: block;
+    display: none;
     position: absolute;
     top: 50%;
     bottom: auto;
@@ -20,8 +20,8 @@
     padding: 0;
     line-height: 100%;
 
-    &:not([open]) {
-        display: none;
+    &[open] {
+        display: block;
     }
 
     &.fixed {

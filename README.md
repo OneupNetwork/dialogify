@@ -1,8 +1,20 @@
 # Dialogify
-A dialog plugin used in 巴哈姆特電玩資訊站, implements with HTMLDialogElement.
+A javascript plugin for creating dialog/lightbox, implements with HTMLDialogElement.
+
+## Basic usage
+```javascript
+new Dialogify('dialog content')
+    .title('dialog title')
+    .buttons([{type:Dialogify.BUTTON_PRIMARY}])
+    .show();
+```
 
 # Demo
 [https://porksteak.github.io/dialogify/](https://porksteak.github.io/dialogify/)
+
+# Dependencies
+* [jQuery](https://jquery.com/)
+* [dialog-polyfill](https://github.com/GoogleChrome/dialog-polyfill) - for compatible with old browser
 
 # Browser compatibility
 All modern browser and IE11
@@ -17,7 +29,7 @@ All modern browser and IE11
 - [x] use gulp
 - [ ] api documents
 - [x] event
-- [ ] browser compatibility
+- [x] browser compatibility
 
 # License
 MIT

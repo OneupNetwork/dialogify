@@ -36,7 +36,7 @@
             dialogClass += ' fixed';
         }
 
-        var dialogHtml = '<form method="dialog"><div class="dialogify__content ' + widthClass + '"><div></div></div></form>';
+        var dialogHtml = '<form method="dialog" onsubmit="return false;"><div class="dialogify__content ' + widthClass + '"><div></div></div></form>';
 
         this.id = 'dialogify_' + (++Dialogify.counter);
 
