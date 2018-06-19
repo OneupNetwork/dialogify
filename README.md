@@ -10,7 +10,7 @@ new Dialogify('dialog content')
 ```
 
 # Demo
-[https://porksteak.github.io/dialogify/](https://porksteak.github.io/dialogify/)
+[https://oneupnetwork.github.io/dialogify/](https://oneupnetwork.github.io/dialogify/)
 
 # Dependencies
 * [jQuery](https://jquery.com/)

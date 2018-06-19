@@ -1,6 +1,6 @@
 /**
  * dialogify
- * https://github.com/porksteak/dialogify
+ * https://github.com/OneupNetwork/dialogify
  */
 (function($, window, dialogPolyfill, undefined){
     'use strict';
