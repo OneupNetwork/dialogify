@@ -6,8 +6,10 @@ A javascript plugin for creating dialog/lightbox, implements with HTMLDialogElem
 new Dialogify('dialog content')
     .title('dialog title')
     .buttons([{type:Dialogify.BUTTON_PRIMARY}])
-    .show();
+    .showModal();
 ```
+
+![basic dialogify](https://raw.githubusercontent.com/OneupNetwork/dialogify/master/docs/img/screenshot1.png)
 
 # Demo
 [https://oneupnetwork.github.io/dialogify/](https://oneupnetwork.github.io/dialogify/)

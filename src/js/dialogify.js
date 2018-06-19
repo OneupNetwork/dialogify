@@ -36,7 +36,8 @@
             dialogClass += ' fixed';
         }
 
-        var dialogHtml = '<form method="dialog" onsubmit="return false;"><div class="dialogify__content ' + widthClass + '"><div></div></div></form>';
+        var edgeSubmitIssue = /edge/i.test(window.navigator.userAgent) ? ' onsubmit="return false;"' : '';
+        var dialogHtml = '<form method="dialog"' + edgeSubmitIssue + '><div class="dialogify__content ' + widthClass + '"><div></div></div></form>';
 
         this.id = 'dialogify_' + (++Dialogify.counter);
 
@@ -190,7 +191,12 @@
 
     Dialogify.alert = function(message){
         new Dialogify(message, {closable: false})
-            .buttons([{type: Dialogify.BUTTON_PRIMARY}], {position: Dialogify.BUTTON_CENTER})
+            .buttons([{
+                type: Dialogify.BUTTON_DANGER,
+                click: function(){
+                    this.close();
+                }
+            }], {position: Dialogify.BUTTON_CENTER})
             .showModal();
     };
 
