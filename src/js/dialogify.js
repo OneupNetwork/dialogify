@@ -13,6 +13,8 @@
             options = {};
         }
 
+        this.options = options;
+
         var ajaxPrefix = options.ajaxPrefix === undefined ? '/ajax/' : options.ajaxPrefix;
 
         var self = this;
@@ -36,8 +38,12 @@
             dialogClass += ' fixed';
         }
 
-        var edgeSubmitIssue = /edge/i.test(window.navigator.userAgent) ? ' onsubmit="return false;"' : '';
-        var dialogHtml = '<form method="dialog"' + edgeSubmitIssue + '><div class="dialogify__content ' + widthClass + '"><div></div></div></form>';
+        var dialogHtml = '<div class="dialogify__content ' + widthClass + '"><div></div></div>';
+
+        if (options.useDialogForm !== false) {
+            var edgeSubmitIssue = /edge/i.test(window.navigator.userAgent) ? ' onsubmit="return false;"' : '';
+            dialogHtml = '<form method="dialog"' + edgeSubmitIssue + '>' + dialogHtml + '</form>';
+        }
 
         this.id = 'dialogify_' + (++Dialogify.counter);
 
@@ -150,7 +156,7 @@
                     .addClass(buttons[i].type || '')
                     .data('click', buttons[i].click);
 
-                if (buttons[i].type == Dialogify.BUTTON_PRIMARY) {
+                if (buttons[i].type == Dialogify.BUTTON_PRIMARY && this.options.useDialogForm !== false) {
                     $btn.attr('type', 'submit');
                 }
 
