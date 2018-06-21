@@ -273,10 +273,10 @@ Dialogify.prompt('What\'s your name ?', {
             dialogify
                 .on('show', function(){
                     this.button[1].disable();
-                    console.log('show');
+                    console.log('show: ' + this.isOpen());
                 })
                 .on('close', function(){
-                    console.log('close');
+                    console.log('close: ' + this.isOpen());
                 })
                 .on('cancel', function(){
                     console.log('cancel');

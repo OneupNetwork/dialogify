@@ -26,7 +26,7 @@ All modern browser and IE11
 
 # TODO
 - [x] implements Alert Confirm Prompt and others...
-- [ ] fixes css
+- [x] fixes css
 - [ ] more options
 - [x] use gulp
 - [ ] api documents

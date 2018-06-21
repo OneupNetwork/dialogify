@@ -92,17 +92,21 @@
         }
 
         this.showModal = function(){
-            $(this).triggerHandler('show');
             dialog.showModal();
+            $(this).triggerHandler('show');
         };
 
         this.show = function(){
-            $(this).triggerHandler('show');
             dialog.show();
+            $(this).triggerHandler('show');
         };
 
         this.close = function(){
             dialog.close();
+        };
+
+        this.isOpen = function(){
+            return dialog.open;
         };
 
         this.on = function(event, handler){
