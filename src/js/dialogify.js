@@ -278,7 +278,7 @@
         $('<style>')
             .attr({type: 'text/css', id: 'dialogifyCss'})
             .html('@@include(addslashes("src/css/dialogify.css"))')
-            .appendTo('head')
+            .prependTo('head')
     }
 
     $.fn.extend({
