@@ -57,15 +57,14 @@
         z-index: -1;
     }
     &>div {
-         //background-image: url(../dialog/box-corner.png);
+        //background-image: url(../dialog/box-corner.png);
         background-repeat: no-repeat;
         background-position: right bottom;
         &:after {
             content: "";
             position: absolute;
             bottom: 0;
-            left: 0;
-            //background-image: url(../dialog/box-corner.png);
+            left: 0; //background-image: url(../dialog/box-corner.png);
             width: 20px;
             height: 21px;
             transform: rotate(90deg);
@@ -79,12 +78,22 @@
             background: #E0E6E8;
         }
     }
-    .dialogify__body{
-      min-height: 70px;
+    .dialogify__body {
+        min-height: 70px;
+        zoom: 1;
+        &:after {
+            clear: both;
+            content: '.';
+            display: block;
+            width: 0;
+            height: 0;
+            visibility: hidden;
+        }
     }
     .dialogify__content {
-        padding: 20px 25px;
-        box-sizing: border-box; //overflow: scroll;
+        padding: 22px 28px 20px 25px;
+        box-sizing: border-box; 
+        //overflow: scroll;
     }
     .dialogify__content-box {
         margin: 20px auto;
@@ -100,10 +109,14 @@
     .dialogify__fixedwidth {
         max-width: 560px;
     }
+    .dialog__maxheight {
+        max-height: 400px;
+        overflow-y: scroll;
+    }
     .dialogify__close {
         position: absolute;
-        top: 10px;
-        right: 10px;
+        top: 8px;
+        right: 8px;
         color: #00555f;
         img {
             width: 16px;
@@ -114,17 +127,17 @@
             opacity: 1;
         }
     }
-    img.dialogify-ajax-loading{
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 24px;
-      height: 24px;
-      transform: translateX(-50%);
+    img.dialogify-ajax-loading {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 24px;
+        height: 24px;
+        transform: translateX(-50%);
     }
-    a:focus{
-      outline: none;
-      text-decoration: none;
+    a:focus {
+        outline: none;
+        text-decoration: none;
     }
     .btn-danger {
         box-shadow: 0 16px 26px -10px rgba(244, 67, 54, 0.56), 0 4px 25px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(244, 67, 54, 0.2);
@@ -135,6 +148,10 @@
         .btn-insert {
             margin-left: 8px;
             margin-right: 3px;
+        }
+        .check-group {
+            float: left;
+            margin-top: 8px;
         }
         .check-group input[type="checkbox"]+label {
             h6 {
@@ -150,12 +167,14 @@
                 }
             }
         }
+        .float-left {
+            margin-left: 0;
+        }
         .float-left a {
             margin-left: 0;
         }
-        .btn-insert {
-            margin-left: 8px;
-            margin-right: 3px;
+        .post__text-small {
+            font-weight: normal;
         }
     }
 
@@ -213,23 +232,21 @@
             }
         }
         &.btn-danger {
-              background-color: #f44336;
-          color: #FFF;
-          &:hover {
-            background: #DE2427;
-          }
-          &.is-disabled:hover {
+            background-color: #f44336;
+            color: #FFF;
+            &:hover {
+                background: #DE2427;
+            }
+            &.is-disabled:hover {
                 background-color: #f44336;
-          }
+            }
         }
-    }
-
-    //標題
+    } //標題
     h5.dialogify_title {
         font-size: 18px;
         color: #00555f;
         margin: 0 0 15px;
-        font-family: "Helvetica Neue", Helvetica, Roboto, Arial, "Lucida Grande", "PingFang TC", "蘋果儷中黑", "Apple LiGothic Medium","微軟正黑體", sans-serif;
+        font-family: "Helvetica Neue", Helvetica, Roboto, Arial, "Lucida Grande", "PingFang TC", "蘋果儷中黑", "Apple LiGothic Medium", "微軟正黑體", sans-serif;
         font-weight: normal;
         img {
             width: 12px;
@@ -240,7 +257,13 @@
         }
     }
 
-    //排版
+    hr {
+        background: #E0E6E8;
+        border: none;
+        height: 1px;
+        width: 100%;
+        margin-bottom: 15px;
+    } //排版
     .text-right {
         text-align: right;
     }
@@ -251,8 +274,7 @@
 
     .text-left {
         text-align: left;
-    }
-
+    } 
     //輸入框
     .text-field {
         margin: 10px 0;
@@ -294,8 +316,8 @@ dialog::backdrop {
     opacity: .7;
 }
 
-dialog + .backdrop {
-    position:fixed;
+dialog+.backdrop {
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
