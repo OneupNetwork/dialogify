@@ -111,7 +111,7 @@
     }
     .dialog__maxheight {
         max-height: 400px;
-        overflow-y: scroll;
+        overflow-y: auto;
     }
     .dialogify__close {
         position: absolute;
@@ -122,6 +122,9 @@
             width: 16px;
             height: 16px;
             opacity: 0.85;
+        }
+        &:hover{
+          cursor: pointer
         }
         &:hover img {
             opacity: 1;
