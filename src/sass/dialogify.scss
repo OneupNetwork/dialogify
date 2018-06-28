@@ -101,6 +101,7 @@
     .dialogify__maxheight {
         max-height: 400px;
         overflow-y: scroll;
+        overflow-x: hidden;
     }
     .dialogify__autowidth {
         max-width: 1100px;
@@ -311,6 +312,7 @@
         min-height: 100px;
         line-height: 1.5;
         font-size: 14px;
+        overflow: auto;
     }
 }
 
