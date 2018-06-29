@@ -31,6 +31,9 @@
         left: 50%;
         transform: translate(-50%, -50%);
     }
+    p{
+      line-height: 1.5;
+    }
     &.pixel-style:before {
         content: "";
         display: block;
@@ -79,7 +82,7 @@
         }
     }
     .dialogify__body {
-        min-height: 70px;
+        min-height: 40px;
         zoom: 1;
         &:after {
             clear: both;
@@ -101,6 +104,7 @@
     .dialogify__maxheight {
         max-height: 400px;
         overflow-y: scroll;
+        overflow-x: hidden;
     }
     .dialogify__autowidth {
         max-width: 1100px;
@@ -248,7 +252,8 @@
     h5.dialogify_title {
         font-size: 18px;
         color: #00555f;
-        margin: 0 0 15px;
+        line-height: 1;
+        margin: 0 0 18px;
         font-family: "Helvetica Neue", Helvetica, Roboto, Arial, "Lucida Grande", "PingFang TC", "蘋果儷中黑", "Apple LiGothic Medium", "微軟正黑體", sans-serif;
         font-weight: normal;
         img {
@@ -311,6 +316,7 @@
         min-height: 100px;
         line-height: 1.5;
         font-size: 14px;
+        overflow: auto;
     }
 }
 
