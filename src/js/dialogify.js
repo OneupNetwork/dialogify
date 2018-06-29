@@ -138,7 +138,7 @@
             options = {};
         }
 
-        this.button = [];
+        this.$buttonList = {};
 
         var $buttonBox = $('<div>')
             .addClass('btn-box')
@@ -148,7 +148,8 @@
         for (var i = 0;i < buttons.length;i++){
             if (typeof buttons[i] == 'string') {
                 var $btn = $(buttons[i]);
-                this.button.push($btn);
+                var btnId = $btn.attr('id') || i;
+                this.$buttonList[btnId] = $btn;
                 $buttonBox.append($btn);
             } else {
                 if (buttons[i] == null || typeof buttons[i] != 'object') {
@@ -175,7 +176,7 @@
                     }
                 });
 
-                this.button.push($btn);
+                this.$buttonList[buttons[i].id || i] = $btn;
                 $buttonBox.append($btn);
             }
         }
@@ -200,7 +201,7 @@
     Dialogify.BUTTON_DANGER = 'btn-danger';
 
     Dialogify.alert = function(message){
-        new Dialogify(message, {closable: false})
+        new Dialogify('<p>' + message + '</p>', {closable: false})
             .buttons([{
                 type: Dialogify.BUTTON_DANGER,
                 click: function(){
@@ -215,7 +216,7 @@
             options = {};
         }
 
-        new Dialogify(message)
+        new Dialogify('<p>' + message + '</p>')
             .buttons([
                 {
                     text: '取消',
@@ -245,7 +246,7 @@
         }
 
         var placeholder = options.placeholder ? ' placeholder="' + options.placeholder + '"' : '';
-        var $html = $('<div>').html(message);
+        var $html = $('<div>').html('<p>' + message + '</p>');
         $html.append('<input type="text" class="text-field dialogify-prompt-input"' + placeholder + '>');
 
         new Dialogify($html.html())
@@ -278,7 +279,7 @@
         $('<style>')
             .attr({type: 'text/css', id: 'dialogifyCss'})
             .html('@@include(addslashes("src/css/dialogify.css"))')
-            .prependTo('head')
+            .appendTo('head')
     }
 
     $.fn.extend({
