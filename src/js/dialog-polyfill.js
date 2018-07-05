@@ -263,7 +263,7 @@
     focus_: function() {
       // Find element with `autofocus` attribute, or fall back to the first form/tabindex control.
       var target = this.dialog_.querySelector('[autofocus]:not([disabled])');
-      if (!target && this.dialog_.tabIndex >= 0) {
+      if (!target && this.dialog_.tabIndex > 0) {
         target = this.dialog_;
       }
       if (!target) {

@@ -11,7 +11,7 @@ new Dialogify('dialog content')
 
 ![basic dialogify](https://raw.githubusercontent.com/OneupNetwork/dialogify/master/docs/img/screenshot1.png)
 
-# Demo
+# Usage and examples
 [https://oneupnetwork.github.io/dialogify/](https://oneupnetwork.github.io/dialogify/)
 
 # Dependencies
@@ -23,15 +23,6 @@ All modern browser and IE11
 
 # Designed by
 [Phoebe](https://github.com/Phoebe1226)
-
-# TODO
-- [x] implements Alert Confirm Prompt and others...
-- [x] fixes css
-- [ ] more options
-- [x] use gulp
-- [ ] api documents
-- [x] event
-- [x] browser compatibility
 
 # License
 MIT

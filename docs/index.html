@@ -40,6 +40,11 @@
 &lt;script src="path/to/jquery.js"&gt;&lt;/script&gt;
 &lt;script src="path/to/dialogify.min.js"&gt;&lt;/script&gt;
                             </code></pre>
+                            <h5 class="mdl-typeography--headline">Disable css injection</h5>
+                            將 id="dialogifyCss" 的 css 放在 js 前，可用此方法自訂樣式（像是暗色版），不然 inject css 是 inline 形式，優先權比 css 檔案高
+                            <pre><code class="html">
+&lt;link href="path/to/dialogify.css" id="dialogifyCss" rel="stylesheet" type="text/css"&gt;
+                            </code></pre>
                         </div>
                     </div>
 
@@ -137,7 +142,7 @@ dialogify.showModal();
                         </div>
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
                             <h5 class="mdl-typeography--headline">Code Example</h5>
-                            <pre><code>
+                            <pre><code class="javascript">
 var options = {
     ajaxPrefix: '',
     ajaxData: {var1: 'hello world'},
@@ -165,7 +170,7 @@ new Dialogify('./view.html', options)
                         </div>
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
                             <h5 class="mdl-typeography--headline">Code Example</h5>
-                            <pre><code>
+                            <pre><code class="javascript">
 Dialogify.alert('Alert &lt;i&gt;Message&lt;/i&gt;');
                             </code></pre>
                         </div>
@@ -180,7 +185,7 @@ Dialogify.alert('Alert &lt;i&gt;Message&lt;/i&gt;');
                         </div>
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
                             <h5 class="mdl-typeography--headline">Code Example</h5>
-                            <pre><code>
+                            <pre><code class="javascript">
 Dialogify.confirm('Do you like Dialogify ?', {
     ok: function(){
         Dialogify.alert('Yes, I do');
@@ -202,7 +207,7 @@ Dialogify.confirm('Do you like Dialogify ?', {
                         </div>
                         <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
                             <h5 class="mdl-typeography--headline">Code Example</h5>
-                            <pre><code>
+                            <pre><code class="javascript">
 Dialogify.prompt('What\'s your name ?', {
     placeholder: 'Enter your name',
     ok: function(val){
