@@ -94,7 +94,7 @@
         }
     }
     .dialogify__content {
-        padding: 22px 28px 20px 25px;
+        padding: 22px 28px 20px 24px;
         box-sizing: border-box; 
         //overflow: scroll;
     }
@@ -257,11 +257,16 @@
         font-family: "Helvetica Neue", Helvetica, Roboto, Arial, "Lucida Grande", "PingFang TC", "蘋果儷中黑", "Apple LiGothic Medium", "微軟正黑體", sans-serif;
         font-weight: normal;
         img {
-            width: 12px;
-            height: 10px;
-            position: relative;
-            top: -2px;
-            margin-right: 3px;
+          width: 12px;
+          height: 10px;
+          position: relative;
+          top: -2px;
+          margin-right: 3px;
+        }
+        .post__text-small img{
+          width: 12px;
+          height: 12px;
+          top: -1px;
         }
     }
 
