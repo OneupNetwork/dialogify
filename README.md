@@ -11,18 +11,18 @@ new Dialogify('dialog content')
 
 ![basic dialogify](https://raw.githubusercontent.com/OneupNetwork/dialogify/master/docs/img/screenshot1.png)
 
-# Usage and examples
+## Usage and examples
 [https://oneupnetwork.github.io/dialogify/](https://oneupnetwork.github.io/dialogify/)
 
-# Dependencies
+## Dependencies
 * [jQuery](https://jquery.com/)
 * [dialog-polyfill](https://github.com/GoogleChrome/dialog-polyfill) - for compatible with old browser
 
-# Browser compatibility
+## Browser compatibility
 All modern browser and IE11
 
-# Designed by
+## Designed by
 [Phoebe](https://github.com/Phoebe1226)
 
-# License
+## License
 MIT
