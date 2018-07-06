@@ -10,62 +10,146 @@
     <style>
         .content{padding:40px 56px;}
         .mdl-switch{margin:8px;}
+        td:first-child{font-weight: 600;}
     </style>
 </head>
 <body>
-    <div class="mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-200">
-        <header class="mdl-layout__header mdl-layout__header--scroll mdl-layout__header--transparent mdl-color-text--indigo-600">
+    <div class="mdl-layout mdl-layout--fixed-header mdl-layout--fixed-drawer mdl-js-layout mdl-color--grey-200">
+        <header class="mdl-layout__header">
             <div class="mdl-layout__header-row">
-                <span class="mdl-layout-title">Dialogify</span>
+                <!--<span class="mdl-layout-title">Dialogify</span>-->
                 <div class="mdl-layout-spacer"></div>
                 <nav class="mdl-navigation">
                     <a href="https://github.com/OneupNetwork/dialogify/" class="mdl-navigation__link github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
                 </nav>
             </div>
         </header>
+        <div class="mdl-layout__drawer">
+            <span class="mdl-layout-title">Dialogify</span>
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="#gettingstarted">Getting Started</a>
+                <a class="mdl-navigation__link" href="#disablecssinjection">Disable Css Injection</a>
+                <a class="mdl-navigation__link" href="#dialogify">Dialogify</a>
+                <a class="mdl-navigation__link" href="#dialogify.alert">Dialogify.alert</a>
+                <a class="mdl-navigation__link" href="#dialogify.confirm">Dialogify.confirm</a>
+                <a class="mdl-navigation__link" href="#dialogify.prompt">Dialogify.prompt</a>
+            </nav>
+        </div>
         <main class="mdl-layout__content">
             <div class="mdl-grid">
                 <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
                 <div class="content mdl-color--white mdl-shadow--4dp mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
 
                     <div class="mdl-grid">
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--5-col-desktop left-col">
-                            <h5 class="mdl-typeography--headline">Getting Started</h5>
-                            <p>
-                                Include script in your HTML document.
-                            </p>
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <a name="gettingstarted"></a>
+                            <h4 class="mdl-typeography--headline">Getting Started</h4>
+                            <p>Include script in your HTML document.</p>
+                            <pre><code class="html">&lt;script src="path/to/jquery.js"&gt;&lt;/script&gt;
+&lt;script src="path/to/dialogify.min.js"&gt;&lt;/script&gt;</code></pre>
                         </div>
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
-                            <pre><code class="html">
-&lt;script src="path/to/jquery.js"&gt;&lt;/script&gt;
-&lt;script src="path/to/dialogify.min.js"&gt;&lt;/script&gt;
-                            </code></pre>
-                            <h5 class="mdl-typeography--headline">Disable css injection</h5>
-                            將 id="dialogifyCss" 的 css 放在 js 前，可用此方法自訂樣式（像是暗色版），不然 inject css 是 inline 形式，優先權比 css 檔案高
-                            <pre><code class="html">
-&lt;link href="path/to/dialogify.css" id="dialogifyCss" rel="stylesheet" type="text/css"&gt;
-                            </code></pre>
-                        </div>
+                        <div class="mdl-layout-spacer"></div>
                     </div>
 
-
+                    <div class="mdl-grid">
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <a name="disablecssinjection"></a>
+                            <h4 class="mdl-typeography--headline">Disable Css Injection</h4>
+                            <p>所有樣式跟圖片都塞進 js 了，不用另外載入 css<br>
+                               要自訂樣式的話（像是暗色版），將 id="dialogifyCss" 的 css 放在 js 前<br>
+                               不然 inject css 是 inline 形式，優先權比 css 檔案高</p>
+                            <pre><code class="html">&lt;link href="path/to/dialogify.css" id="dialogifyCss" rel="stylesheet" type="text/css"&gt;</code></pre>
+                        </div>
+                        <div class="mdl-layout-spacer"></div>
+                    </div>
 
                     <div class="mdl-grid">
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--5-col-desktop left-col">
-                            <h5 class="mdl-typeography--headline">Normal Dialogify</h5>
-                            <p>
-                            </p>
-                            <button id="demo1" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <a name="dialogify"></a>
+                            <h4 class="mdl-typeography--headline">Dialogify</h4>
+                            <pre><code class="javascript">var dialog = new Dialogify(source, dialogOptions)
+    .title(title)
+    .buttons(buttonList, buttonOptions)
+    .on('show', showCallback)
+    .on('close', closeCallback)
+    .on('cancel', cancelCallback);
+
+dialog.show();
+dialog.showModal();
+dialog.close();
+dialog.isOpen();</code></pre>
+
+<h6>source</h6>
+<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">id selector</td>
+            <td class="mdl-data-table__cell--non-numeric"># 開頭的字串，會用元素的 innerHTML 當燈箱內容，e.g. '#dialogContent'</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">ajax url</td>
+            <td class="mdl-data-table__cell--non-numeric">ajaxPrefix 開頭的字串，e.g. '/ajax/dialogContent.html'</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">html</td>
+            <td class="mdl-data-table__cell--non-numeric">直接用 html</td>
+        </tr>
+    </tbody>
+</table>
+
+<h6>dialogOptions</h6>
+<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">size: Dialogify.SIZE_LARGE</td>
+            <td class="mdl-data-table__cell--non-numeric">設定後會套用較寬的燈箱樣式</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">closable: false</td>
+            <td class="mdl-data-table__cell--non-numeric">設定後沒右上關閉鈕，modal 燈箱無法按 esc 關閉</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">fixed: false</td>
+            <td class="mdl-data-table__cell--non-numeric">設定後燈箱會跟頁面捲動</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">useDialogForm: false</td>
+            <td class="mdl-data-table__cell--non-numeric">設定後燈箱中不會有 &lt;form method="dialog"&gt;&lt;/form&gt;</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">ajaxPrefix: '/ajax/'</td>
+            <td class="mdl-data-table__cell--non-numeric">更改預設 ajax url prefix</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">ajaxData: {}</td>
+            <td class="mdl-data-table__cell--non-numeric">ajax 載入資料時，要傳給網址的參數</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">ajaxComplete: function(){}</td>
+            <td class="mdl-data-table__cell--non-numeric">ajax 載入完成時呼叫，this 是 dialog object</td>
+        </tr>
+    </tbody>
+</table>
                         </div>
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
-                            <h5 class="mdl-typeography--headline">Code Example</h5>
-                            <pre><code class="html">
-&lt;script type="text/template" id="demo1_template"&gt;
+                        <div class="mdl-layout-spacer"></div>
+                    </div>
+
+                    <div class="mdl-grid">
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <h5 class="mdl-typeography--headline">Example - Normal Dialogify</h5>
+                            <button id="demo1" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
+                            <pre><code class="html">&lt;script type="text/template" id="demo1_template"&gt;
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.
     &lt;input type="text" class="text-field" placeholder="title"&gt;
     &lt;textarea class="text-field" placeholder="content"&gt;&lt;/textarea&gt;
 &lt;/script&gt;
 &lt;script&gt;
+// 用 text/template 放燈箱的 html，瀏覽器會略過未知的 script type
+// 比在元素上加 display:none 效能來得好
 new Dialogify('#demo1_template')
     .title('Dialogify')
     .buttons([
@@ -85,23 +169,17 @@ new Dialogify('#demo1_template')
         }
     ])
     .show();
-&lt;/script&gt;
-                            </code></pre>
+&lt;/script&gt;</code></pre>
                         </div>
+                        <div class="mdl-layout-spacer"></div>
                     </div>
 
                     <div class="mdl-grid">
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--5-col-desktop left-col">
-                            <h5 class="mdl-typeography--headline">Modal Dialogify</h5>
-                            <p>
-                                dialog with backdrop
-                            </p>
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <h5 class="mdl-typeography--headline">Example - Modal Dialogify</h5>
                             <button id="demo2" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
-                        </div>
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
-                            <h5 class="mdl-typeography--headline">Code Example</h5>
-                            <pre><code class="javascript">
-let html = '&lt;b&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.&lt;/b&gt;';
+                            <pre><code class="javascript">let html = '&lt;b&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.&lt;/b&gt;';
 let dialogify = new Dialogify(html)
     .title('Modal Dialogify')
     .buttons([
@@ -127,23 +205,17 @@ dialogify
         console.log('cancel');
     });
 
-dialogify.showModal();
-                            </code></pre>
+dialogify.showModal();</code></pre>
                         </div>
+                        <div class="mdl-layout-spacer"></div>
                     </div>
 
                     <div class="mdl-grid">
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--5-col-desktop left-col">
-                            <h5 class="mdl-typeography--headline">Ajax Dialogify</h5>
-                            <p>
-                                load content from ajax
-                            </p>
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <h5 class="mdl-typeography--headline">Example - Ajax Dialogify</h5>
                             <button id="demo3" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
-                        </div>
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
-                            <h5 class="mdl-typeography--headline">Code Example</h5>
-                            <pre><code class="javascript">
-var options = {
+                            <pre><code class="javascript">var options = {
     ajaxPrefix: '',
     ajaxData: {var1: 'hello world'},
     ajaxComplete: function(){
@@ -156,59 +228,47 @@ var options = {
 
 new Dialogify('./view.html', options)
     .title('Ajax Dialogify')
-    .show();
-                            </code></pre>
+    .show();</code></pre>
                         </div>
+                        <div class="mdl-layout-spacer"></div>
                     </div>
 
                     <div class="mdl-grid">
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--5-col-desktop left-col">
-                            <h5 class="mdl-typeography--headline">Alert Dialogify</h5>
-                            <p>
-                            </p>
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <a name="dialogify.alert"></a>
+                            <h4 class="mdl-typeography--headline">Dialogify.alert</h4>
                             <button id="demo4" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
+                            <pre><code class="javascript">Dialogify.alert('Alert &lt;i&gt;Message&lt;/i&gt;');</code></pre>
                         </div>
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
-                            <h5 class="mdl-typeography--headline">Code Example</h5>
-                            <pre><code class="javascript">
-Dialogify.alert('Alert &lt;i&gt;Message&lt;/i&gt;');
-                            </code></pre>
-                        </div>
+                        <div class="mdl-layout-spacer"></div>
                     </div>
 
                     <div class="mdl-grid">
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--5-col-desktop left-col">
-                            <h5 class="mdl-typeography--headline">Confirm Dialogify</h5>
-                            <p>
-                            </p>
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <a name="dialogify.confirm"></a>
+                            <h4 class="mdl-typeography--headline">Dialogify.confirm</h4>
                             <button id="demo5" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
-                        </div>
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
-                            <h5 class="mdl-typeography--headline">Code Example</h5>
-                            <pre><code class="javascript">
-Dialogify.confirm('Do you like Dialogify ?', {
+                            <pre><code class="javascript">Dialogify.confirm('Do you like Dialogify ?', {
     ok: function(){
         Dialogify.alert('Yes, I do');
     },
     cancel: function(){
         Dialogify.alert('No, I don\'t');
     }
-});
-                            </code></pre>
+});</code></pre>
                         </div>
+                        <div class="mdl-layout-spacer"></div>
                     </div>
 
                     <div class="mdl-grid">
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--5-col-desktop left-col">
-                            <h5 class="mdl-typeography--headline">Prompt Dialogify</h5>
-                            <p>
-                            </p>
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <a name="dialogify.prompt"></a>
+                            <h4 class="mdl-typeography--headline">Dialogify.prompt</h4>
                             <button id="demo6" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
-                        </div>
-                        <div class="mdl-cell mdl-cell--8-col mdl-cell--7-col-desktop right-col">
-                            <h5 class="mdl-typeography--headline">Code Example</h5>
-                            <pre><code class="javascript">
-Dialogify.prompt('What\'s your name ?', {
+                            <pre><code class="javascript">Dialogify.prompt('What\'s your name ?', {
     placeholder: 'Enter your name',
     ok: function(val){
         Dialogify.alert('Hi! ' + val);
@@ -216,9 +276,9 @@ Dialogify.prompt('What\'s your name ?', {
     cancel: function(){
         Dialogify.alert('canceled');
     }
-});
-                            </code></pre>
+});</code></pre>
                         </div>
+                        <div class="mdl-layout-spacer"></div>
                     </div>
 
                 </div>
