@@ -305,8 +305,8 @@
             border-color: #117e96;
         }
         &::-webkit-input-placeholder,
-        &::-moz-placeholder,
-        &::-ms-input-placeholder,
+        &:-moz-placeholder,
+        &:-ms-input-placeholder,
         &::-moz-placeholder {
             color: #B3B3B3!important;
         }
