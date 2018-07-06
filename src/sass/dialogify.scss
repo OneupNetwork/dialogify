@@ -308,7 +308,7 @@
         &::-moz-placeholder,
         &::-ms-input-placeholder,
         &::-moz-placeholder {
-            color: #B3B3B3;
+            color: #B3B3B3!important;
         }
         &.is-error {
             border-color: #DE2427;
