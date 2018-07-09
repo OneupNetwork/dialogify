@@ -62,6 +62,7 @@
             })
             .click(function(e){
                 if (options.closable !== false && e.target == dialog) {
+                    $(self).triggerHandler('cancel');
                     dialog.close();
                 }
             })
