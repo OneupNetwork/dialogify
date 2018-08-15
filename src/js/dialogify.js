@@ -41,7 +41,7 @@
         var dialogHtml = '<div class="dialogify__content ' + widthClass + '"><div></div></div>';
 
         if (options.useDialogForm !== false) {
-            var edgeSubmitIssue = /edge/i.test(window.navigator.userAgent) ? ' onsubmit="return false;"' : '';
+            var edgeSubmitIssue = /(?:edge|iPad)/i.test(window.navigator.userAgent) ? ' onsubmit="return false;"' : '';
             dialogHtml = '<form method="dialog"' + edgeSubmitIssue + '>' + dialogHtml + '</form>';
         }
 
