@@ -166,6 +166,10 @@
                     $btn.attr('type', 'submit');
                 }
 
+                if (buttons[i].focused) {
+                    $btn.prop('autofocus', true);
+                }
+
                 if (buttons[i].disabled) {
                     $btn.disable();
                 }
@@ -229,6 +233,7 @@
                 {
                     text: '確定',
                     type: Dialogify.BUTTON_PRIMARY,
+                    focused: true,
                     click: function(e){
                         options.ok && options.ok.call(this);
                         this.close();
