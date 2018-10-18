@@ -71,17 +71,17 @@
                         <div class="mdl-cell mdl-cell--10-col">
                             <a name="dialogify"></a>
                             <h4 class="mdl-typeography--headline">Dialogify</h4>
-                            <pre><code class="javascript">var dialog = new Dialogify(source, dialogOptions)
+                            <pre><code class="javascript">let dialogify = new Dialogify(source, dialogOptions)
     .title(title)
     .buttons([button, buttonHtml...], buttonOptions)
     .on('show', showCallback)
     .on('close', closeCallback)
     .on('cancel', cancelCallback);
 
-dialog.show();
-dialog.showModal();
-dialog.close();
-dialog.isOpen();</code></pre>
+dialogify.show();
+dialogify.showModal();
+dialogify.close();
+dialogify.isOpen();</code></pre>
 
 <h6>source: string</h6>
 <table class="mdl-data-table mdl-js-data-table">
@@ -97,7 +97,7 @@ dialog.isOpen();</code></pre>
     </tbody>
 </table>
 
-<h6>dialogOptions: {}</h6>
+<h6>dialogOptions: {}, optional</h6>
 <table class="mdl-data-table mdl-js-data-table">
     <tbody>
         <tr>
@@ -146,7 +146,7 @@ dialog.isOpen();</code></pre>
             <td class="mdl-data-table__cell--non-numeric">ajaxComplete</td>
             <td class="mdl-data-table__cell--non-numeric">
                 function<br>
-                ajax 載入完成時呼叫，this 是 dialog object
+                ajax 載入完成時呼叫，this 是 dialogify object
             </td>
         </tr>
     </tbody>
@@ -183,7 +183,7 @@ dialog.isOpen();</code></pre>
             <td class="mdl-data-table__cell--non-numeric">click</td>
             <td class="mdl-data-table__cell--non-numeric">
                 function<br>
-                按鈕動作，this 是 dialog object
+                按鈕動作，this 是 dialogify object
             </td>
         </tr>
         <tr>
@@ -224,7 +224,7 @@ dialog.isOpen();</code></pre>
     </tbody>
 </table>
 
-<h6>buttonOptions: {}</h6>
+<h6>buttonOptions: {}, optional</h6>
 <table class="mdl-data-table mdl-js-data-table">
     <tbody>
         <tr>
@@ -244,14 +244,14 @@ dialog.isOpen();</code></pre>
             <td class="mdl-data-table__cell--non-numeric">callback</td>
             <td class="mdl-data-table__cell--non-numeric">
                 function<br>
-                相對應的時機呼叫的 function，this 是 dialog object<br>
+                相對應的時機呼叫的 function，this 是 dialogify object<br>
                 cancel 只有按右上關閉、點背景或按 esc 會呼叫
             </td>
         </tr>
     </tbody>
 </table>
 
-<h6>dialog method</h6>
+<h6>dialogify method & public variable</h6>
 <table class="mdl-data-table mdl-js-data-table">
     <tbody>
         <tr>
@@ -400,9 +400,39 @@ new Dialogify('./view.html', options)
                         <div class="mdl-layout-spacer"></div>
                         <div class="mdl-cell mdl-cell--10-col">
                             <a name="dialogify.alert"></a>
-                            <h4 class="mdl-typeography--headline">Dialogify.alert</h4>
+                            <h4 class="mdl-typeography--headline">Dialogify.alert(message, options)</h4>
+
+<h6>message: string</h6>
+<table class="mdl-data-table mdl-js-data-table">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">message</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                html text<br>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h6>options: {}, optional</h6>
+<table class="mdl-data-table mdl-js-data-table">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">close</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                function<br>
+                關閉時呼叫，this 是 dialogify object，沒特別動作可省略
+            </td>
+        </tr>
+    </tbody>
+</table><br>
+
                             <button id="demo4" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
-                            <pre><code class="javascript">Dialogify.alert('Alert &lt;i&gt;Message&lt;/i&gt;');</code></pre>
+                            <pre><code class="javascript">Dialogify.alert('Alert &lt;i&gt;Message&lt;/i&gt;', {
+    close: function(){
+        console.log('alert close');
+    }
+});</code></pre>
                         </div>
                         <div class="mdl-layout-spacer"></div>
                     </div>
@@ -411,7 +441,40 @@ new Dialogify('./view.html', options)
                         <div class="mdl-layout-spacer"></div>
                         <div class="mdl-cell mdl-cell--10-col">
                             <a name="dialogify.confirm"></a>
-                            <h4 class="mdl-typeography--headline">Dialogify.confirm</h4>
+                            <h4 class="mdl-typeography--headline">Dialogify.confirm(message, options)</h4>
+
+<h6>message: string</h6>
+<table class="mdl-data-table mdl-js-data-table">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">message</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                html text<br>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h6>options: {}, optional</h6>
+<table class="mdl-data-table mdl-js-data-table">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">ok</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                function<br>
+                按確定時呼叫，this 是 dialogify object，沒特別動作可省略
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">cancel</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                function<br>
+                按取消時呼叫，this 是 dialogify object，沒特別動作可省略
+            </td>
+        </tr>
+    </tbody>
+</table><br>
+
                             <button id="demo5" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
                             <pre><code class="javascript">Dialogify.confirm('Do you like Dialogify ?', {
     ok: function(){
@@ -429,7 +492,47 @@ new Dialogify('./view.html', options)
                         <div class="mdl-layout-spacer"></div>
                         <div class="mdl-cell mdl-cell--10-col">
                             <a name="dialogify.prompt"></a>
-                            <h4 class="mdl-typeography--headline">Dialogify.prompt</h4>
+                            <h4 class="mdl-typeography--headline">Dialogify.prompt(message, options)</h4>
+
+<h6>message: string</h6>
+<table class="mdl-data-table mdl-js-data-table">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">message</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                html text<br>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h6>options: {}, optional</h6>
+<table class="mdl-data-table mdl-js-data-table">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">placeholder</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                string<br>
+                輸入框的 placeholder，可省略
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">ok</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                function<br>
+                按確定時呼叫，this 是 dialogify object，沒特別動作可省略
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">cancel</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                function<br>
+                按取消時呼叫，this 是 dialogify object，沒特別動作可省略
+            </td>
+        </tr>
+    </tbody>
+</table><br>
+
                             <button id="demo6" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
                             <pre><code class="javascript">Dialogify.prompt('What\'s your name ?', {
     placeholder: 'Enter your name',
@@ -515,7 +618,7 @@ new Dialogify('./view.html', options)
         });
 
         $('#demo3').click(function(){
-            var options = {
+            let options = {
                 ajaxPrefix: '',
                 ajaxComplete: function(){
                     console.log('ajax complete');
@@ -531,7 +634,11 @@ new Dialogify('./view.html', options)
         });
 
         $('#demo4').click(function(){
-            Dialogify.alert('Alert <i>Message</i>');
+            Dialogify.alert('Alert <i>Message</i>', {
+                close: function(){
+                    console.log('alert close');
+                }
+            });
         });
 
         $('#demo5').click(function(){
