@@ -31,9 +31,11 @@
                 <a class="mdl-navigation__link" href="#gettingstarted">Getting Started</a>
                 <a class="mdl-navigation__link" href="#disablecssinjection">Disable Css Injection</a>
                 <a class="mdl-navigation__link" href="#dialogify">Dialogify</a>
+                <a class="mdl-navigation__link" href="#globalconfig">Global Config</a>
                 <a class="mdl-navigation__link" href="#dialogify.alert">Dialogify.alert</a>
                 <a class="mdl-navigation__link" href="#dialogify.confirm">Dialogify.confirm</a>
                 <a class="mdl-navigation__link" href="#dialogify.prompt">Dialogify.prompt</a>
+                <a class="mdl-navigation__link" href="#dialogify.closeall">Dialogify.closeAll</a>
             </nav>
         </div>
         <main class="mdl-layout__content">
@@ -304,6 +306,31 @@ dialogify.isOpen();</code></pre>
                     <div class="mdl-grid">
                         <div class="mdl-layout-spacer"></div>
                         <div class="mdl-cell mdl-cell--10-col">
+                            <a name="globalconfig"></a>
+                            <h4 class="mdl-typeography--headline">Global Config (optional)</h4>
+                            <p>全域設定，需寫在載入 dialogify.js 之前，沒特別需求可不設定</p>
+                            <pre><code class="html">&lt;script&gt;window.dialogifyConfig = {locale: 'en_US'};&lt;/script&gt;
+&lt;script src="path/to/dialogify.min.js"&gt;&lt;/script&gt;</code></pre>
+
+<h6>dialogifyConfig: {}</h6>
+<table class="mdl-data-table mdl-js-data-table">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">locale</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                'zh_TW' (default) | 'zh_CN' | 'en_US'
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+                        </div>
+                        <div class="mdl-layout-spacer"></div>
+                    </div>
+
+                    <div class="mdl-grid">
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
                             <h5 class="mdl-typeography--headline">Example - Normal Dialogify</h5>
                             <button id="demo1" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
                             <pre><code class="html">&lt;script type="text/template" id="demo1_template"&gt;
@@ -543,6 +570,17 @@ new Dialogify('./view.html', options)
         Dialogify.alert('canceled');
     }
 });</code></pre>
+                        </div>
+                        <div class="mdl-layout-spacer"></div>
+                    </div>
+
+
+                    <div class="mdl-grid">
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <a name="dialogify.closeall"></a>
+                            <h4 class="mdl-typeography--headline">Dialogify.closeAll()</h4>
+                            <p>關閉所有 dialogify 燈箱</p>
                         </div>
                         <div class="mdl-layout-spacer"></div>
                     </div>

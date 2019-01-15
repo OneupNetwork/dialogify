@@ -24,5 +24,16 @@ All modern browser and IE11
 ## Designed by
 [Phoebe](https://github.com/Phoebe1226)
 
+## Contribute
+* Fork & clone this repo
+    ```
+    npm install
+    gulp build
+    ```
+* Create branch and commit your changes
+* Open a pull request
+
+Feel free to contribute
+
 ## License
 MIT

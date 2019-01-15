@@ -174,7 +174,7 @@
                     $btn.disable();
                 }
 
-                $btn.text(buttons[i].text || '關閉');
+                $btn.text(buttons[i].text || Dialogify.LOCALE[config.locale].close);
                 $btn.click(function(e){
                     if (typeof $(this).data('click') == 'function') {
                         $(this).data('click').call(self, e);
@@ -205,6 +205,11 @@
     Dialogify.BUTTON_PRIMARY = 'btn-primary';
     Dialogify.BUTTON_DANGER = 'btn-danger';
 
+    Dialogify.LOCALE = {};
+    Dialogify.LOCALE['zh_TW'] = {ok: '確定', cancel: '取消', close: '關閉'};
+    Dialogify.LOCALE['zh_CN'] = {ok: '确定', cancel: '取消', close: '关闭'};
+    Dialogify.LOCALE['en_US'] = {ok: 'Ok', cancel: 'Cancel', close: 'Close'};
+
     Dialogify.alert = function(message, options){
         if (options == null || typeof options != 'object') {
             options = {};
@@ -232,14 +237,14 @@
         new Dialogify('<p>' + message + '</p>')
             .buttons([
                 {
-                    text: '取消',
+                    text: Dialogify.LOCALE[config.locale].cancel,
                     click: function(e){
                         options.cancel && options.cancel.call(this);
                         this.close();
                     }
                 },
                 {
-                    text: '確定',
+                    text: Dialogify.LOCALE[config.locale].ok,
                     type: Dialogify.BUTTON_PRIMARY,
                     focused: true,
                     click: function(e){
@@ -266,14 +271,14 @@
         new Dialogify($html.html())
             .buttons([
                 {
-                    text: '取消',
+                    text: Dialogify.LOCALE[config.locale].cancel,
                     click: function(e){
                         options.cancel && options.cancel.call(this);
                         this.close();
                     }
                 },
                 {
-                    text: '確定',
+                    text: Dialogify.LOCALE[config.locale].ok,
                     type: Dialogify.BUTTON_PRIMARY,
                     click: function(e){
                         var value = this.$content.find('.dialogify-prompt-input').val();
@@ -287,6 +292,21 @@
             })
             .showModal();
     };
+
+    Dialogify.closeAll = function(){
+        $('dialog[id^=dialogify_]').each(function(){
+            this.close();
+        });
+    };
+
+    // global config
+    var config = window.dialogifyConfig;
+    if (config == null || typeof config != 'object') {
+        config = {};
+    }
+
+    // default global config
+    config.locale = config.locale || 'zh_TW';
 
     // inject css
     if (!$('#dialogifyCss').length) {
