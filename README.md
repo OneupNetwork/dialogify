@@ -28,6 +28,7 @@ All modern browser and IE11
 * Fork & clone this repo
     ```
     npm install
+    npm install gulp-cli -g
     gulp build
     ```
 * Create branch and commit your changes
