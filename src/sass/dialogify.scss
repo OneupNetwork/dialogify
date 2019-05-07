@@ -140,23 +140,6 @@
             opacity: 1;
         }
     }
-    .dialogify__close_custom {
-        position: absolute;
-        top: 0px;
-        right: 0px;
-        color: #00555f;
-        img {
-            width: 36px;
-            height: 36px;
-            opacity: 0.85;
-        }
-        &:hover{
-          cursor: pointer
-        }
-        &:hover img {
-            opacity: 1;
-        }
-    }
     img.dialogify-ajax-loading {
         position: absolute;
         left: 50%;
