@@ -78,7 +78,7 @@
                 $.each(customClose.style, function(key, value) {
                     customCss += key + ': ' + value + '; ';
                 });
-                closeImage = escape(customClose.imageUrl.trim());
+                closeImage = customClose.imageUrl.trim();
             }
             var $closeButton = $('<a>').addClass(closeClass)
                 .append('<img src="' + closeImage + '" style="' + customCss + '">')
