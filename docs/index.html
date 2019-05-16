@@ -13,6 +13,11 @@
         .content{padding:40px 56px;}
         .mdl-switch{margin:8px;}
         td:first-child{font-weight: 600;}
+
+        .custom-close {top: 0px !important;right: 0px !important;}
+        .custom-close img {width: 36px !important;height: 36px !important;opacity: 1 !important;}
+
+        .custom-content {background-color:gold;border-radius: 12px !important;margin: 12px !important;}
     </style>
 </head>
 <body>
@@ -126,27 +131,17 @@ dialogify.isOpen();</code></pre>
             </td>
         </tr>
         <tr>
-            <td class="mdl-data-table__cell--non-numeric">style</td>
+            <td class="mdl-data-table__cell--non-numeric">dialog</td>
             <td class="mdl-data-table__cell--non-numeric">
-                {'selector': {'css-attribute': 'value'}}<br>
-                新增自訂 CSS 屬性，可一次設定多個屬性，EX:<br>
-<pre>{
-  '.abc': {
-    'css-attribute1': 'value1',
-    'css-attribute2': 'value2'
-  },
-  '#def': {
-    'css-attribute1': 'value1',
-    'css-attribute2': 'value2'
-  }
-}</pre>
+                object<br>
+                設定燈箱樣式，詳見下面的 dialogOptions.dialog
             </td>
         </tr>
         <tr>
-            <td class="mdl-data-table__cell--non-numeric">customClose</td>
+            <td class="mdl-data-table__cell--non-numeric">closeButton</td>
             <td class="mdl-data-table__cell--non-numeric">
-                {imageUrl: 'url', style:{'css-attribute': 'value'}}<br>
-                自定義右上角關閉的圖案，可用 style 來設定該圖片 CSS
+                object<br>
+                設定關閉鈕樣式，詳見下面的 dialogOptions.closeButton
             </td>
         </tr>
         <tr>
@@ -174,6 +169,46 @@ dialogify.isOpen();</code></pre>
                 function<br>
                 ajax 載入完成時呼叫，this 是 dialogify object
             </td>
+        </tr>
+    </tbody>
+</table>
+
+<h6>dialogOptions.dialog: {}</h6>
+<table class="mdl-data-table mdl-js-data-table">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">style</td>
+            <td class="mdl-data-table__cell--non-numeric">object<br>設定最外層燈箱樣式，同 jQuery .css() 設定規則</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">className</td>
+            <td class="mdl-data-table__cell--non-numeric">string<br>設定最外層燈箱 class name</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">contentStyle</td>
+            <td class="mdl-data-table__cell--non-numeric">object<br>設定內容樣式，同 jQuery .css() 設定規則</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">contentClassName</td>
+            <td class="mdl-data-table__cell--non-numeric">string<br>設定內容 class name</td>
+        </tr>
+    </tbody>
+</table>
+
+<h6>dialogOptions.closeButton: {}</h6>
+<table class="mdl-data-table mdl-js-data-table">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">image</td>
+            <td class="mdl-data-table__cell--non-numeric">string<br>設定關閉鈕圖片</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">style</td>
+            <td class="mdl-data-table__cell--non-numeric">object<br>設定關閉鈕樣式，同 jQuery .css() 設定規則</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">className</td>
+            <td class="mdl-data-table__cell--non-numeric">string<br>設定關閉鈕 class name</td>
         </tr>
     </tbody>
 </table>
@@ -345,6 +380,14 @@ dialogify.isOpen();</code></pre>
                 'zh_TW' (default) | 'zh_CN' | 'en_US'
             </td>
         </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">dialog</td>
+            <td class="mdl-data-table__cell--non-numeric">同 dialogOptions.dialog，會影響全部燈箱</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">closeButton</td>
+            <td class="mdl-data-table__cell--non-numeric">同 dialogOptions.closeButton，會影響全部燈箱</td>
+        </tr>
     </tbody>
 </table>
 
@@ -440,8 +483,37 @@ dialogify.showModal();</code></pre>
     }
 };
 
-new Dialogify('./view.html', options)
+new Dialogify('./ajax.html', options)
     .title('Ajax Dialogify')
+    .show();</code></pre>
+                        </div>
+                        <div class="mdl-layout-spacer"></div>
+                    </div>
+
+                    <div class="mdl-grid">
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <h5 class="mdl-typeography--headline">Example - Style Dialogify</h5>
+                            <button id="demo7" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
+                            <pre><code class="javascript">let options = {
+    dialog: {
+        style: {'background-color': 'transparent', 'box-shadow': 'none'},
+        contentClassName: 'custom-content'
+    },
+    closeButton: {
+        image: 'img/x.png',
+        className: 'custom-close'
+    }
+};
+
+let html = '&lt;b&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.&lt;/b&gt;';
+new Dialogify(html, options)
+    .title('Style Dialogify')
+    .buttons([
+        {
+            type: Dialogify.BUTTON_PRIMARY
+        }
+    ])
     .show();</code></pre>
                         </div>
                         <div class="mdl-layout-spacer"></div>
@@ -690,8 +762,31 @@ new Dialogify('./view.html', options)
                 }
             };
 
-            new Dialogify('./view.html', options)
+            new Dialogify('./ajax.html', options)
                 .title('Ajax Dialogify')
+                .show();
+        });
+
+        $('#demo7').click(function(){
+            let options = {
+                dialog: {
+                    style: {'background-color': 'transparent', 'box-shadow': 'none'},
+                    contentClassName: 'custom-content'
+                },
+                closeButton: {
+                    image: 'img/x.png',
+                    className: 'custom-close'
+                }
+            };
+
+            let html = '<b>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.</b>';
+            new Dialogify(html, options)
+                .title('Style Dialogify')
+                .buttons([
+                    {
+                        type: Dialogify.BUTTON_PRIMARY
+                    }
+                ])
                 .show();
         });
 

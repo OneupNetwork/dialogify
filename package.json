@@ -7,7 +7,7 @@
     "url": "https://github.com/OneupNetwork/dialogify"
   },
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "gulp": "^4.0.1",
     "gulp-autoprefixer": "^6.1.0",
     "gulp-concat": "^2.6.1",
