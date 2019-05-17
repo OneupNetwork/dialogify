@@ -21,6 +21,7 @@ gulp.task('sass', function() {
 gulp.task('js', function() {
     return gulp.src([
             p('src/js/dialog-polyfill.js'),
+            p('src/js/ResizeSensor.js'),
             p('src/js/dialogify.js')
         ])
         .pipe(sourcemaps.init())

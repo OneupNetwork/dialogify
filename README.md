@@ -16,7 +16,6 @@ new Dialogify('dialog content')
 
 ## Dependencies
 * [jQuery](https://jquery.com/)
-* [dialog-polyfill](https://github.com/GoogleChrome/dialog-polyfill) - for compatible with old browser
 
 ## Browser compatibility
 All modern browser and IE11

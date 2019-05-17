@@ -151,6 +151,12 @@
             $(this).on(event, handler);
             return this;
         };
+
+        // fix blurry render in some browser
+        // see also https://stackoverflow.com/a/42256897/3188956
+        new ResizeSensor(dialog, function(){
+            roundCssTransformMatrix(dialog);
+        });
     };
 
     // set title
@@ -339,6 +345,25 @@
             this.close();
         });
     };
+
+    function roundCssTransformMatrix(el){
+        el.style.transform = '';
+
+        var mx = window.getComputedStyle(el, null);
+        mx = mx.getPropertyValue('transform') ||
+             mx.getPropertyValue('-webkit-transform') ||
+             mx.getPropertyValue('-moz-transform') ||
+             mx.getPropertyValue('-ms-transform') ||
+             mx.getPropertyValue('-o-transform') || false;
+
+        if (mx) {
+            var values = mx.replace(/[ \(\)]|matrix/g, '').split(',');
+            values[4] = Math.ceil(values[4]);
+            values[5] = Math.ceil(values[5]);
+
+            $(el).css('transform', 'matrix(' + values.join() + ')');
+        }
+    }
 
     // global config
     var config = window.dialogifyConfig;

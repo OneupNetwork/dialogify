@@ -3,6 +3,7 @@
 ## 1.0.2
     add dialog style options
     add close button style options
+    fix blurry render in some browser
 
 ## 1.0.1
     add global config
