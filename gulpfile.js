@@ -1,6 +1,6 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
-var uglify = require('gulp-uglify');
+var terser = require('gulp-terser');
 var autoprefixer = require('gulp-autoprefixer');
 var sourcemaps = require('gulp-sourcemaps');
 var concat = require('gulp-concat');
@@ -33,7 +33,7 @@ gulp.task('js', function() {
                 }
             }
         }))
-        .pipe(uglify())
+        .pipe(terser())
         .on('error', function(err){
             console.log(err.toString())
          })
