@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3
+    change package name
+    change gulp-uglify to gulp-terser
+    refactoring to ES6 (let, template, class)
+
 ## 1.0.2
     add dialog style options
     add close button style options

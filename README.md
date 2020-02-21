@@ -18,7 +18,7 @@ new Dialogify('dialog content')
 * [jQuery](https://jquery.com/)
 
 ## Browser compatibility
-All modern browser and IE11
+All modern browser
 
 ## Designed by
 [Phoebe](https://github.com/Phoebe1226)

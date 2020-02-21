@@ -1,6 +1,6 @@
 {
-  "name": "dialogify",
-  "version": "1.0.1",
+  "name": "@oneup_network/dialogify",
+  "version": "1.0.3",
   "description": "A javascript plugin for creating dialog/lightbox, implements with HTMLDialogElement.",
   "repository": {
     "type": "git",
@@ -15,7 +15,6 @@
     "gulp-sass": "^4.0.2",
     "gulp-size": "^3.0.0",
     "gulp-sourcemaps": "^2.6.5",
-    "gulp-terser": "^1.2.0",
-    "gulp-uglify": "^3.0.2"
+    "gulp-terser": "^1.2.0"
   }
 }
