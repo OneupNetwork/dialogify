@@ -1,13 +1,13 @@
-var gulp = require('gulp');
-var sass = require('gulp-sass');
-var terser = require('gulp-terser');
-var autoprefixer = require('gulp-autoprefixer');
-var sourcemaps = require('gulp-sourcemaps');
-var concat = require('gulp-concat');
-var size = require('gulp-size');
-var fileinclude = require('gulp-file-include');
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const terser = require('gulp-terser');
+const autoprefixer = require('gulp-autoprefixer');
+const sourcemaps = require('gulp-sourcemaps');
+const concat = require('gulp-concat');
+const size = require('gulp-size');
+const fileinclude = require('gulp-file-include');
 
-var p = function (path) {
+let p = function (path) {
     return __dirname + (path.charAt(0) === '/' ? '' : '/') + path;
 };
 
