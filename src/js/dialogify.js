@@ -275,7 +275,11 @@
             options = {};
         }
 
-        new Dialogify(`<p>${message}</p>`)
+        if (options.dialogOptions == null || typeof options.dialogOptions != 'object') {
+            options.dialogOptions = {};
+        }
+
+        new Dialogify(`<p>${message}</p>`, options.dialogOptions)
             .buttons([{
                 type: Dialogify.BUTTON_DANGER,
                 click: function(e){
@@ -294,7 +298,11 @@
             options = {};
         }
 
-        new Dialogify(`<p>${message}</p>`)
+        if (options.dialogOptions == null || typeof options.dialogOptions != 'object') {
+            options.dialogOptions = {};
+        }
+
+        new Dialogify(`<p>${message}</p>`, options.dialogOptions)
             .buttons([
                 {
                     text: Dialogify.LOCALE[config.locale].cancel,
@@ -324,11 +332,15 @@
             options = {};
         }
 
+        if (options.dialogOptions == null || typeof options.dialogOptions != 'object') {
+            options.dialogOptions = {};
+        }
+
         let placeholder = options.placeholder ? ` placeholder="${options.placeholder}"` : '';
         let $html = $('<div>').html(`<p>${message}</p>`);
         $html.append(`<input type="text" class="text-field dialogify-prompt-input"${placeholder}>`);
 
-        new Dialogify($html.html())
+        new Dialogify($html.html(), options.dialogOptions)
             .buttons([
                 {
                     text: Dialogify.LOCALE[config.locale].cancel,
