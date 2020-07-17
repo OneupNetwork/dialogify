@@ -547,6 +547,13 @@ new Dialogify(html, options)
                 關閉時呼叫，this 是 dialogify object，沒特別動作可省略
             </td>
         </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">dialogOptions</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                object<br>
+                see dialogOptions above
+            </td>
+        </tr>
     </tbody>
 </table><br>
 
@@ -554,6 +561,9 @@ new Dialogify(html, options)
                             <pre><code class="javascript">Dialogify.alert('Alert &lt;i&gt;Message&lt;/i&gt;', {
     close: function(){
         console.log('alert close');
+    },
+    dialogOptions: {
+        closable: false
     }
 });</code></pre>
                         </div>
@@ -593,6 +603,13 @@ new Dialogify(html, options)
             <td class="mdl-data-table__cell--non-numeric">
                 function<br>
                 按取消時呼叫，this 是 dialogify object，沒特別動作可省略
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">dialogOptions</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                object<br>
+                see dialogOptions above
             </td>
         </tr>
     </tbody>
@@ -651,6 +668,13 @@ new Dialogify(html, options)
             <td class="mdl-data-table__cell--non-numeric">
                 function<br>
                 按取消時呼叫，this 是 dialogify object，沒特別動作可省略
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">dialogOptions</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                object<br>
+                see dialogOptions above
             </td>
         </tr>
     </tbody>
@@ -795,6 +819,9 @@ new Dialogify(html, options)
             Dialogify.alert('Alert <i>Message</i>', {
                 close: function(){
                     console.log('alert close');
+                },
+                dialogOptions: {
+                    closable: false
                 }
             });
         });
