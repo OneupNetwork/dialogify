@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+    add dialogOptions in static dialog method
+    change some style
+
 ## 1.0.3
     change package name
     change gulp-uglify to gulp-terser
