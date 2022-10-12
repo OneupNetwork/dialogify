@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.5
+    build with esbuild
+    add promise api for static methods
+    remove dialog-polyfill.js
+    remove ResizeSensor.js
+
 ## 1.0.4
     add dialogOptions in static dialog method
     change some style

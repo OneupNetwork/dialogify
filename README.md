@@ -9,7 +9,7 @@ new Dialogify('dialog content')
     .showModal();
 ```
 
-![basic dialogify](https://raw.githubusercontent.com/OneupNetwork/dialogify/master/docs/img/screenshot1.png)
+![basic dialogify](docs/img/screenshot1.png)
 
 ## Usage and examples
 [https://oneupnetwork.github.io/dialogify/](https://oneupnetwork.github.io/dialogify/)
