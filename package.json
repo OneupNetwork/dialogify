@@ -7,7 +7,7 @@
     "url": "https://github.com/OneupNetwork/dialogify"
   },
   "license": "MIT",
-  "main": "dist/dialogify.min.js",
+  "browser": "dist/dialogify.min.js",
   "files": [
     "dist"
   ],
