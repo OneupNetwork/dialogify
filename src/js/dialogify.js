@@ -429,5 +429,3 @@
 
     window.Dialogify = Dialogify;
 })(jQuery, window);
-
-export default Dialogify;
