@@ -2,7 +2,7 @@
  * dialogify
  * https://github.com/OneupNetwork/dialogify
  */
-(function($, window, dialogPolyfill, undefined){
+(function ($, window, undefined) {
     'use strict';
 
     // global config
@@ -15,10 +15,9 @@
     config.locale = config.locale || 'zh_TW';
 
     class Dialogify {
-        
-        constructor (source, options) {
+
+        constructor(source, options) {
             let dialog = window.document.createElement('dialog');
-            dialogPolyfill.registerDialog(dialog);
 
             if (options == null || typeof options != 'object') {
                 options = {};
@@ -33,7 +32,7 @@
             let ajax = false;
             if (source.charAt(0) == '#') {
                 content = $(source).html();
-            } else if(source.indexOf(ajaxPrefix) == 0){
+            } else if (source.indexOf(ajaxPrefix) == 0) {
                 let loadingSvg = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMzZweCcgaGVpZ2h0PSczNnB4JyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCIgY2xhc3M9InVpbC1kZWZhdWx0Ij48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0ibm9uZSIgY2xhc3M9ImJrIj48L3JlY3Q+PHJlY3QgIHg9JzQ2LjUnIHk9JzQwJyB3aWR0aD0nNycgaGVpZ2h0PScyMCcgcng9JzUnIHJ5PSc1JyBmaWxsPScjMDA5NDk5JyB0cmFuc2Zvcm09J3JvdGF0ZSgwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMHMnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJy8+PC9yZWN0PjxyZWN0ICB4PSc0Ni41JyB5PSc0MCcgd2lkdGg9JzcnIGhlaWdodD0nMjAnIHJ4PSc1JyByeT0nNScgZmlsbD0nIzAwOTQ5OScgdHJhbnNmb3JtPSdyb3RhdGUoMzAgNTAgNTApIHRyYW5zbGF0ZSgwIC0zMCknPiAgPGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nb3BhY2l0eScgZnJvbT0nMScgdG89JzAnIGR1cj0nMXMnIGJlZ2luPScwLjA4MzMzMzMzMzMzMzMzMzMzcycgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnLz48L3JlY3Q+PHJlY3QgIHg9JzQ2LjUnIHk9JzQwJyB3aWR0aD0nNycgaGVpZ2h0PScyMCcgcng9JzUnIHJ5PSc1JyBmaWxsPScjMDA5NDk5JyB0cmFuc2Zvcm09J3JvdGF0ZSg2MCA1MCA1MCkgdHJhbnNsYXRlKDAgLTMwKSc+ICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdvcGFjaXR5JyBmcm9tPScxJyB0bz0nMCcgZHVyPScxcycgYmVnaW49JzAuMTY2NjY2NjY2NjY2NjY2NjZzJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScvPjwvcmVjdD48cmVjdCAgeD0nNDYuNScgeT0nNDAnIHdpZHRoPSc3JyBoZWlnaHQ9JzIwJyByeD0nNScgcnk9JzUnIGZpbGw9JyMwMDk0OTknIHRyYW5zZm9ybT0ncm90YXRlKDkwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMC4yNXMnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJy8+PC9yZWN0PjxyZWN0ICB4PSc0Ni41JyB5PSc0MCcgd2lkdGg9JzcnIGhlaWdodD0nMjAnIHJ4PSc1JyByeT0nNScgZmlsbD0nIzAwOTQ5OScgdHJhbnNmb3JtPSdyb3RhdGUoMTIwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMC4zMzMzMzMzMzMzMzMzMzMzcycgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnLz48L3JlY3Q+PHJlY3QgIHg9JzQ2LjUnIHk9JzQwJyB3aWR0aD0nNycgaGVpZ2h0PScyMCcgcng9JzUnIHJ5PSc1JyBmaWxsPScjMDA5NDk5JyB0cmFuc2Zvcm09J3JvdGF0ZSgxNTAgNTAgNTApIHRyYW5zbGF0ZSgwIC0zMCknPiAgPGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nb3BhY2l0eScgZnJvbT0nMScgdG89JzAnIGR1cj0nMXMnIGJlZ2luPScwLjQxNjY2NjY2NjY2NjY2NjdzJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScvPjwvcmVjdD48cmVjdCAgeD0nNDYuNScgeT0nNDAnIHdpZHRoPSc3JyBoZWlnaHQ9JzIwJyByeD0nNScgcnk9JzUnIGZpbGw9JyMwMDk0OTknIHRyYW5zZm9ybT0ncm90YXRlKDE4MCA1MCA1MCkgdHJhbnNsYXRlKDAgLTMwKSc+ICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdvcGFjaXR5JyBmcm9tPScxJyB0bz0nMCcgZHVyPScxcycgYmVnaW49JzAuNXMnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJy8+PC9yZWN0PjxyZWN0ICB4PSc0Ni41JyB5PSc0MCcgd2lkdGg9JzcnIGhlaWdodD0nMjAnIHJ4PSc1JyByeT0nNScgZmlsbD0nIzAwOTQ5OScgdHJhbnNmb3JtPSdyb3RhdGUoMjEwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMC41ODMzMzMzMzMzMzMzMzM0cycgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnLz48L3JlY3Q+PHJlY3QgIHg9JzQ2LjUnIHk9JzQwJyB3aWR0aD0nNycgaGVpZ2h0PScyMCcgcng9JzUnIHJ5PSc1JyBmaWxsPScjMDA5NDk5JyB0cmFuc2Zvcm09J3JvdGF0ZSgyNDAgNTAgNTApIHRyYW5zbGF0ZSgwIC0zMCknPiAgPGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nb3BhY2l0eScgZnJvbT0nMScgdG89JzAnIGR1cj0nMXMnIGJlZ2luPScwLjY2NjY2NjY2NjY2NjY2NjZzJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScvPjwvcmVjdD48cmVjdCAgeD0nNDYuNScgeT0nNDAnIHdpZHRoPSc3JyBoZWlnaHQ9JzIwJyByeD0nNScgcnk9JzUnIGZpbGw9JyMwMDk0OTknIHRyYW5zZm9ybT0ncm90YXRlKDI3MCA1MCA1MCkgdHJhbnNsYXRlKDAgLTMwKSc+ICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdvcGFjaXR5JyBmcm9tPScxJyB0bz0nMCcgZHVyPScxcycgYmVnaW49JzAuNzVzJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScvPjwvcmVjdD48cmVjdCAgeD0nNDYuNScgeT0nNDAnIHdpZHRoPSc3JyBoZWlnaHQ9JzIwJyByeD0nNScgcnk9JzUnIGZpbGw9JyMwMDk0OTknIHRyYW5zZm9ybT0ncm90YXRlKDMwMCA1MCA1MCkgdHJhbnNsYXRlKDAgLTMwKSc+ICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdvcGFjaXR5JyBmcm9tPScxJyB0bz0nMCcgZHVyPScxcycgYmVnaW49JzAuODMzMzMzMzMzMzMzMzMzNHMnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJy8+PC9yZWN0PjxyZWN0ICB4PSc0Ni41JyB5PSc0MCcgd2lkdGg9JzcnIGhlaWdodD0nMjAnIHJ4PSc1JyByeT0nNScgZmlsbD0nIzAwOTQ5OScgdHJhbnNmb3JtPSdyb3RhdGUoMzMwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMC45MTY2NjY2NjY2NjY2NjY2cycgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnLz48L3JlY3Q+PC9zdmc+';
                 content = `<div class="dialogify-ajax-content"><img class="dialogify-ajax-loading" src="${loadingSvg}"></div>`;
                 ajax = true;
@@ -41,7 +40,7 @@
                 content = source;
             }
 
-            content  = `<div class="dialogify__body">${content}</div>`;
+            content = `<div class="dialogify__body">${content}</div>`;
 
             let widthClass = options.size || 'dialogify__fixedwidth';
             let dialogClass = 'dialogify';
@@ -62,17 +61,17 @@
             $(dialog).attr('id', this.id)
                 .addClass(dialogClass)
                 .append(dialogHtml)
-                .on('close', function(e){
+                .on('close', function (e) {
                     $(self).triggerHandler('close');
                     $(this).remove();
                 })
-                .on('cancel', function(e){
+                .on('cancel', function (e) {
                     $(self).triggerHandler('cancel');
                     if (options.closable === false) {
                         e.preventDefault();
                     }
                 })
-                .click(function(e){
+                .click(function (e) {
                     if (options.closable !== false && e.target == dialog) {
                         $(self).triggerHandler('cancel');
                         dialog.close();
@@ -97,7 +96,7 @@
                 let $closeButton = $('<a>').addClass('dialogify__close')
                     .css(closeButtonStyle)
                     .append($closeImage)
-                    .click(function(e){
+                    .click(function (e) {
                         $(dialog).triggerHandler('cancel');
                         dialog.close();
                     });
@@ -130,7 +129,7 @@
 
             // ajax content
             if (ajax) {
-                $.get(source, options.ajaxData || {}, function(resp){
+                $.get(source, options.ajaxData || {}, function (resp) {
                     if (options.ajaxComplete) {
                         options.ajaxComplete.call(self);
                     }
@@ -140,69 +139,72 @@
             }
 
             // public methods
-            this.showModal = function(){
+            this.showModal = function () {
                 dialog.showModal();
                 $(this).triggerHandler('show');
             };
 
-            this.show = function(){
+            this.show = function () {
                 dialog.show();
                 $(this).triggerHandler('show');
             };
 
-            this.close = function(){
+            this.close = function () {
                 dialog.close();
             };
 
-            this.isOpen = function(){
+            this.isOpen = function () {
                 return dialog.open;
             };
 
-            this.on = function(event, handler){
+            this.on = function (event, handler) {
                 $(this).on(event, handler);
                 return this;
             };
 
             // fix blurry render in some browser
+            // require https://github.com/marcj/css-element-queries/blob/master/src/ResizeSensor.js
             // see also https://stackoverflow.com/a/42256897/3188956
-            new ResizeSensor(dialog, function(){
-                roundCssTransformMatrix(dialog);
-            });
+            if (window.ResizeSensor) {
+                new ResizeSensor(dialog, function () {
+                    roundCssTransformMatrix(dialog);
+                });
+            }
         }
 
         // set title
-        title (title){
+        title(title) {
             let $titleBox = $('<h5>').addClass('dialogify_title')
                 .append('<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/PjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iJiN4NTcxNjsmI3g1QzY0O18xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDEyIDEwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAxMiAxMDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxnPjxyZWN0IHk9IjEiIHN0eWxlPSJmaWxsOiM4RDhEOEQ7IiB3aWR0aD0iMyIgaGVpZ2h0PSIzIi8+PHJlY3QgeT0iNyIgc3R5bGU9ImZpbGw6IzhEOEQ4RDsiIHdpZHRoPSIzIiBoZWlnaHQ9IjMiLz48cmVjdCB4PSIzIiB5PSI0IiBzdHlsZT0iZmlsbDojOEQ4RDhEOyIgd2lkdGg9IjMiIGhlaWdodD0iMyIvPjwvZz48L3N2Zz4=">')
                 .append(title);
-    
+
             if (this.$content.find('.dialogify_title').length) {
                 this.$content.find('.dialogify_title').replaceWith($titleBox);
             } else {
                 this.$content.prepend($titleBox);
             }
-    
+
             return this;
         }
 
         // set buttons
-        buttons (buttons, options){
+        buttons(buttons, options) {
             if (!Array.isArray(buttons)) {
                 buttons = [];
             }
-    
+
             if (options == null || typeof options != 'object') {
                 options = {};
             }
-    
+
             this.$buttonList = {};
-    
+
             let $buttonBox = $('<div>')
                 .addClass('btn-box')
                 .addClass(options.position || 'text-right');
-    
+
             let self = this;
-            for (let i = 0;i < buttons.length;i++){
+            for (let i = 0; i < buttons.length; i++) {
                 if (typeof buttons[i] == 'string') {
                     let $btn = $(buttons[i]);
                     let btnId = $btn.attr('id') || i;
@@ -212,42 +214,42 @@
                     if (buttons[i] == null || typeof buttons[i] != 'object') {
                         buttons[i] = {};
                     }
-    
+
                     let $btn = $('<button type="button">')
                         .addClass('btn btn-insert')
                         .addClass(buttons[i].type || '')
                         .data('click', buttons[i].click);
-    
+
                     if (buttons[i].type == Dialogify.BUTTON_PRIMARY && this.options.useDialogForm !== false) {
                         $btn.attr('type', 'submit');
                     }
-    
+
                     if (buttons[i].focused) {
                         $btn.prop('autofocus', true);
                     }
-    
+
                     if (buttons[i].disabled) {
                         $btn.disable();
                     }
-    
+
                     $btn.text(buttons[i].text || Dialogify.LOCALE[config.locale].close);
-                    $btn.click(function(e){
+                    $btn.click(function (e) {
                         if (typeof $(this).data('click') == 'function') {
                             $(this).data('click').call(self, e);
                         }
                     });
-    
+
                     this.$buttonList[buttons[i].id || i] = $btn;
                     $buttonBox.append($btn);
                 }
             }
-    
+
             if (this.$content.find('.btn-box').length) {
                 this.$content.find('.btn-box').replaceWith($buttonBox);
             } else {
                 this.$content.append($buttonBox);
             }
-    
+
             return this;
         }
 
@@ -265,12 +267,12 @@
     Dialogify.BUTTON_DANGER = 'btn-danger';
 
     Dialogify.LOCALE = {};
-    Dialogify.LOCALE['zh_TW'] = {ok: '確定', cancel: '取消', close: '關閉'};
-    Dialogify.LOCALE['zh_CN'] = {ok: '确定', cancel: '取消', close: '关闭'};
-    Dialogify.LOCALE['en_US'] = {ok: 'Ok', cancel: 'Cancel', close: 'Close'};
+    Dialogify.LOCALE['zh_TW'] = { ok: '確定', cancel: '取消', close: '關閉' };
+    Dialogify.LOCALE['zh_CN'] = { ok: '确定', cancel: '取消', close: '关闭' };
+    Dialogify.LOCALE['en_US'] = { ok: 'Ok', cancel: 'Cancel', close: 'Close' };
 
     // static methods
-    Dialogify.alert = function(message, options){
+    Dialogify.alert = function (message, options) {
         if (options == null || typeof options != 'object') {
             options = {};
         }
@@ -279,21 +281,25 @@
             options.dialogOptions = {};
         }
 
-        new Dialogify(`<p>${message}</p>`, options.dialogOptions)
-            .buttons([{
-                type: Dialogify.BUTTON_DANGER,
-                click: function(e){
+        return new Promise((resolve) => {
+            new Dialogify(`<p>${message}</p>`, options.dialogOptions)
+                .buttons([{
+                    type: Dialogify.BUTTON_DANGER,
+                    click: function (e) {
+                        options.close && options.close.call(this);
+                        resolve();
+                        this.close();
+                    }
+                }], { position: Dialogify.BUTTON_CENTER })
+                .on('cancel', function () {
                     options.close && options.close.call(this);
-                    this.close();
-                }
-            }], {position: Dialogify.BUTTON_CENTER})
-            .on('cancel', function(){
-                options.close && options.close.call(this);
-            })
-            .showModal();
+                    resolve();
+                })
+                .showModal();
+        });
     };
 
-    Dialogify.confirm = function(message, options){
+    Dialogify.confirm = function (message, options) {
         if (options == null || typeof options != 'object') {
             options = {};
         }
@@ -302,32 +308,37 @@
             options.dialogOptions = {};
         }
 
-        new Dialogify(`<p>${message}</p>`, options.dialogOptions)
-            .buttons([
-                {
-                    text: Dialogify.LOCALE[config.locale].cancel,
-                    click: function(e){
-                        options.cancel && options.cancel.call(this);
-                        this.close();
+        return new Promise((resolve) => {
+            new Dialogify(`<p>${message}</p>`, options.dialogOptions)
+                .buttons([
+                    {
+                        text: Dialogify.LOCALE[config.locale].cancel,
+                        click: function (e) {
+                            options.cancel && options.cancel.call(this);
+                            resolve(false);
+                            this.close();
+                        }
+                    },
+                    {
+                        text: Dialogify.LOCALE[config.locale].ok,
+                        type: Dialogify.BUTTON_PRIMARY,
+                        focused: true,
+                        click: function (e) {
+                            options.ok && options.ok.call(this);
+                            resolve(true);
+                            this.close();
+                        }
                     }
-                },
-                {
-                    text: Dialogify.LOCALE[config.locale].ok,
-                    type: Dialogify.BUTTON_PRIMARY,
-                    focused: true,
-                    click: function(e){
-                        options.ok && options.ok.call(this);
-                        this.close();
-                    }
-                }
-            ])
-            .on('cancel', function(){
-                options.cancel && options.cancel.call(this);
-            })
-            .showModal();
+                ])
+                .on('cancel', function () {
+                    options.cancel && options.cancel.call(this);
+                    resolve(false);
+                })
+                .showModal();
+        });
     };
 
-    Dialogify.prompt = function(message, options){
+    Dialogify.prompt = function (message, options) {
         if (options == null || typeof options != 'object') {
             options = {};
         }
@@ -340,46 +351,51 @@
         let $html = $('<div>').html(`<p>${message}</p>`);
         $html.append(`<input type="text" class="text-field dialogify-prompt-input"${placeholder}>`);
 
-        new Dialogify($html.html(), options.dialogOptions)
-            .buttons([
-                {
-                    text: Dialogify.LOCALE[config.locale].cancel,
-                    click: function(e){
-                        options.cancel && options.cancel.call(this);
-                        this.close();
+        return new Promise((resolve) => {
+            new Dialogify($html.html(), options.dialogOptions)
+                .buttons([
+                    {
+                        text: Dialogify.LOCALE[config.locale].cancel,
+                        click: function (e) {
+                            options.cancel && options.cancel.call(this);
+                            resolve(null);
+                            this.close();
+                        }
+                    },
+                    {
+                        text: Dialogify.LOCALE[config.locale].ok,
+                        type: Dialogify.BUTTON_PRIMARY,
+                        click: function (e) {
+                            let value = this.$content.find('.dialogify-prompt-input').val();
+                            options.ok && options.ok.call(this, value);
+                            resolve(value);
+                            this.close();
+                        }
                     }
-                },
-                {
-                    text: Dialogify.LOCALE[config.locale].ok,
-                    type: Dialogify.BUTTON_PRIMARY,
-                    click: function(e){
-                        let value = this.$content.find('.dialogify-prompt-input').val();
-                        options.ok && options.ok.call(this, value);
-                        this.close();
-                    }
-                }
-            ])
-            .on('cancel', function(){
-                options.cancel && options.cancel.call(this);
-            })
-            .showModal();
+                ])
+                .on('cancel', function () {
+                    options.cancel && options.cancel.call(this);
+                    resolve(null);
+                })
+                .showModal();
+        });
     };
 
-    Dialogify.closeAll = function(){
-        $('dialog[id^=dialogify_]').each(function(){
+    Dialogify.closeAll = function () {
+        $('dialog[id^=dialogify_]').each(function () {
             this.close();
         });
     };
 
-    function roundCssTransformMatrix(el){
+    function roundCssTransformMatrix(el) {
         el.style.transform = '';
 
         let mx = window.getComputedStyle(el, null);
         mx = mx.getPropertyValue('transform') ||
-             mx.getPropertyValue('-webkit-transform') ||
-             mx.getPropertyValue('-moz-transform') ||
-             mx.getPropertyValue('-ms-transform') ||
-             mx.getPropertyValue('-o-transform') || false;
+            mx.getPropertyValue('-webkit-transform') ||
+            mx.getPropertyValue('-moz-transform') ||
+            mx.getPropertyValue('-ms-transform') ||
+            mx.getPropertyValue('-o-transform') || false;
 
         if (mx) {
             let values = mx.replace(/[ \(\)]|matrix/g, '').split(',');
@@ -393,18 +409,18 @@
     // inject css
     if (!$('#dialogifyCss').length) {
         $('<style>')
-            .attr({type: 'text/css', id: 'dialogifyCss'})
-            .html('@@include(addslashes("src/css/dialogify.css"))')
+            .attr({ type: 'text/css', id: 'dialogifyCss' })
+            .html('__css__')
             .appendTo('head')
     }
 
     $.fn.extend({
-        enable: function(){
+        enable: function () {
             if ($(this).hasClass('btn btn-insert')) {
                 $(this).prop('disabled', false).removeClass('is-disabled');
             }
         },
-        disable: function(){
+        disable: function () {
             if ($(this).hasClass('btn btn-insert')) {
                 $(this).prop('disabled', true).addClass('is-disabled');
             }
@@ -412,4 +428,4 @@
     });
 
     window.Dialogify = Dialogify;
-})(jQuery, window, dialogPolyfill);
+})(jQuery, window);

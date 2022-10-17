@@ -561,11 +561,18 @@ new Dialogify(html, options)
                             <pre><code class="javascript">Dialogify.alert('Alert &lt;i&gt;Message&lt;/i&gt;', {
     close: function(){
         console.log('alert close');
-    },
-    dialogOptions: {
-        closable: false
     }
-});</code></pre>
+});
+
+// same as
+Dialogify.alert('Alert &lt;i&gt;Message&lt;/i&gt;')
+    .then(() => console.log('alert close'));
+
+// same as
+async function() {
+    await Dialogify.alert('Alert &lt;i&gt;Message&lt;/i&gt;')
+    console.log('alert close');
+}</code></pre>
                         </div>
                         <div class="mdl-layout-spacer"></div>
                     </div>
@@ -623,7 +630,16 @@ new Dialogify(html, options)
     cancel: function(){
         Dialogify.alert('No, I don\'t');
     }
-});</code></pre>
+});
+
+// same as
+async function() {
+    if(await Dialogify.confirm('Do you like Dialogify ?')) {
+        Dialogify.alert('Yes, I do');
+    } else {
+        Dialogify.alert('No, I don\'t');
+    }
+}</code></pre>
                         </div>
                         <div class="mdl-layout-spacer"></div>
                     </div>
@@ -689,7 +705,20 @@ new Dialogify(html, options)
     cancel: function(){
         Dialogify.alert('canceled');
     }
-});</code></pre>
+});
+
+// same as
+async function(){
+    const name = await Dialogify.prompt('What\'s your name ?', {
+        placeholder: 'Enter your name'
+    });
+
+    if (name != null) {
+        Dialogify.alert('Hi! ' + name);
+    } else {
+        Dialogify.alert('canceled');
+    }
+}</code></pre>
                         </div>
                         <div class="mdl-layout-spacer"></div>
                     </div>
@@ -815,38 +844,29 @@ new Dialogify(html, options)
                 .show();
         });
 
-        $('#demo4').click(function(){
-            Dialogify.alert('Alert <i>Message</i>', {
-                close: function(){
-                    console.log('alert close');
-                },
-                dialogOptions: {
-                    closable: false
-                }
-            });
+        $('#demo4').click(async function() {
+            await Dialogify.alert('Alert <i>Message</i>');
+            console.log('alert close');
         });
 
-        $('#demo5').click(function(){
-            Dialogify.confirm('Do you like Dialogify ?', {
-                ok: function(){
-                    Dialogify.alert('Yes, I do');
-                },
-                cancel: function(){
-                    Dialogify.alert('No, I don\'t');
-                }
-            });
+        $('#demo5').click(async function() {
+            if(await Dialogify.confirm('Do you like Dialogify ?')) {
+                Dialogify.alert('Yes, I do');
+            } else {
+                Dialogify.alert('No, I don\'t');
+            }
         });
 
-        $('#demo6').click(function(){
-            Dialogify.prompt('What\'s your name ?', {
-                placeholder: 'Enter your name',
-                ok: function(val){
-                    Dialogify.alert('Hi! ' + val);
-                },
-                cancel: function(){
-                    Dialogify.alert('canceled');
-                }
+        $('#demo6').click(async function() {
+            const name = await Dialogify.prompt('What\'s your name ?', {
+                placeholder: 'Enter your name'
             });
+
+            if (name != null) {
+                Dialogify.alert('Hi! ' + name);
+            } else {
+                Dialogify.alert('canceled');
+            }
         });
 
         hljs.initHighlightingOnLoad();

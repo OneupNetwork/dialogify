@@ -1,20 +1,28 @@
 {
   "name": "@oneup_network/dialogify",
-  "version": "1.0.4",
-  "description": "A javascript plugin for creating dialog/lightbox, implements with HTMLDialogElement.",
+  "version": "1.0.5",
+  "description": "A javascript plugin for creating dialog, implements with HTMLDialogElement.",
   "repository": {
     "type": "git",
     "url": "https://github.com/OneupNetwork/dialogify"
   },
   "license": "MIT",
+  "browser": "dist/dialogify.min.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node build.mjs"
+  },
   "devDependencies": {
-    "gulp": "^4.0.2",
-    "gulp-autoprefixer": "^7.0.0",
-    "gulp-concat": "^2.6.1",
-    "gulp-file-include": "^2.3.0",
-    "gulp-sass": "^4.1.0",
-    "gulp-size": "^3.0.0",
-    "gulp-sourcemaps": "^2.6.5",
-    "gulp-terser": "^1.4.1"
+    "autoprefixer": "^10.4.12",
+    "esbuild": "^0.15.8",
+    "esbuild-plugin-replace": "^1.2.0",
+    "esbuild-sass-plugin": "^2.3.2",
+    "postcss": "^8.4.16",
+    "postcss-preset-env": "^7.8.2"
+  },
+  "dependencies": {
+    "jquery": "^3.6.1"
   }
 }

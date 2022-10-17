@@ -7,9 +7,21 @@ new Dialogify('dialog content')
     .title('dialog title')
     .buttons([{type:Dialogify.BUTTON_PRIMARY}])
     .showModal();
+
+// alternate alert, confirm and prompt
+(async function() {
+    await Dialogify.alert('Alert!!');
+
+    if (await Dialogify.confirm('Yes or no？')) {
+        // blah..
+    }
+
+    const answer = await Dialogify.prompt('Question？');
+    // if (answer == blah...)
+})();
 ```
 
-![basic dialogify](https://raw.githubusercontent.com/OneupNetwork/dialogify/master/docs/img/screenshot1.png)
+![basic dialogify](docs/img/screenshot1.png)
 
 ## Usage and examples
 [https://oneupnetwork.github.io/dialogify/](https://oneupnetwork.github.io/dialogify/)
@@ -27,8 +39,7 @@ All modern browser
 * Fork & clone this repo
     ```
     npm install
-    npm install gulp-cli -g
-    gulp build
+    npm run build
     ```
 * Create branch and commit your changes
 * Open a pull request
