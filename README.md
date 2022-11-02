@@ -1,5 +1,5 @@
 # Dialogify
-A javascript plugin for creating dialog/lightbox, implements with HTMLDialogElement.
+A javascript plugin for creating dialog, implements with HTMLDialogElement.
 
 ## Basic usage
 ```javascript

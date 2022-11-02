@@ -2,6 +2,9 @@
  * dialogify
  * https://github.com/OneupNetwork/dialogify
  */
+
+import dialogPolyfill from './dialog-polyfill.esm';
+
 (function ($, window, undefined) {
     'use strict';
 
@@ -18,6 +21,7 @@
 
         constructor(source, options) {
             let dialog = window.document.createElement('dialog');
+            dialogPolyfill.registerDialog(dialog);
 
             if (options == null || typeof options != 'object') {
                 options = {};
