@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.6
+    revert dialog-polyfill.js
+
 ## 1.0.5
     build with esbuild
     add promise api for static methods
