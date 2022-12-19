@@ -28,6 +28,7 @@ esbuild.build({
         minify: true,
         sourcemap: true,
         outfile: 'dist/dialogify.min.js',
+        target: ['es2018'],
         plugins: [replace({
             '__css__': css.replace(/'/g, "\\'").replace(/\\/g, '\\\\').replace(/\n/g, '')
         })]
@@ -35,4 +36,3 @@ esbuild.build({
 }).then(() => {
     fs.copyFileSync('dist/dialogify.min.js', 'docs/js/dialogify.min.js')
 })
-
