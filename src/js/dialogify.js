@@ -352,8 +352,9 @@ import dialogPolyfill from './dialog-polyfill.esm';
         }
 
         let placeholder = options.placeholder ? ` placeholder="${options.placeholder}"` : '';
+        let value = options.value ? ` value="${options.value}"` : '';
         let $html = $('<div>').html(`<p>${message}</p>`);
-        $html.append(`<input type="text" class="text-field dialogify-prompt-input"${placeholder}>`);
+        $html.append(`<input type="text" class="text-field dialogify-prompt-input"${value}${placeholder}>`);
 
         return new Promise((resolve) => {
             new Dialogify($html.html(), options.dialogOptions)
