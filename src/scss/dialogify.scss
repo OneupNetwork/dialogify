@@ -322,3 +322,13 @@ dialog+.backdrop {
     background: #000;
     opacity: .7;
 }
+
+.dialog-mask {
+    width: 100vw;
+    height: 100vh;
+    position:fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+    background-color: transparent;
+}
