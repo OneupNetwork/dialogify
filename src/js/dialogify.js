@@ -149,7 +149,7 @@ import dialogPolyfill from './dialog-polyfill.esm';
             // public methods
             this.showModal = function () {
                 if (options.backgroundScroll === false) {
-                    preventScroll(true);
+                    preventScroll();
                 }
                 dialog.showModal();
                 $(this).triggerHandler('show');
@@ -157,7 +157,7 @@ import dialogPolyfill from './dialog-polyfill.esm';
 
             this.show = function () {
                 if (options.backgroundScroll === false) {
-                    preventScroll(false);
+                    preventScroll();
                 }
                 dialog.show();
                 $(this).triggerHandler('show');
@@ -403,16 +403,9 @@ import dialogPolyfill from './dialog-polyfill.esm';
         });
     };
 
-    function preventScroll(needMask) {
+    function preventScroll() {
         // 防止body滾動
         $('body').css({'overflow': 'hidden', 'padding-right': window.innerWidth - document.documentElement.clientWidth});
-
-        if (needMask) {
-            // 避免部分overflow-y或overflow-x的設定導致背景可動
-            var mask = document.createElement("div");
-            $(mask).addClass('dialog-mask');
-            $('body').append(mask);
-        }
     }
 
     function roundCssTransformMatrix(el) {
