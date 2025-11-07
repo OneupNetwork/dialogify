@@ -68,7 +68,7 @@ import dialogPolyfill from './dialog-polyfill.esm';
                 .on('close', function (e) {
                     $(self).triggerHandler('close');
                     $(this).remove();
-                    if (options.scroll === false) {
+                    if (options.backgroundScroll === false) {
                         $('body').css({'overflow': '', 'padding-right': ''});
                         $('.dialog-mask').remove();
                     }
@@ -148,16 +148,16 @@ import dialogPolyfill from './dialog-polyfill.esm';
 
             // public methods
             this.showModal = function () {
-                if (options.scroll === false) {
-                    preventScroll();
+                if (options.backgroundScroll === false) {
+                    preventScroll(true);
                 }
                 dialog.showModal();
                 $(this).triggerHandler('show');
             };
 
             this.show = function () {
-                if (options.scroll === false) {
-                    preventScroll();
+                if (options.backgroundScroll === false) {
+                    preventScroll(false);
                 }
                 dialog.show();
                 $(this).triggerHandler('show');
@@ -403,14 +403,16 @@ import dialogPolyfill from './dialog-polyfill.esm';
         });
     };
 
-    function preventScroll() {
+    function preventScroll(needMask) {
         // 防止body滾動
         $('body').css({'overflow': 'hidden', 'padding-right': window.innerWidth - document.documentElement.clientWidth});
 
-        // 避免部分overflow-y或overflow-x的設定導致背景可動
-        var mask = document.createElement("div");
-        $(mask).addClass('dialog-mask');
-        $('body').append(mask);
+        if (needMask) {
+            // 避免部分overflow-y或overflow-x的設定導致背景可動
+            var mask = document.createElement("div");
+            $(mask).addClass('dialog-mask');
+            $('body').append(mask);
+        }
     }
 
     function roundCssTransformMatrix(el) {
