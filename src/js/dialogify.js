@@ -70,7 +70,6 @@ import dialogPolyfill from './dialog-polyfill.esm';
                     $(this).remove();
                     if (options.backgroundScroll === false) {
                         $('body').css({'overflow': '', 'padding-right': ''});
-                        $('.dialog-mask').remove();
                     }
                 })
                 .on('cancel', function (e) {
