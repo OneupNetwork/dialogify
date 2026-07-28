@@ -98,7 +98,9 @@ dialogify.isOpen();</code></pre>
             <td class="mdl-data-table__cell--non-numeric">
                 id selector | ajax url | html<br>
                 id selector: # 開頭的字串，e.g. '#dialogContent'<br>
-                ajax url: ajaxPrefix 開頭的字串，e.g. '/ajax/dialogContent.html'
+                ajax url: ajaxPrefix 開頭的字串，e.g. '/ajax/dialogContent.html'<br>
+                html: 其餘字串會直接當作 <strong>HTML</strong> 插入（可放圖片、標籤等豐富內容）<br>
+                ⚠️ 內容以 HTML 呈現，請務必先跳脫／清理不可信的使用者輸入以避免 XSS
             </td>
         </tr>
     </tbody>

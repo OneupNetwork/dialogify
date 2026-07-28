@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.0
+    **BREAKING**: entry points and dependency model changed
+    docs: document that dialog content is HTML (with XSS caveat)
+    build: emit standalone dialogify.css plus IIFE / ESM / CJS bundles and .d.ts types
+    build: ship dialog-polyfill as an optional separate bundle (not bundled by default)
+    refactor: drop IIFE wrapper, export default + window global, methods on prototype
+    refactor: read global config lazily, replace $.get with fetch
+    refactor: replace ResizeSensor with ResizeObserver, remove edge/iPad hack
+    chore: jquery moved to peerDependencies, devDependencies updated (0 audit issues)
+    chore: add ESLint, Prettier, vitest DOM tests and GitHub Actions CI
+
 ## 1.0.6
     revert dialog-polyfill.js
 

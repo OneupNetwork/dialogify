@@ -1,0 +1,7 @@
+dist/
+docs/
+node_modules/
+src/css/
+src/js/dialog-polyfill.esm.js
+package-lock.json
+CHANGELOG.md

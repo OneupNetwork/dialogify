@@ -1,28 +1,56 @@
 {
-  "name": "@oneup_network/dialogify",
-  "version": "1.0.6",
-  "description": "A javascript plugin for creating dialog, implements with HTMLDialogElement.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/OneupNetwork/dialogify"
-  },
-  "license": "MIT",
-  "browser": "dist/dialogify.min.js",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "node build.mjs"
-  },
-  "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "esbuild": "^0.25.5",
-    "esbuild-plugin-replace": "^1.4.0",
-    "esbuild-sass-plugin": "^3.3.1",
-    "postcss": "^8.5.6",
-    "postcss-preset-env": "^10.2.3"
-  },
-  "dependencies": {
-    "jquery": "^3.7.1"
-  }
+    "name": "@oneup_network/dialogify",
+    "version": "2.0.0",
+    "description": "A javascript plugin for creating dialog, implements with HTMLDialogElement.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/OneupNetwork/dialogify"
+    },
+    "license": "MIT",
+    "type": "module",
+    "main": "dist/dialogify.cjs",
+    "module": "dist/dialogify.mjs",
+    "browser": "dist/dialogify.min.js",
+    "types": "dist/dialogify.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/dialogify.d.ts",
+            "browser": "./dist/dialogify.min.js",
+            "import": "./dist/dialogify.mjs",
+            "require": "./dist/dialogify.cjs",
+            "default": "./dist/dialogify.mjs"
+        },
+        "./css": "./dist/dialogify.css",
+        "./polyfill": "./dist/dialog-polyfill.min.js",
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "node build.mjs",
+        "lint": "eslint .",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "test": "vitest run"
+    },
+    "peerDependencies": {
+        "jquery": ">=3.0.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "autoprefixer": "^10.5.4",
+        "esbuild": "^0.28.1",
+        "esbuild-plugin-replace": "^1.4.0",
+        "esbuild-sass-plugin": "^3.7.0",
+        "eslint": "^10.7.0",
+        "eslint-config-prettier": "^10.1.8",
+        "globals": "^17.7.0",
+        "jquery": "^3.7.1",
+        "jsdom": "^29.1.1",
+        "postcss": "^8.5.22",
+        "postcss-preset-env": "^11.3.2",
+        "prettier": "^3.9.6",
+        "vitest": "^4.1.10"
+    }
 }
