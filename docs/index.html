@@ -37,6 +37,7 @@
                 <a class="mdl-navigation__link" href="#disablecssinjection">Disable Css Injection</a>
                 <a class="mdl-navigation__link" href="#dialogify">Dialogify</a>
                 <a class="mdl-navigation__link" href="#globalconfig">Global Config</a>
+                <a class="mdl-navigation__link" href="#customelement">&lt;dialog is="bahamut-dialogify"&gt;</a>
                 <a class="mdl-navigation__link" href="#dialogify.alert">Dialogify.alert</a>
                 <a class="mdl-navigation__link" href="#dialogify.confirm">Dialogify.confirm</a>
                 <a class="mdl-navigation__link" href="#dialogify.prompt">Dialogify.prompt</a>
@@ -407,6 +408,194 @@ dialogify.isOpen();</code></pre>
                     <div class="mdl-grid">
                         <div class="mdl-layout-spacer"></div>
                         <div class="mdl-cell mdl-cell--10-col">
+                            <a name="customelement"></a>
+                            <h4 class="mdl-typeography--headline">&lt;dialog is="bahamut-dialogify"&gt;</h4>
+                            <p>
+                                除了用 JavaScript 建立燈箱外，也可以直接把燈箱寫在 HTML 裡。載入 dialogify 後會自動註冊
+                                <a href="https://developer.mozilla.org/docs/Web/API/Web_components/Using_custom_elements#customized_built-in_elements" target="_blank" rel="noopener">customized built-in element</a>，
+                                用 <code>document.querySelector()</code> 取到的元素本身就有 dialogify 的 public method。
+                            </p>
+                            <p>
+                                元素名稱有前綴是因為 custom element 規格要求名稱必須含連字號，<code>is="dialogify"</code> 不是合法名稱。
+                            </p>
+                            <p>
+                                和 <code>new Dialogify()</code> 不同，宣告式燈箱關閉後<strong>不會</strong>從 DOM 移除，可以重複開啟。
+                            </p>
+                            <pre><code class="html">&lt;dialog is="bahamut-dialogify" dialog-title="Dialogify"&gt;
+    dialog content &lt;b&gt;bold text&lt;/b&gt;
+    &lt;button ok&gt;&lt;/button&gt;
+    &lt;button cancel&gt;&lt;/button&gt;
+&lt;/dialog&gt;
+
+&lt;script&gt;
+const dialog = document.querySelector('dialog[is="bahamut-dialogify"]');
+dialog.showModal();
+&lt;/script&gt;</code></pre>
+
+<h6>Methods</h6>
+<table class="mdl-data-table mdl-js-data-table">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.show() / .showModal()</td>
+            <td class="mdl-data-table__cell--non-numeric">開啟燈箱</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.close(returnValue)</td>
+            <td class="mdl-data-table__cell--non-numeric">關閉燈箱，&lt;dialog&gt; 原生 method</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.isOpen()</td>
+            <td class="mdl-data-table__cell--non-numeric">燈箱是否開啟中</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.setTitle(title)</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                設定燈箱標題<br>
+                命名為 setTitle 是因為 HTMLElement.title 是原生的 tooltip 屬性，不能覆寫
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.buttons(buttons, options)</td>
+            <td class="mdl-data-table__cell--non-numeric">用 JavaScript 加按鈕，同 Dialogify.buttons()</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.on(event, handler)</td>
+            <td class="mdl-data-table__cell--non-numeric">綁定 dialogify instance 事件</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.dialogify</td>
+            <td class="mdl-data-table__cell--non-numeric">對應的 Dialogify instance</td>
+        </tr>
+    </tbody>
+</table>
+
+<h6>Options (attribute)</h6>
+<p>
+    ⚠️ 屬性值是字串，所以布林設定是<strong>看值</strong>而不是看有沒有這個屬性：要關閉請寫
+    <code>closable="false"</code>，只寫屬性名稱、<code>"true"</code> 或其他值都代表 true，
+    這和 HTML 原生布林屬性的慣例相反。
+</p>
+<table class="mdl-data-table mdl-js-data-table">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">dialog-title</td>
+            <td class="mdl-data-table__cell--non-numeric">燈箱標題（title 是原生 tooltip，所以改用 dialog-title）</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">size</td>
+            <td class="mdl-data-table__cell--non-numeric">size="large" 對應 Dialogify.SIZE_LARGE，其他值直接當 class 使用</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">closable</td>
+            <td class="mdl-data-table__cell--non-numeric">是否顯示關閉按鈕</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">fixed</td>
+            <td class="mdl-data-table__cell--non-numeric">是否使用 position: fixed</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">background-scroll</td>
+            <td class="mdl-data-table__cell--non-numeric">燈箱開啟時是否允許背景捲動</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">use-dialog-form</td>
+            <td class="mdl-data-table__cell--non-numeric">是否用 &lt;form method="dialog"&gt; 包住內容</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">src</td>
+            <td class="mdl-data-table__cell--non-numeric">改用 ajax 載入內容，不使用標籤內的 html</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">ajax-prefix</td>
+            <td class="mdl-data-table__cell--non-numeric">同 dialogOptions.ajaxPrefix</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">options='{...}'</td>
+            <td class="mdl-data-table__cell--non-numeric">用 JSON 一次設定多個 options</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">buttons-position</td>
+            <td class="mdl-data-table__cell--non-numeric">按鈕對齊：left | center | right（預設 right）</td>
+        </tr>
+    </tbody>
+</table>
+<p>無法用屬性表示的設定（callback、style 物件）可以在第一次開啟前用 JavaScript 指定：</p>
+<pre><code class="javascript">dialog.options = {ajaxComplete: function(){ /* ... */ }};</code></pre>
+
+<h6>Buttons</h6>
+<p>
+    在燈箱內容裡直接放 &lt;button&gt; 並加上標記屬性，dialogify 會把它們收集成按鈕列，
+    結構和用 JavaScript 的 buttons() 產生的一樣。按鈕沒有文字時會自動帶入對應語系的預設文字。
+</p>
+<p>
+    ⚠️ 請寫 <code>&lt;button ok&gt;&lt;/button&gt;</code>，不要寫 <code>&lt;button ok /&gt;</code>。
+    HTML 元素沒有自閉合語法，那樣寫會讓後面的兄弟元素被解析成它的子元素。
+</p>
+<table class="mdl-data-table mdl-js-data-table">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">ok</td>
+            <td class="mdl-data-table__cell--non-numeric">primary 樣式，點擊後關閉燈箱</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">cancel</td>
+            <td class="mdl-data-table__cell--non-numeric">預設樣式，點擊後觸發 cancel 事件並關閉燈箱</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">close</td>
+            <td class="mdl-data-table__cell--non-numeric">預設樣式，點擊後關閉燈箱</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">primary</td>
+            <td class="mdl-data-table__cell--non-numeric">primary 樣式，不會自動關閉</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">danger</td>
+            <td class="mdl-data-table__cell--non-numeric">danger 樣式，不會自動關閉</td>
+        </tr>
+    </tbody>
+</table>
+<pre><code class="html">&lt;dialog is="bahamut-dialogify"&gt;
+    確定要刪除嗎？
+    &lt;button cancel&gt;&lt;/button&gt;
+    &lt;button danger onclick="doDelete()"&gt;刪除&lt;/button&gt;
+&lt;/dialog&gt;</code></pre>
+
+<h6>Events</h6>
+<p>
+    close、cancel 是 &lt;dialog&gt; 的原生事件，show 由 dialogify 發送，三種都可以用一般方式綁定：
+</p>
+<pre><code class="javascript">dialog.addEventListener('show', function(){});
+dialog.onshow = function(){};
+dialog.onclose = function(){};</code></pre>
+<p>
+    也可以寫在標籤上。onclose、oncancel 是原生 inline handler，行為就是瀏覽器定義的那樣；
+    除此之外 dialogify 會把 onshow、onclose、oncancel 的值當成<strong>函式名稱</strong>解析：
+</p>
+<pre><code class="html">&lt;dialog is="bahamut-dialogify" onshow="myHandler" onclose="MyApp.onClose"&gt;&lt;/dialog&gt;</code></pre>
+<pre><code class="javascript">Dialogify.handlers.myHandler = function(){
+    // this 是燈箱元素
+};</code></pre>
+<p>
+    名稱會先找 <code>Dialogify.handlers</code>，再找 <code>window</code>（支援 <code>A.b.c</code> 這種路徑），
+    而且是在事件發生時才解析，所以 handler 可以晚於標籤定義。值如果不是單純的識別字就會被 dialogify 忽略，
+    交給瀏覽器原生的 inline handler 處理 —— dialogify 本身不會執行任何字串程式碼。
+</p>
+
+<h6>Browser support</h6>
+<p>
+    Safari/WebKit 不支援 customized built-in elements，需要在 dialogify 之前載入
+    <a href="https://github.com/ungap/custom-elements" target="_blank" rel="noopener">@ungap/custom-elements</a>
+    之類的 polyfill 才能使用宣告式寫法。JavaScript API 則不受影響。
+</p>
+
+                        </div>
+                        <div class="mdl-layout-spacer"></div>
+                    </div>
+
+                    <div class="mdl-grid">
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
                             <h5 class="mdl-typeography--headline">Example - Normal Dialogify</h5>
                             <button id="demo1" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
                             <pre><code class="html">&lt;script type="text/template" id="demo1_template"&gt;
@@ -495,6 +684,43 @@ dialogify.showModal();</code></pre>
 new Dialogify('./ajax.html', options)
     .title('Ajax Dialogify')
     .show();</code></pre>
+                        </div>
+                        <div class="mdl-layout-spacer"></div>
+                    </div>
+
+                    <div class="mdl-grid">
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <h5 class="mdl-typeography--headline">Example - Declarative Dialogify</h5>
+                            <button id="demo8" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
+                            <dialog is="bahamut-dialogify" id="demo8_dialog" dialog-title="Declarative Dialogify" onshow="demo8Shown">
+                                完全用 html 寫的燈箱，內容支援 <b>html 標籤</b>。
+                                <input type="text" class="text-field" placeholder="title">
+                                <button cancel></button>
+                                <button ok></button>
+                            </dialog>
+                            <pre><code class="html">&lt;dialog is="bahamut-dialogify" id="demo8_dialog" dialog-title="Declarative Dialogify" onshow="demo8Shown"&gt;
+    完全用 html 寫的燈箱，內容支援 &lt;b&gt;html 標籤&lt;/b&gt;。
+    &lt;input type="text" class="text-field" placeholder="title"&gt;
+    &lt;button cancel&gt;&lt;/button&gt;
+    &lt;button ok&gt;&lt;/button&gt;
+&lt;/dialog&gt;
+
+&lt;script&gt;
+// onshow="demo8Shown" 指向的具名 handler
+Dialogify.handlers.demo8Shown = function(){
+    console.log('shown');
+};
+
+document.querySelector('#demo8').addEventListener('click', function(){
+    // querySelector 拿到的元素本身就有 dialogify 的 method
+    document.querySelector('#demo8_dialog').showModal();
+});
+
+document.querySelector('#demo8_dialog').addEventListener('close', function(){
+    console.log('closed');
+});
+&lt;/script&gt;</code></pre>
                         </div>
                         <div class="mdl-layout-spacer"></div>
                     </div>
@@ -858,6 +1084,20 @@ async function(){
                     }
                 ])
                 .show();
+        });
+
+        // onshow="demo8Shown" 指向的具名 handler
+        Dialogify.handlers.demo8Shown = function(){
+            console.log('shown');
+        };
+
+        document.querySelector('#demo8').addEventListener('click', function(){
+            // querySelector 拿到的元素本身就有 dialogify 的 method
+            document.querySelector('#demo8_dialog').showModal();
+        });
+
+        document.querySelector('#demo8_dialog').addEventListener('close', function(){
+            console.log('closed');
         });
 
         $('#demo4').click(async function() {

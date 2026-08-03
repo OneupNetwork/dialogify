@@ -69,6 +69,12 @@ declare namespace Dialogify {
         closeButton?: CloseButtonConfig;
         /** Custom dialog styling. */
         dialog?: DialogStyleConfig;
+        /**
+         * Remove the `<dialog>` element from the DOM when it closes.
+         * Defaults to `true` for `new Dialogify()`, and `false` for
+         * `<dialog is="bahamut-dialogify">` so author markup is reusable.
+         */
+        autoRemove?: boolean;
     }
 
     interface CloseButtonConfig {
@@ -128,4 +134,57 @@ declare namespace Dialogify {
 
     /** Close all open dialogify dialogs. */
     function closeAll(): void;
+
+    /** Tag name of the customized built-in element: `bahamut-dialogify`. */
+    const ELEMENT_NAME: string;
+
+    /**
+     * Named handlers referenced declaratively from markup, e.g.
+     * `<dialog is="bahamut-dialogify" onshow="myHandler">`.
+     * Looked up here first, then on `window` (dotted paths supported).
+     */
+    const handlers: Record<string, (this: DialogifyElement, event: Event) => void>;
+
+    /**
+     * Register the customized built-in element. Called automatically on import.
+     * Returns `null` when the environment lacks customized built-in support.
+     */
+    function defineElement(name?: string): CustomElementConstructor | null;
+
+    /** Build a Dialogify instance around an existing `<dialog>` element. */
+    function adopt(
+        dialog: HTMLDialogElement,
+        source: string,
+        options?: Options,
+        setupOptions?: { append?: boolean; content?: Node | null }
+    ): Dialogify;
+
+    /**
+     * A `<dialog is="bahamut-dialogify">` element. Extends the native dialog
+     * element with the dialogify API.
+     */
+    interface DialogifyElement extends HTMLDialogElement {
+        /** The backing Dialogify instance (initialised on first access). */
+        readonly dialogify: Dialogify;
+        /** Options for the backing instance. Assigning merges into them. */
+        options: Options;
+        /** Handler for the non-native `show` event. */
+        onshow: ((this: DialogifyElement, event: Event) => void) | null;
+        show(): void;
+        showModal(): void;
+        isOpen(): boolean;
+        /**
+         * Set the dialog title. Named `setTitle` because the native
+         * `HTMLElement.title` property is the tooltip string.
+         */
+        setTitle(title: string): this;
+        buttons(buttons: ButtonConfig[], options?: ButtonBoxOptions): this;
+        on(event: 'show' | 'close' | 'cancel', handler: (this: Dialogify) => void): this;
+    }
+}
+
+declare global {
+    interface HTMLElementTagNameMap {
+        'bahamut-dialogify': Dialogify.DialogifyElement;
+    }
 }

@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.1.0
+    feat: declarative `<dialog is="bahamut-dialogify">` customized built-in element
+    feat: dialogify API (show/showModal/isOpen/setTitle/buttons/on) on the element itself
+    feat: options as attributes (dialog-title, size, closable, src, options='{...}', ...)
+    feat: declarative buttons via `<button ok>` / `cancel` / `close` / `primary` / `danger`
+    feat: events via addEventListener, on* properties, or `onshow="handlerName"` markup
+    feat: Dialogify.handlers registry for named declarative handlers
+    feat: Dialogify.adopt() to wrap an existing <dialog> element
+    feat: autoRemove option (defaults to false for declarative dialogs, so they are reusable)
+    refactor: split core into src/js/core.js, element into src/js/element.js
+
 ## 2.0.0
     **BREAKING**: entry points and dependency model changed
     docs: document that dialog content is HTML (with XSS caveat)
