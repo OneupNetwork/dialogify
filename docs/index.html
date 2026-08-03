@@ -41,6 +41,7 @@
                 <a class="mdl-navigation__link" href="#dialogify.alert">Dialogify.alert</a>
                 <a class="mdl-navigation__link" href="#dialogify.confirm">Dialogify.confirm</a>
                 <a class="mdl-navigation__link" href="#dialogify.prompt">Dialogify.prompt</a>
+                <a class="mdl-navigation__link" href="#dialogify.toast">Dialogify.toast</a>
                 <a class="mdl-navigation__link" href="#dialogify.closeall">Dialogify.closeAll</a>
             </nav>
         </div>
@@ -138,6 +139,20 @@ dialogify.isOpen();</code></pre>
             <td class="mdl-data-table__cell--non-numeric">
                 true | false<br>
                 預設 true，設定 false 後燈箱會跟頁面捲動
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">position</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                Dialogify.POSITION_LEFT | POSITION_RIGHT | POSITION_TOP | POSITION_BOTTOM<br>
+                設定後燈箱會變成 drawer，從指定邊緣滑入並貼齊該側
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">variant</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                string<br>
+                加在燈箱上的額外樣式名稱，會變成 dialogify--{variant}
             </td>
         </tr>
         <tr>
@@ -328,19 +343,35 @@ dialogify.isOpen();</code></pre>
         <tr>
             <td class="mdl-data-table__cell--non-numeric">.show()</td>
             <td class="mdl-data-table__cell--non-numeric">
-                顯示燈箱，無背景遮罩
+                顯示燈箱，無背景遮罩<br>
+                回傳 Promise，燈箱關閉時 resolve 燈箱的 returnValue
             </td>
         </tr>
         <tr>
             <td class="mdl-data-table__cell--non-numeric">.showModal()</td>
             <td class="mdl-data-table__cell--non-numeric">
-                顯示 Modal 燈箱，有背景遮罩強調燈箱
+                顯示 Modal 燈箱，有背景遮罩強調燈箱<br>
+                回傳 Promise，燈箱關閉時 resolve 燈箱的 returnValue
             </td>
         </tr>
         <tr>
-            <td class="mdl-data-table__cell--non-numeric">.close()</td>
+            <td class="mdl-data-table__cell--non-numeric">.showAt(anchor, options)</td>
             <td class="mdl-data-table__cell--non-numeric">
-                關閉燈箱
+                錨定在指定元素旁顯示，適合做下拉選單、popover 卡片<br>
+                options: {placement: 'top|bottom|left|right', align: 'start|center|end', offset: 8}<br>
+                空間不足時會自動翻到另一側，捲動與改變視窗大小時會跟著移動
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.reposition()</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                重新計算 showAt() 的位置
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.close(returnValue)</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                關閉燈箱，會先觸發可攔截的 beforeclose 事件
             </td>
         </tr>
         <tr>
@@ -351,9 +382,103 @@ dialogify.isOpen();</code></pre>
             </td>
         </tr>
         <tr>
+            <td class="mdl-data-table__cell--non-numeric">.setContent(html)</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                更換燈箱內容，標題與按鈕會保留<br>
+                可傳 html 字串或 DOM 節點（傳節點可保留已綁定的事件）
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.getContent()</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                取得目前的燈箱內容 html
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.load(url, data)</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                用 ajax 載入新內容，載入期間會自動顯示 loading，回傳 Promise
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.setLoading(bool)</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                顯示 / 隱藏覆蓋在內容上的 loading 遮罩
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.isLoading()</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                回傳是否顯示 loading 中
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.validate()</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                執行瀏覽器原生表單驗證，會提示第一個不合法的欄位<br>
+                沒有使用 dialog form 時一律回傳 true
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.formValues()</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                取得燈箱表單內容的物件，同名欄位會收集成陣列
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.formData()</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                取得燈箱表單的 FormData，沒有表單時回傳 null
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.addButton(button, options)</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                加一顆按鈕，不用重設整組<br>
+                options.prepend = true 可加在最前面
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.updateButton(id, changes)</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                修改按鈕：{text, type, disabled, click, loading, loadingText}<br>
+                loading: true 會停用按鈕、顯示轉圈並換成 loadingText
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.removeButton(id)</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                移除指定按鈕
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.getButton(id)</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                取得按鈕的 jQuery object
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.on(event, handler)<br>.off(event, handler)</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                綁定 / 解除燈箱事件：show、close、cancel、beforeclose
+            </td>
+        </tr>
+        <tr>
             <td class="mdl-data-table__cell--non-numeric">.$content</td>
             <td class="mdl-data-table__cell--non-numeric">
                 燈箱內容的 jQuery object
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.$body</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                燈箱內容區的 jQuery object（不含標題與按鈕）
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.$form</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                燈箱的 &lt;form method="dialog"&gt; jQuery object
             </td>
         </tr>
         <tr>
@@ -367,6 +492,26 @@ dialogify.isOpen();</code></pre>
         </tr>
     </tbody>
 </table>
+
+<h6>beforeclose 事件</h6>
+<p>
+    beforeclose 會在所有關閉途徑之前觸發（按鈕、右上關閉、esc、點背景、form 送出、close()），
+    呼叫 preventDefault() 就可以留住燈箱：
+</p>
+<pre><code class="javascript">dialogify.on('beforeclose', async function(e){
+    if(isDirty) {
+        e.preventDefault();
+        if(await Dialogify.confirm('確定要放棄編輯嗎？')) {
+            isDirty = false;
+            dialogify.close();
+        }
+    }
+});</code></pre>
+
+<h6>drawer（側邊滑出）</h6>
+<p>設定 position 就會從指定邊緣滑入，而不是置中顯示：</p>
+<pre><code class="javascript">new Dialogify('&lt;h4&gt;篩選條件&lt;/h4&gt;', {position: Dialogify.POSITION_RIGHT}).showModal();
+// position: 'left' | 'right' | 'top' | 'bottom'</code></pre>
 
                         </div>
                         <div class="mdl-layout-spacer"></div>
@@ -437,11 +582,21 @@ dialog.showModal();
     <tbody>
         <tr>
             <td class="mdl-data-table__cell--non-numeric">.show() / .showModal()</td>
-            <td class="mdl-data-table__cell--non-numeric">開啟燈箱</td>
+            <td class="mdl-data-table__cell--non-numeric">開啟燈箱，回傳 Promise，燈箱關閉時 resolve returnValue</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.showAt(anchor, options)</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                錨定在指定元素旁顯示；不傳參數時會用 anchor / placement / align / offset 屬性
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.reposition()</td>
+            <td class="mdl-data-table__cell--non-numeric">重新計算錨定位置</td>
         </tr>
         <tr>
             <td class="mdl-data-table__cell--non-numeric">.close(returnValue)</td>
-            <td class="mdl-data-table__cell--non-numeric">關閉燈箱，&lt;dialog&gt; 原生 method</td>
+            <td class="mdl-data-table__cell--non-numeric">關閉燈箱，會先觸發可攔截的 beforeclose 事件</td>
         </tr>
         <tr>
             <td class="mdl-data-table__cell--non-numeric">.isOpen()</td>
@@ -455,12 +610,36 @@ dialog.showModal();
             </td>
         </tr>
         <tr>
+            <td class="mdl-data-table__cell--non-numeric">.setContent(html)<br>.getContent()</td>
+            <td class="mdl-data-table__cell--non-numeric">更換 / 取得燈箱內容</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.load(url, data)</td>
+            <td class="mdl-data-table__cell--non-numeric">用 ajax 換掉燈箱內容，回傳 Promise</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.setLoading(bool)<br>.isLoading()</td>
+            <td class="mdl-data-table__cell--non-numeric">切換 / 查詢 loading 遮罩</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">.validate()<br>.formValues()<br>.formData()</td>
+            <td class="mdl-data-table__cell--non-numeric">燈箱表單的驗證與取值</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">
+                .addButton()<br>.updateButton()<br>.removeButton()<br>.getButton()
+            </td>
+            <td class="mdl-data-table__cell--non-numeric">
+                單顆按鈕的增刪改查，寫在 html 裡的按鈕也在管理範圍內
+            </td>
+        </tr>
+        <tr>
             <td class="mdl-data-table__cell--non-numeric">.buttons(buttons, options)</td>
             <td class="mdl-data-table__cell--non-numeric">用 JavaScript 加按鈕，同 Dialogify.buttons()</td>
         </tr>
         <tr>
-            <td class="mdl-data-table__cell--non-numeric">.on(event, handler)</td>
-            <td class="mdl-data-table__cell--non-numeric">綁定 dialogify instance 事件</td>
+            <td class="mdl-data-table__cell--non-numeric">.on(event, handler)<br>.off(event, handler)</td>
+            <td class="mdl-data-table__cell--non-numeric">綁定 / 解除 dialogify instance 事件</td>
         </tr>
         <tr>
             <td class="mdl-data-table__cell--non-numeric">.dialogify</td>
@@ -510,6 +689,28 @@ dialog.showModal();
             <td class="mdl-data-table__cell--non-numeric">同 dialogOptions.ajaxPrefix</td>
         </tr>
         <tr>
+            <td class="mdl-data-table__cell--non-numeric">position</td>
+            <td class="mdl-data-table__cell--non-numeric">left | right | top | bottom，設定後變成 drawer 樣式</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">anchor</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                錨定元素的 CSS selector，設定後呼叫 showAt() 可以不用傳參數
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">placement</td>
+            <td class="mdl-data-table__cell--non-numeric">錨定方向：top | bottom | left | right（預設 bottom）</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">align</td>
+            <td class="mdl-data-table__cell--non-numeric">錨定對齊：start | center | end（預設 start）</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">offset</td>
+            <td class="mdl-data-table__cell--non-numeric">錨定元素與燈箱的間距，單位 px（預設 8）</td>
+        </tr>
+        <tr>
             <td class="mdl-data-table__cell--non-numeric">options='{...}'</td>
             <td class="mdl-data-table__cell--non-numeric">用 JSON 一次設定多個 options</td>
         </tr>
@@ -553,6 +754,13 @@ dialog.showModal();
             <td class="mdl-data-table__cell--non-numeric">danger</td>
             <td class="mdl-data-table__cell--non-numeric">danger 樣式，不會自動關閉</td>
         </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">id / loading-text</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                寫在 html 的按鈕也會加入 $buttonList，有 id 就用 id 當 key，沒有就用順序<br>
+                loading-text 是按鈕 loading 時要顯示的文字
+            </td>
+        </tr>
     </tbody>
 </table>
 <pre><code class="html">&lt;dialog is="bahamut-dialogify"&gt;
@@ -560,17 +768,23 @@ dialog.showModal();
     &lt;button cancel&gt;&lt;/button&gt;
     &lt;button danger onclick="doDelete()"&gt;刪除&lt;/button&gt;
 &lt;/dialog&gt;</code></pre>
+<pre><code class="javascript">// 寫在 html 的按鈕一樣可以用 JavaScript 控制
+dialog.updateButton('save', {loading: true});</code></pre>
 
 <h6>Events</h6>
 <p>
-    close、cancel 是 &lt;dialog&gt; 的原生事件，show 由 dialogify 發送，三種都可以用一般方式綁定：
+    close、cancel 是 &lt;dialog&gt; 的原生事件，show、beforeclose 由 dialogify 發送，都可以用一般方式綁定：
 </p>
 <pre><code class="javascript">dialog.addEventListener('show', function(){});
 dialog.onshow = function(){};
-dialog.onclose = function(){};</code></pre>
+dialog.onclose = function(){};
+
+// beforeclose 可以攔下關閉動作
+dialog.addEventListener('beforeclose', function(e){ e.preventDefault(); });
+dialog.onbeforeclose = function(){ return false; };</code></pre>
 <p>
     也可以寫在標籤上。onclose、oncancel 是原生 inline handler，行為就是瀏覽器定義的那樣；
-    除此之外 dialogify 會把 onshow、onclose、oncancel 的值當成<strong>函式名稱</strong>解析：
+    除此之外 dialogify 會把 onshow、onclose、oncancel、onbeforeclose 的值當成<strong>函式名稱</strong>解析：
 </p>
 <pre><code class="html">&lt;dialog is="bahamut-dialogify" onshow="myHandler" onclose="MyApp.onClose"&gt;&lt;/dialog&gt;</code></pre>
 <pre><code class="javascript">Dialogify.handlers.myHandler = function(){
@@ -721,6 +935,89 @@ document.querySelector('#demo8_dialog').addEventListener('close', function(){
     console.log('closed');
 });
 &lt;/script&gt;</code></pre>
+                        </div>
+                        <div class="mdl-layout-spacer"></div>
+                    </div>
+
+                    <div class="mdl-grid">
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <h5 class="mdl-typeography--headline">Example - Drawer</h5>
+                            <button id="demo9" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
+                            <pre><code class="javascript">new Dialogify('#demo9_template', {
+    position: Dialogify.POSITION_RIGHT
+})
+    .title('篩選條件')
+    .buttons([
+        {type: Dialogify.BUTTON_DEFAULT, text: '重設'},
+        {type: Dialogify.BUTTON_PRIMARY, text: '套用'}
+    ])
+    .showModal();</code></pre>
+                        </div>
+                        <div class="mdl-layout-spacer"></div>
+                    </div>
+
+                    <div class="mdl-grid">
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <h5 class="mdl-typeography--headline">Example - Toast</h5>
+                            <button id="demo10" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
+                            <pre><code class="javascript">Dialogify.toast('儲存成功', {type: 'success'});
+Dialogify.toast('有 3 個欄位需要確認', {type: 'warning', duration: 4000});
+Dialogify.toast('連線失敗', {
+    type: 'error',
+    position: Dialogify.TOAST_BOTTOM_CENTER,
+    closable: true
+});</code></pre>
+                        </div>
+                        <div class="mdl-layout-spacer"></div>
+                    </div>
+
+                    <div class="mdl-grid">
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <h5 class="mdl-typeography--headline">Example - Anchored popover</h5>
+                            <button id="demo11" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
+                            <pre><code class="javascript">new Dialogify('&lt;p&gt;錨定在按鈕旁邊的小卡片，捲動時會跟著移動，空間不夠會自動翻面。&lt;/p&gt;')
+    .showAt('#demo11', {placement: 'bottom', align: 'start', offset: 8});</code></pre>
+                        </div>
+                        <div class="mdl-layout-spacer"></div>
+                    </div>
+
+                    <div class="mdl-grid">
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
+                            <h5 class="mdl-typeography--headline">Example - beforeclose, loading &amp; form</h5>
+                            <button id="demo12" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">try it</button>
+                            <pre><code class="javascript">const dialogify = new Dialogify('#demo12_template')
+    .title('編輯文章')
+    .buttons([
+        {type: Dialogify.BUTTON_DEFAULT, text: 'Cancel'},
+        {id: 'save', type: Dialogify.BUTTON_PRIMARY, text: '儲存', click: onSave}
+    ]);
+
+// 儲存中不讓它關（esc、點背景、關閉鈕都擋得住）
+dialogify.on('beforeclose', function(e){
+    if (this.isLoading()) e.preventDefault();
+});
+
+async function onSave(e){
+    e.preventDefault();                       // 擋掉 dialog form 的自動關閉
+    if (!dialogify.validate()) return;        // 原生表單驗證
+
+    dialogify.setLoading(true);
+    dialogify.updateButton('save', {loading: true, loadingText: '儲存中...'});
+    await save(dialogify.formValues());       // {title: '...', content: '...'}
+    dialogify.setLoading(false);
+    dialogify.updateButton('save', {loading: false});
+
+    dialogify.close();
+    Dialogify.toast('已儲存', {type: 'success'});
+}
+
+dialogify.showModal().then(function(returnValue){
+    console.log('closed with', returnValue);  // show()/showModal() 回傳 promise
+});</code></pre>
                         </div>
                         <div class="mdl-layout-spacer"></div>
                     </div>
@@ -969,6 +1266,70 @@ async function(){
                     <div class="mdl-grid">
                         <div class="mdl-layout-spacer"></div>
                         <div class="mdl-cell mdl-cell--10-col">
+                            <a name="dialogify.toast"></a>
+                            <h4 class="mdl-typeography--headline">Dialogify.toast(message, options)</h4>
+                            <p>顯示會自動消失的輕量提示，不會擋住使用者操作，同一角落的 toast 會自動往下堆疊。</p>
+                            <pre><code class="javascript">Dialogify.toast('儲存成功', {type: 'success'});
+
+Dialogify.toast('連線失敗，請稍後再試', {
+    type: 'error',
+    duration: 5000,
+    position: Dialogify.TOAST_BOTTOM_CENTER
+});
+
+// duration: 0 代表不自動關閉，要自己收
+const toast = Dialogify.toast('處理中...', {duration: 0, closable: true});
+toast.close();</code></pre>
+<h6>options: {}, optional</h6>
+<table class="mdl-data-table mdl-js-data-table">
+    <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">type</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                info | success | warning | error<br>
+                預設 info，決定 toast 的配色
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">duration</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                number<br>
+                預設 3000 毫秒；設 0 則不自動關閉
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">position</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                Dialogify.TOAST_TOP_RIGHT | TOAST_TOP_LEFT | TOAST_TOP_CENTER |
+                TOAST_BOTTOM_RIGHT | TOAST_BOTTOM_LEFT | TOAST_BOTTOM_CENTER<br>
+                預設右上角
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">closable</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                true | false<br>
+                預設 false，設 true 會顯示關閉鈕
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">onClose</td>
+            <td class="mdl-data-table__cell--non-numeric">function，toast 關閉後呼叫</td>
+        </tr>
+    </tbody>
+</table>
+<p>
+    回傳的物件有 <code>close()</code> 和 <code>dialog</code>（toast 的 DOM 元素）。
+    message 和其他 API 一樣會當成 html 解析，帶入使用者輸入時請先做逸出處理。
+</p>
+                        </div>
+                        <div class="mdl-layout-spacer"></div>
+                    </div>
+
+
+                    <div class="mdl-grid">
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-cell mdl-cell--10-col">
                             <a name="dialogify.closeall"></a>
                             <h4 class="mdl-typeography--headline">Dialogify.closeAll()</h4>
                             <p>關閉所有 dialogify 燈箱</p>
@@ -987,6 +1348,17 @@ async function(){
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.
         <input type="text" class="text-field" placeholder="title">
         <textarea class="text-field" placeholder="content"></textarea>
+    </script>
+
+    <script type="text/template" id="demo9_template">
+        <label>關鍵字<input type="text" class="text-field" placeholder="keyword"></label>
+        <label>分類<input type="text" class="text-field" placeholder="category"></label>
+        <label><input type="checkbox" checked> 只顯示上架中</label>
+    </script>
+
+    <script type="text/template" id="demo12_template">
+        <input type="text" name="title" class="text-field" placeholder="標題（必填）" required>
+        <textarea name="content" class="text-field" placeholder="內容"></textarea>
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.min.js" integrity="sha512-mPYFRGkgrXvIQo9eMKjv5vuy73j7kXXelllj3W49nVCKarBVOUxNai2dnqVIp8QnnVS7AKHwdFyZSVibSqWtkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -1098,6 +1470,63 @@ async function(){
 
         document.querySelector('#demo8_dialog').addEventListener('close', function(){
             console.log('closed');
+        });
+
+        $('#demo9').click(function(){
+            new Dialogify('#demo9_template', {position: Dialogify.POSITION_RIGHT})
+                .title('篩選條件')
+                .buttons([
+                    {type: Dialogify.BUTTON_DEFAULT, text: '重設'},
+                    {type: Dialogify.BUTTON_PRIMARY, text: '套用'}
+                ])
+                .showModal();
+        });
+
+        $('#demo10').click(function(){
+            Dialogify.toast('儲存成功', {type: 'success'});
+            Dialogify.toast('有 3 個欄位需要確認', {type: 'warning', duration: 4000});
+            Dialogify.toast('連線失敗', {
+                type: 'error',
+                position: Dialogify.TOAST_BOTTOM_CENTER,
+                closable: true
+            });
+        });
+
+        $('#demo11').click(function(){
+            new Dialogify('<p>錨定在按鈕旁邊的小卡片，捲動時會跟著移動，空間不夠會自動翻面。</p>')
+                .showAt('#demo11', {placement: 'bottom', align: 'start', offset: 8});
+        });
+
+        $('#demo12').click(function(){
+            const dialogify = new Dialogify('#demo12_template')
+                .title('編輯文章')
+                .buttons([
+                    {type: Dialogify.BUTTON_DEFAULT, text: 'Cancel'},
+                    {id: 'save', type: Dialogify.BUTTON_PRIMARY, text: '儲存', click: onSave}
+                ]);
+
+            dialogify.on('beforeclose', function(e){
+                if(this.isLoading()) e.preventDefault();
+            });
+
+            async function onSave(e){
+                e.preventDefault();
+                if(!dialogify.validate()) return;
+
+                dialogify.setLoading(true);
+                dialogify.updateButton('save', {loading: true, loadingText: '儲存中...'});
+                await new Promise(function(resolve){ setTimeout(resolve, 1500); });
+                dialogify.setLoading(false);
+                dialogify.updateButton('save', {loading: false});
+
+                console.log(dialogify.formValues());
+                dialogify.close();
+                Dialogify.toast('已儲存', {type: 'success'});
+            }
+
+            dialogify.showModal().then(function(returnValue){
+                console.log('closed with', returnValue);
+            });
         });
 
         $('#demo4').click(async function() {

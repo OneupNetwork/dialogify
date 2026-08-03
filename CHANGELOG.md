@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.2.0
+    feat(a11y): aria-labelledby from title(), focusable and labelled close button
+    feat(a11y): role=status on loading and toasts, aria-busy on loading buttons, reduced-motion support
+    feat: show()/showModal() return a promise resolving with the dialog returnValue
+    feat: cancelable beforeclose event covering every close path (button, ESC, backdrop, form submit, close())
+    feat: setContent()/getContent()/load() to update a dialog after it is created
+    feat: setLoading()/isLoading() overlay and per-button loading state via updateButton()
+    feat: validate()/formData()/formValues() on top of the existing <form method="dialog">
+    feat: addButton()/updateButton()/removeButton()/getButton(); declarative buttons join the button list
+    feat: drawer mode via the position option and attribute (left/right/top/bottom)
+    feat: Dialogify.toast() auto-dismissing notifications with stacking and types
+    feat: showAt() anchored popover positioning with viewport flipping and follow-on-scroll
+    feat: off() to unbind instance events, and onbeforeclose on the custom element
+    feat: anchor/placement/align/offset and loading-text attributes on the custom element
+
 ## 2.1.0
     feat: declarative `<dialog is="bahamut-dialogify">` customized built-in element
     feat: dialogify API (show/showModal/isOpen/setTitle/buttons/on) on the element itself

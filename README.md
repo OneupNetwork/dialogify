@@ -50,6 +50,166 @@ new Dialogify('dialog content')
 
 ![basic dialogify](docs/img/screenshot1.png)
 
+## Working with an open dialog
+
+### Awaiting the result
+
+`show()` and `showModal()` resolve with the dialog's `returnValue` once it closes:
+
+```javascript
+const dialog = new Dialogify('Are you sure?').buttons([
+    { text: 'Yes', type: Dialogify.BUTTON_PRIMARY, click: () => dialog.close('yes') },
+    { text: 'No', click: () => dialog.close('no') }
+]);
+
+const answer = await dialog.showModal(); // 'yes' or 'no'
+```
+
+### Preventing a close
+
+`beforeclose` fires before every close — buttons, the close button, `ESC`, the
+backdrop, a `<form method="dialog">` submit and `close()` itself. Cancel it to
+keep the dialog open:
+
+```javascript
+dialog.on('beforeclose', async (event) => {
+    if (isDirty) {
+        event.preventDefault();
+        if (await Dialogify.confirm('Discard your changes?')) {
+            isDirty = false;
+            dialog.close();
+        }
+    }
+});
+```
+
+### Updating content
+
+```javascript
+dialog.setContent('<p>Step 2</p>'); // replaces the body, keeps title and buttons
+dialog.getContent();
+
+await dialog.load('/ajax/step2', { id: 7 }); // fetch into the body, with a loading state
+```
+
+### Loading state
+
+```javascript
+dialog.setLoading(true); // overlay across the dialog content
+dialog.setLoading(false);
+dialog.isLoading();
+
+dialog.updateButton('save', { loading: true }); // busy spinner, disabled, swaps in loadingText
+```
+
+### Forms
+
+The content is wrapped in `<form method="dialog">` by default, so native
+validation and `FormData` work out of the box:
+
+```javascript
+const dialog = new Dialogify('<input name="title" required>').buttons([
+    {
+        id: 'save',
+        text: 'Save',
+        type: Dialogify.BUTTON_PRIMARY,
+        loadingText: 'Saving...',
+        click: async () => {
+            if (!dialog.validate()) {
+                return; // reports the first invalid field
+            }
+
+            dialog.updateButton('save', { loading: true });
+            await save(dialog.formValues()); // { title: '...' }
+            dialog.close('saved');
+        }
+    }
+]);
+```
+
+`formValues()` returns a plain object (repeated fields become arrays);
+`formData()` returns a `FormData`, or `null` when `useDialogForm` is `false`.
+
+### Managing buttons
+
+```javascript
+dialog.addButton({ id: 'more', text: 'More' });
+dialog.addButton({ id: 'first', text: 'First' }, { prepend: true });
+dialog.updateButton('more', { text: 'Fewer', type: Dialogify.BUTTON_DANGER, disabled: true });
+dialog.removeButton('more');
+dialog.getButton('save'); // the button's jQuery object
+```
+
+## Drawers, toasts and popovers
+
+### Drawer
+
+`position` slides the dialog in from an edge instead of centring it:
+
+```javascript
+new Dialogify('<h4>Filters</h4>', { position: Dialogify.POSITION_RIGHT }).showModal();
+```
+
+```html
+<dialog is="bahamut-dialogify" position="right">Filters</dialog>
+```
+
+Accepts `left`, `right`, `top` and `bottom`.
+
+### Toast
+
+A lightweight, auto-dismissing notification. Toasts stack in a fixed corner
+container and are not modal, so they never block the page:
+
+```javascript
+Dialogify.toast('Saved');
+Dialogify.toast('Could not save', {
+    type: Dialogify.TOAST_ERROR, // TOAST_INFO (default), TOAST_SUCCESS, TOAST_WARNING
+    position: 'bottom-right', // top/bottom + left/center/right, default top-right
+    duration: 5000, // 0 keeps it open until closed
+    title: 'Error',
+    closable: true
+});
+```
+
+Hovering a toast pauses its auto-dismiss timer. `Dialogify.toast()` returns the
+dialog instance, so `close()` and the usual events are available.
+
+### Anchored popover
+
+`showAt()` positions a non-modal dialog next to another element, for dropdowns
+and popover cards. It flips to the opposite side when the preferred placement
+would overflow the viewport, and follows the anchor on scroll and resize:
+
+```javascript
+new Dialogify('<ul>...</ul>', { closable: false, useDialogForm: false }).showAt('#menu-button', {
+    placement: 'bottom', // top | bottom | left | right
+    align: 'start', // start | center | end
+    offset: 8
+});
+```
+
+```html
+<dialog is="bahamut-dialogify" anchor="#menu-button" placement="bottom" align="end">…</dialog>
+```
+
+```javascript
+document.querySelector('dialog[is="bahamut-dialogify"]').showAt();
+```
+
+## Accessibility
+
+- `title()` links the heading to the dialog with `aria-labelledby`.
+- The close button is exposed as a button, is keyboard focusable and activates
+  with <kbd>Enter</kbd> / <kbd>Space</kbd>, and is labelled from the locale.
+- Decorative icons are hidden from assistive technology; the loading indicator
+  and toasts announce themselves with `role="status"`.
+- Buttons in their loading state are marked `aria-busy`.
+- Animations are disabled under `prefers-reduced-motion`.
+
+Modal dialogs get focus trapping and focus restoration from the native
+`<dialog>` element itself.
+
 ## Dialog content is HTML
 
 The `source` passed to `new Dialogify(source)` and the `message` passed to
@@ -99,16 +259,30 @@ it closes, so it can be shown again.
 `document.querySelector(...)` returns the element itself, and the dialogify API is
 available on it:
 
-| Method                       | Description                      |
-| ---------------------------- | -------------------------------- |
-| `show()`                     | Show the dialog (non-modal)      |
-| `showModal()`                | Show the dialog as a modal       |
-| `close(returnValue?)`        | Native `<dialog>` close          |
-| `isOpen()`                   | Whether the dialog is open       |
-| `setTitle(text)`             | Set the dialog title             |
-| `buttons(buttons, options?)` | Add buttons programmatically     |
-| `on(event, handler)`         | Bind a dialogify instance event  |
-| `.dialogify`                 | The backing `Dialogify` instance |
+| Method                       | Description                                       |
+| ---------------------------- | ------------------------------------------------- |
+| `show()`                     | Show the dialog (non-modal); resolves on close    |
+| `showModal()`                | Show the dialog as a modal; resolves on close     |
+| `showAt(anchor?, options?)`  | Show anchored to another element                  |
+| `reposition()`               | Recompute the anchored position                   |
+| `close(returnValue?)`        | Close the dialog (fires `beforeclose`)            |
+| `isOpen()`                   | Whether the dialog is open                        |
+| `setTitle(text)`             | Set the dialog title                              |
+| `setContent(html)`           | Replace the body, keeping title and buttons       |
+| `getContent()`               | The current body HTML                             |
+| `load(url, data?)`           | Load body content over ajax, with a loading state |
+| `setLoading(bool)`           | Toggle the loading overlay                        |
+| `isLoading()`                | Whether the loading overlay is shown              |
+| `validate()`                 | Run native form validation                        |
+| `formData()`                 | The dialog form as `FormData`                     |
+| `formValues()`               | The dialog form as a plain object                 |
+| `buttons(buttons, options?)` | Set the buttons programmatically                  |
+| `addButton(button, opts?)`   | Append (or prepend) one button                    |
+| `updateButton(id, changes)`  | Update a button in place                          |
+| `removeButton(id)`           | Remove a button                                   |
+| `getButton(id)`              | A button's jQuery object                          |
+| `on/off(event, handler)`     | Bind/unbind a dialogify instance event            |
+| `.dialogify`                 | The backing `Dialogify` instance                  |
 
 > `setTitle()` is used instead of `title()` because `HTMLElement.title` is the
 > native tooltip property and must keep its standard behaviour.
@@ -119,6 +293,7 @@ available on it:
 | ------------------- | ------------------ | ------------------------------------------------------------- |
 | `dialog-title`      | —                  | Dialog title (`title` is the native tooltip)                  |
 | `size="large"`      | `size`             | Maps to `Dialogify.SIZE_LARGE`; any other value is used as-is |
+| `position`          | `position`         | Drawer edge: `left` / `right` / `top` / `bottom`              |
 | `closable`          | `closable`         | Show the close button                                         |
 | `fixed`             | `fixed`            | Use `position: fixed`                                         |
 | `background-scroll` | `backgroundScroll` | Allow scrolling behind the dialog                             |
@@ -127,6 +302,10 @@ available on it:
 | `ajax-prefix`       | `ajaxPrefix`       | Ajax prefix used to resolve `src`                             |
 | `options='{...}'`   | —                  | Any option as a JSON object                                   |
 | `buttons-position`  | —                  | `left` / `center` / `right` (default `right`)                 |
+| `anchor`            | —                  | Selector for the anchor element used by `showAt()`            |
+| `placement`         | —                  | `top` / `bottom` / `left` / `right` for `showAt()`            |
+| `align`             | —                  | `start` / `center` / `end` for `showAt()`                     |
+| `offset`            | —                  | Gap in pixels for `showAt()`                                  |
 
 > ⚠️ Because attributes are strings, these booleans are **value-based**, not
 > presence-based: use `closable="false"` to disable. A bare attribute, `"true"`,
@@ -170,20 +349,39 @@ If the button has no text, a localized default (`Ok` / `Cancel` / `Close`) is us
 > Write `<button ok></button>`, not `<button ok />`. Self-closing syntax is not
 > valid for HTML elements and makes the parser nest the following siblings.
 
+Declarative buttons join the button list too, so they can be driven from
+JavaScript. Give them an `id` to address them by name (otherwise they are keyed
+by index), and a `loading-text` for their busy state:
+
+```html
+<dialog is="bahamut-dialogify">
+    <input name="title" required />
+    <button ok id="save" loading-text="Saving...">Save</button>
+</dialog>
+```
+
+```javascript
+dialog.updateButton('save', { loading: true });
+```
+
 ### Events
 
-`close` and `cancel` are native `<dialog>` events; `show` is dispatched by dialogify.
-All three can be bound in the usual ways:
+`close` and `cancel` are native `<dialog>` events; `show` and `beforeclose` are
+dispatched by dialogify. They can all be bound in the usual ways:
 
 ```javascript
 dialog.addEventListener('show', () => {});
 dialog.onshow = () => {};
 dialog.onclose = () => {};
+
+dialog.addEventListener('beforeclose', (e) => e.preventDefault()); // keeps it open
+dialog.onbeforeclose = () => false; // same thing
 ```
 
 They can also be bound in markup. `onclose` and `oncancel` are native inline
 handlers and behave exactly as the browser defines. In addition, dialogify
-resolves a **function name** on `onshow`, `onclose` and `oncancel`:
+resolves a **function name** on `onshow`, `onclose`, `oncancel` and
+`onbeforeclose`:
 
 ```html
 <dialog is="bahamut-dialogify" onshow="myHandler" onclose="MyApp.onClose"></dialog>

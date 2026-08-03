@@ -11,7 +11,7 @@
  */
 
 import $ from 'jquery';
-import Dialogify, { getConfig, nativeDialogCall } from './core.js';
+import Dialogify, { getLocale, dispatchDomEvent } from './core.js';
 
 export const ELEMENT_NAME = 'bahamut-dialogify';
 
@@ -25,11 +25,14 @@ const BOOLEAN_ATTRIBUTES = {
 
 // attribute name -> string option name
 const STRING_ATTRIBUTES = {
-    'ajax-prefix': 'ajaxPrefix'
+    'ajax-prefix': 'ajaxPrefix',
+    position: 'position'
 };
 
 const BUTTON_SELECTOR =
     'button[ok], button[cancel], button[close], button[primary], button[danger]';
+
+const EVENT_ATTRIBUTES = ['onshow', 'onclose', 'oncancel', 'onbeforeclose'];
 
 const IDENTIFIER_PATTERN = /^[A-Za-z_$][\w$]*(\.[A-Za-z_$][\w$]*)*$/;
 
@@ -115,13 +118,17 @@ function upgradeButtons(instance, element) {
         return;
     }
 
-    const config = getConfig();
-    const locale = Dialogify.LOCALE[config.locale] || Dialogify.LOCALE['zh_TW'];
+    const locale = getLocale();
 
     const position = element.getAttribute('buttons-position');
     const $buttonBox = $('<div>')
         .addClass('btn-box')
         .addClass(position ? `text-${position}` : 'text-right');
+
+    // Declarative buttons join $buttonList so getButton()/updateButton() work
+    // on them exactly like programmatic ones.
+    instance.$buttonList = instance.$buttonList || {};
+    let index = 0;
 
     $buttons.each(function () {
         const $button = $(this);
@@ -152,17 +159,26 @@ function upgradeButtons(instance, element) {
             $button.addClass('is-disabled');
         }
 
+        // Normalise the declarative loading-text attribute onto the same
+        // data attribute updateButton() reads for programmatic buttons.
+        const loadingText = $button.attr('loading-text');
+        if (loadingText && !$button.attr('data-loading-text')) {
+            $button.attr('data-loading-text', loadingText);
+        }
+
         if ($button.is('[ok], [cancel], [close]')) {
             const isCancel = $button.is('[cancel]');
             $button.on('click', function () {
-                if (isCancel) {
-                    element.dispatchEvent(
-                        new window.CustomEvent('cancel', { bubbles: false, cancelable: true })
-                    );
+                // Route through close() so beforeclose can veto the close.
+                if (isCancel && !dispatchDomEvent(element, 'cancel')) {
+                    return;
                 }
-                nativeDialogCall(element, 'close');
+                instance.close();
             });
         }
+
+        instance.$buttonList[$button.attr('id') || index] = $button;
+        index++;
 
         $buttonBox.append(this);
     });
@@ -174,12 +190,16 @@ function upgradeButtons(instance, element) {
 // handlers declared later in the page (or swapped at runtime) still work, and
 // changing the attribute takes effect immediately.
 function bindDeclarativeHandlers(element) {
-    ['onshow', 'onclose', 'oncancel'].forEach(function (attr) {
+    EVENT_ATTRIBUTES.forEach(function (attr) {
         const type = attr.slice(2);
         element.addEventListener(type, function (event) {
             const handler = resolveHandler(element.getAttribute(attr));
-            if (handler) {
-                handler.call(element, event);
+            if (!handler) {
+                return;
+            }
+            // Returning false cancels the event, matching inline handler semantics.
+            if (handler.call(element, event) === false) {
+                event.preventDefault();
             }
         });
     });
@@ -289,18 +309,93 @@ export function createDialogifyElement() {
             }
         }
 
+        get onbeforeclose() {
+            return this._onbeforecloseHandler || null;
+        }
+
+        set onbeforeclose(handler) {
+            if (this._onbeforecloseWrapper) {
+                this.removeEventListener('beforeclose', this._onbeforecloseWrapper);
+                this._onbeforecloseWrapper = null;
+            }
+
+            this._onbeforecloseHandler = typeof handler == 'function' ? handler : null;
+
+            if (this._onbeforecloseHandler) {
+                const self = this;
+                this._onbeforecloseWrapper = function (event) {
+                    if (self._onbeforecloseHandler.call(self, event) === false) {
+                        event.preventDefault();
+                    }
+                };
+                this.addEventListener('beforeclose', this._onbeforecloseWrapper);
+            }
+        }
+
         show() {
             this._initDialogify();
-            this._dialogifyInstance.show();
+            return this._dialogifyInstance.show();
         }
 
         showModal() {
             this._initDialogify();
-            this._dialogifyInstance.showModal();
+            return this._dialogifyInstance.showModal();
+        }
+
+        // Show anchored next to another element, e.g. a dropdown or popover.
+        showAt(anchor, options) {
+            this._initDialogify();
+            return this._dialogifyInstance.showAt(
+                anchor === undefined ? this._defaultAnchor() : anchor,
+                options === undefined ? this._defaultAnchorOptions() : options
+            );
+        }
+
+        reposition() {
+            this._initDialogify();
+            this._dialogifyInstance.reposition();
+            return this;
+        }
+
+        _defaultAnchor() {
+            const selector = this.getAttribute('anchor');
+            return selector ? window.document.querySelector(selector) : null;
+        }
+
+        _defaultAnchorOptions() {
+            const options = {};
+            const placement = this.getAttribute('placement');
+            const align = this.getAttribute('align');
+            const offset = this.getAttribute('offset');
+
+            if (placement) {
+                options.placement = placement;
+            }
+            if (align) {
+                options.align = align;
+            }
+            if (offset !== null && offset !== '' && !isNaN(Number(offset))) {
+                options.offset = Number(offset);
+            }
+            return options;
         }
 
         isOpen() {
             return this.open;
+        }
+
+        // Routed through the instance so beforeclose can veto this path too.
+        // The instance calls the native close via HTMLDialogElement.prototype,
+        // so this override does not recurse.
+        close(returnValue) {
+            if (!this._dialogifyInstance) {
+                window.HTMLDialogElement.prototype.close.apply(
+                    this,
+                    returnValue === undefined ? [] : [returnValue]
+                );
+                return;
+            }
+            this._dialogifyInstance.close(returnValue);
         }
 
         // Named setTitle, not title: HTMLElement.title is the native tooltip
@@ -317,9 +412,80 @@ export function createDialogifyElement() {
             return this;
         }
 
+        addButton(button, options) {
+            this._initDialogify();
+            this._dialogifyInstance.addButton(button, options);
+            return this;
+        }
+
+        removeButton(id) {
+            this._initDialogify();
+            this._dialogifyInstance.removeButton(id);
+            return this;
+        }
+
+        updateButton(id, changes) {
+            this._initDialogify();
+            this._dialogifyInstance.updateButton(id, changes);
+            return this;
+        }
+
+        getButton(id) {
+            this._initDialogify();
+            return this._dialogifyInstance.getButton(id);
+        }
+
+        setContent(content) {
+            this._initDialogify();
+            this._dialogifyInstance.setContent(content);
+            return this;
+        }
+
+        getContent() {
+            this._initDialogify();
+            return this._dialogifyInstance.getContent();
+        }
+
+        load(url, data) {
+            this._initDialogify();
+            return this._dialogifyInstance.load(url, data);
+        }
+
+        setLoading(loading) {
+            this._initDialogify();
+            this._dialogifyInstance.setLoading(loading);
+            return this;
+        }
+
+        isLoading() {
+            this._initDialogify();
+            return this._dialogifyInstance.isLoading();
+        }
+
+        validate() {
+            this._initDialogify();
+            return this._dialogifyInstance.validate();
+        }
+
+        formData() {
+            this._initDialogify();
+            return this._dialogifyInstance.formData();
+        }
+
+        formValues() {
+            this._initDialogify();
+            return this._dialogifyInstance.formValues();
+        }
+
         on(event, handler) {
             this._initDialogify();
             this._dialogifyInstance.on(event, handler);
+            return this;
+        }
+
+        off(event, handler) {
+            this._initDialogify();
+            this._dialogifyInstance.off(event, handler);
             return this;
         }
     };

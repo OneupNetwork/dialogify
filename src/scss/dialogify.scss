@@ -91,6 +91,10 @@
         padding: 22px 28px 20px 24px;
         box-sizing: border-box;
         //overflow: scroll;
+        // positioning context for the loading overlay
+        > div {
+            position: relative;
+        }
     }
     .dialogify__content-box {
         margin: 20px auto;
@@ -126,6 +130,28 @@
         }
         &:hover img {
             opacity: 1;
+        }
+        &:focus-visible {
+            outline: 2px solid #117e96;
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+    }
+    // loading overlay shown by setLoading()
+    .dialogify__loading {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.75);
+        z-index: 3;
+        img {
+            width: 36px;
+            height: 36px;
         }
     }
     img.dialogify-ajax-loading {
@@ -215,6 +241,25 @@
             cursor: not-allowed !important;
             &:hover {
                 animation: 300ms shake;
+            }
+        }
+        // button busy state set by updateButton(id, {loading: true})
+        &.is-loading {
+            cursor: progress !important;
+            &:hover {
+                animation: none;
+            }
+            &:before {
+                content: '';
+                display: inline-block;
+                width: 12px;
+                height: 12px;
+                margin-right: 6px;
+                vertical-align: -1px;
+                border: 2px solid currentColor;
+                border-right-color: transparent;
+                border-radius: 50%;
+                animation: dialogify-spin 700ms linear infinite;
             }
         }
         @keyframes shake {
@@ -324,6 +369,242 @@
         line-height: 1.5;
         font-size: 14px;
         overflow: auto;
+    }
+}
+
+@keyframes dialogify-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// --- drawer -------------------------------------------------------------
+// position: left|right|top|bottom slides the dialog in from that edge
+// instead of centring it.
+.dialogify.dialogify--drawer {
+    position: fixed;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+    margin: 0;
+    transform: none;
+
+    .dialogify__content {
+        height: 100%;
+        box-sizing: border-box;
+        overflow: auto;
+    }
+
+    &.dialogify--left,
+    &.dialogify--right {
+        top: 0;
+        bottom: 0;
+        height: 100%;
+        width: 420px;
+        max-width: 100vw;
+    }
+
+    &.dialogify--left {
+        left: 0;
+        right: auto;
+        animation: dialogify-slide-left 220ms ease-out;
+    }
+
+    &.dialogify--right {
+        right: 0;
+        left: auto;
+        animation: dialogify-slide-right 220ms ease-out;
+    }
+
+    &.dialogify--top,
+    &.dialogify--bottom {
+        left: 0;
+        right: auto;
+        width: 100%;
+        max-height: 90vh;
+    }
+
+    &.dialogify--top {
+        top: 0;
+        bottom: auto;
+        animation: dialogify-slide-top 220ms ease-out;
+    }
+
+    &.dialogify--bottom {
+        bottom: 0;
+        top: auto;
+        animation: dialogify-slide-bottom 220ms ease-out;
+    }
+}
+
+@keyframes dialogify-slide-left {
+    from {
+        transform: translateX(-100%);
+    }
+}
+@keyframes dialogify-slide-right {
+    from {
+        transform: translateX(100%);
+    }
+}
+@keyframes dialogify-slide-top {
+    from {
+        transform: translateY(-100%);
+    }
+}
+@keyframes dialogify-slide-bottom {
+    from {
+        transform: translateY(100%);
+    }
+}
+
+// --- anchored popover ---------------------------------------------------
+// showAt() positions the dialog next to an anchor element.
+.dialogify.dialogify--popover {
+    position: fixed;
+    min-width: 0;
+    transform: none;
+    animation: dialogify-fade-in 140ms ease-out;
+
+    .dialogify__content {
+        padding: 12px 16px;
+    }
+
+    .dialogify__fixedwidth {
+        max-width: 320px;
+    }
+}
+
+@keyframes dialogify-fade-in {
+    from {
+        opacity: 0;
+    }
+}
+
+// --- toast --------------------------------------------------------------
+.dialogify-toast-container {
+    position: fixed;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    pointer-events: none;
+    max-width: 100vw;
+
+    &--top-left,
+    &--top-center,
+    &--top-right {
+        top: 0;
+    }
+
+    &--bottom-left,
+    &--bottom-center,
+    &--bottom-right {
+        bottom: 0;
+        flex-direction: column-reverse;
+    }
+
+    &--top-left,
+    &--bottom-left {
+        left: 0;
+        align-items: flex-start;
+    }
+
+    &--top-right,
+    &--bottom-right {
+        right: 0;
+        align-items: flex-end;
+    }
+
+    &--top-center,
+    &--bottom-center {
+        left: 50%;
+        transform: translateX(-50%);
+        align-items: center;
+    }
+}
+
+.dialogify.dialogify--toast {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    transform: none;
+    margin: 0;
+    min-width: 240px;
+    max-width: 380px;
+    pointer-events: auto;
+    animation: dialogify-toast-in 200ms ease-out;
+
+    .dialogify__content {
+        padding: 12px 16px;
+    }
+
+    .dialogify_title {
+        margin: 0 0 4px;
+    }
+
+    // coloured status bar down the leading edge
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 4px;
+        border-radius: 4px 0 0 4px;
+        background: #117e96;
+    }
+
+    &.dialogify--toast-success:before {
+        background: #2f9e44;
+    }
+    &.dialogify--toast-warning:before {
+        background: #e8a33d;
+    }
+    &.dialogify--toast-error:before {
+        background: #de2427;
+    }
+
+    &.dialogify--toast-closable .dialogify__content {
+        padding-right: 34px;
+    }
+
+    .dialogify__toast-close {
+        position: absolute;
+        top: 6px;
+        right: 8px;
+        border: none;
+        background: none;
+        padding: 0 4px;
+        font-size: 18px;
+        line-height: 1;
+        color: #8d8d8d;
+        cursor: pointer;
+        &:hover {
+            color: #464646;
+        }
+        &:focus-visible {
+            outline: 2px solid #117e96;
+            outline-offset: 2px;
+        }
+    }
+}
+
+@keyframes dialogify-toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dialogify.dialogify--drawer,
+    .dialogify.dialogify--popover,
+    .dialogify.dialogify--toast {
+        animation: none;
     }
 }
 

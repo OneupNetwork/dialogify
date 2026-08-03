@@ -32,11 +32,59 @@ export function nativeDialogCall(dialog, method, args) {
 
 // Dispatch a real DOM event on the dialog element so that both
 // addEventListener and the declarative element handlers can observe it.
-export function dispatchDomEvent(dialog, type) {
+// Returns false when a listener called preventDefault().
+export function dispatchDomEvent(dialog, type, detail) {
     if (typeof window.CustomEvent != 'function') {
-        return;
+        return true;
     }
-    dialog.dispatchEvent(new window.CustomEvent(type, { bubbles: false, cancelable: true }));
+    const event = new window.CustomEvent(type, {
+        bubbles: false,
+        cancelable: true,
+        detail: detail
+    });
+    dialog.dispatchEvent(event);
+    return !event.defaultPrevented;
+}
+
+// Resolve the locale strings for the current config.
+export function getLocale() {
+    const config = getConfig();
+    return Dialogify.LOCALE[config.locale] || Dialogify.LOCALE['zh_TW'];
+}
+
+const DRAWER_POSITIONS = ['left', 'right', 'top', 'bottom'];
+
+const TOAST_POSITIONS = [
+    'top-left',
+    'top-center',
+    'top-right',
+    'bottom-left',
+    'bottom-center',
+    'bottom-right'
+];
+
+const LOADING_IMAGE =
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMzZweCcgaGVpZ2h0PSczNnB4JyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCIgY2xhc3M9InVpbC1kZWZhdWx0Ij48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0ibm9uZSIgY2xhc3M9ImJrIj48L3JlY3Q+PHJlY3QgIHg9JzQ2LjUnIHk9JzQwJyB3aWR0aD0nNycgaGVpZ2h0PScyMCcgcng9JzUnIHJ5PSc1JyBmaWxsPScjMDA5NDk5JyB0cmFuc2Zvcm09J3JvdGF0ZSgwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMHMnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJy8+PC9yZWN0PjxyZWN0ICB4PSc0Ni41JyB5PSc0MCcgd2lkdGg9JzcnIGhlaWdodD0nMjAnIHJ4PSc1JyByeT0nNScgZmlsbD0nIzAwOTQ5OScgdHJhbnNmb3JtPSdyb3RhdGUoMzAgNTAgNTApIHRyYW5zbGF0ZSgwIC0zMCknPiAgPGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nb3BhY2l0eScgZnJvbT0nMScgdG89JzAnIGR1cj0nMXMnIGJlZ2luPScwLjA4MzMzMzMzMzMzMzMzMzMzcycgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnLz48L3JlY3Q+PHJlY3QgIHg9JzQ2LjUnIHk9JzQwJyB3aWR0aD0nNycgaGVpZ2h0PScyMCcgcng9JzUnIHJ5PSc1JyBmaWxsPScjMDA5NDk5JyB0cmFuc2Zvcm09J3JvdGF0ZSg2MCA1MCA1MCkgdHJhbnNsYXRlKDAgLTMwKSc+ICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdvcGFjaXR5JyBmcm9tPScxJyB0bz0nMCcgZHVyPScxcycgYmVnaW49JzAuMTY2NjY2NjY2NjY2NjY2NjZzJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScvPjwvcmVjdD48cmVjdCAgeD0nNDYuNScgeT0nNDAnIHdpZHRoPSc3JyBoZWlnaHQ9JzIwJyByeD0nNScgcnk9JzUnIGZpbGw9JyMwMDk0OTknIHRyYW5zZm9ybT0ncm90YXRlKDkwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMC4yNXMnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJy8+PC9yZWN0PjxyZWN0ICB4PSc0Ni41JyB5PSc0MCcgd2lkdGg9JzcnIGhlaWdodD0nMjAnIHJ4PSc1JyByeT0nNScgZmlsbD0nIzAwOTQ5OScgdHJhbnNmb3JtPSdyb3RhdGUoMTIwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMC4zMzMzMzMzMzMzMzMzMzMzcycgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnLz48L3JlY3Q+PHJlY3QgIHg9JzQ2LjUnIHk9JzQwJyB3aWR0aD0nNycgaGVpZ2h0PScyMCcgcng9JzUnIHJ5PSc1JyBmaWxsPScjMDA5NDk5JyB0cmFuc2Zvcm09J3JvdGF0ZSgxNTAgNTAgNTApIHRyYW5zbGF0ZSgwIC0zMCknPiAgPGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nb3BhY2l0eScgZnJvbT0nMScgdG89JzAnIGR1cj0nMXMnIGJlZ2luPScwLjQxNjY2NjY2NjY2NjY2NjdzJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScvPjwvcmVjdD48cmVjdCAgeD0nNDYuNScgeT0nNDAnIHdpZHRoPSc3JyBoZWlnaHQ9JzIwJyByeD0nNScgcnk9JzUnIGZpbGw9JyMwMDk0OTknIHRyYW5zZm9ybT0ncm90YXRlKDE4MCA1MCA1MCkgdHJhbnNsYXRlKDAgLTMwKSc+ICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdvcGFjaXR5JyBmcm9tPScxJyB0bz0nMCcgZHVyPScxcycgYmVnaW49JzAuNXMnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJy8+PC9yZWN0PjxyZWN0ICB4PSc0Ni41JyB5PSc0MCcgd2lkdGg9JzcnIGhlaWdodD0nMjAnIHJ4PSc1JyByeT0nNScgZmlsbD0nIzAwOTQ5OScgdHJhbnNmb3JtPSdyb3RhdGUoMjEwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMC41ODMzMzMzMzMzMzMzMzM0cycgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnLz48L3JlY3Q+PHJlY3QgIHg9JzQ2LjUnIHk9JzQwJyB3aWR0aD0nNycgaGVpZ2h0PScyMCcgcng9JzUnIHJ5PSc1JyBmaWxsPScjMDA5NDk5JyB0cmFuc2Zvcm09J3JvdGF0ZSgyNDAgNTAgNTApIHRyYW5zbGF0ZSgwIC0zMCknPiAgPGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nb3BhY2l0eScgZnJvbT0nMScgdG89JzAnIGR1cj0nMXMnIGJlZ2luPScwLjY2NjY2NjY2NjY2NjY2NjZzJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScvPjwvcmVjdD48cmVjdCAgeD0nNDYuNScgeT0nNDAnIHdpZHRoPSc3JyBoZWlnaHQ9JzIwJyByeD0nNScgcnk9JzUnIGZpbGw9JyMwMDk0OTknIHRyYW5zZm9ybT0ncm90YXRlKDI3MCA1MCA1MCkgdHJhbnNsYXRlKDAgLTMwKSc+ICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdvcGFjaXR5JyBmcm9tPScxJyB0bz0nMCcgZHVyPScxcycgYmVnaW49JzAuNzVzJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScvPjwvcmVjdD48cmVjdCAgeD0nNDYuNScgeT0nNDAnIHdpZHRoPSc3JyBoZWlnaHQ9JzIwJyByeD0nNScgcnk9JzUnIGZpbGw9JyMwMDk0OTknIHRyYW5zZm9ybT0ncm90YXRlKDMwMCA1MCA1MCkgdHJhbnNsYXRlKDAgLTMwKSc+ICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdvcGFjaXR5JyBmcm9tPScxJyB0bz0nMCcgZHVyPScxcycgYmVnaW49JzAuODMzMzMzMzMzMzMzMzMzNHMnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJy8+PC9yZWN0PjxyZWN0ICB4PSc0Ni41JyB5PSc0MCcgd2lkdGg9JzcnIGhlaWdodD0nMjAnIHJ4PSc1JyByeT0nNScgZmlsbD0nIzAwOTQ5OScgdHJhbnNmb3JtPSdyb3RhdGUoMzMwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMC45MTY2NjY2NjY2NjY2NjY2cycgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnLz48L3JlY3Q+PC9zdmc+';
+
+function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (char) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char];
+    });
+}
+
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+}
+
+// Align the cross axis of an anchored dialog against the anchor rect.
+function alignAxis(align, start, anchorSize, boxSize) {
+    if (align == 'center') {
+        return start + anchorSize / 2 - boxSize / 2;
+    }
+    if (align == 'end') {
+        return start + anchorSize - boxSize;
+    }
+    return start;
 }
 
 class Dialogify {
@@ -77,9 +125,7 @@ class Dialogify {
         } else if (source.charAt(0) == '#') {
             content = $(source).html();
         } else if (source.indexOf(ajaxPrefix) == 0) {
-            let loadingSvg =
-                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMzZweCcgaGVpZ2h0PSczNnB4JyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCIgY2xhc3M9InVpbC1kZWZhdWx0Ij48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0ibm9uZSIgY2xhc3M9ImJrIj48L3JlY3Q+PHJlY3QgIHg9JzQ2LjUnIHk9JzQwJyB3aWR0aD0nNycgaGVpZ2h0PScyMCcgcng9JzUnIHJ5PSc1JyBmaWxsPScjMDA5NDk5JyB0cmFuc2Zvcm09J3JvdGF0ZSgwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMHMnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJy8+PC9yZWN0PjxyZWN0ICB4PSc0Ni41JyB5PSc0MCcgd2lkdGg9JzcnIGhlaWdodD0nMjAnIHJ4PSc1JyByeT0nNScgZmlsbD0nIzAwOTQ5OScgdHJhbnNmb3JtPSdyb3RhdGUoMzAgNTAgNTApIHRyYW5zbGF0ZSgwIC0zMCknPiAgPGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nb3BhY2l0eScgZnJvbT0nMScgdG89JzAnIGR1cj0nMXMnIGJlZ2luPScwLjA4MzMzMzMzMzMzMzMzMzMzcycgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnLz48L3JlY3Q+PHJlY3QgIHg9JzQ2LjUnIHk9JzQwJyB3aWR0aD0nNycgaGVpZ2h0PScyMCcgcng9JzUnIHJ5PSc1JyBmaWxsPScjMDA5NDk5JyB0cmFuc2Zvcm09J3JvdGF0ZSg2MCA1MCA1MCkgdHJhbnNsYXRlKDAgLTMwKSc+ICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdvcGFjaXR5JyBmcm9tPScxJyB0bz0nMCcgZHVyPScxcycgYmVnaW49JzAuMTY2NjY2NjY2NjY2NjY2NjZzJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScvPjwvcmVjdD48cmVjdCAgeD0nNDYuNScgeT0nNDAnIHdpZHRoPSc3JyBoZWlnaHQ9JzIwJyByeD0nNScgcnk9JzUnIGZpbGw9JyMwMDk0OTknIHRyYW5zZm9ybT0ncm90YXRlKDkwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMC4yNXMnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJy8+PC9yZWN0PjxyZWN0ICB4PSc0Ni41JyB5PSc0MCcgd2lkdGg9JzcnIGhlaWdodD0nMjAnIHJ4PSc1JyByeT0nNScgZmlsbD0nIzAwOTQ5OScgdHJhbnNmb3JtPSdyb3RhdGUoMTIwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMC4zMzMzMzMzMzMzMzMzMzMzcycgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnLz48L3JlY3Q+PHJlY3QgIHg9JzQ2LjUnIHk9JzQwJyB3aWR0aD0nNycgaGVpZ2h0PScyMCcgcng9JzUnIHJ5PSc1JyBmaWxsPScjMDA5NDk5JyB0cmFuc2Zvcm09J3JvdGF0ZSgxNTAgNTAgNTApIHRyYW5zbGF0ZSgwIC0zMCknPiAgPGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nb3BhY2l0eScgZnJvbT0nMScgdG89JzAnIGR1cj0nMXMnIGJlZ2luPScwLjQxNjY2NjY2NjY2NjY2NjdzJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScvPjwvcmVjdD48cmVjdCAgeD0nNDYuNScgeT0nNDAnIHdpZHRoPSc3JyBoZWlnaHQ9JzIwJyByeD0nNScgcnk9JzUnIGZpbGw9JyMwMDk0OTknIHRyYW5zZm9ybT0ncm90YXRlKDE4MCA1MCA1MCkgdHJhbnNsYXRlKDAgLTMwKSc+ICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdvcGFjaXR5JyBmcm9tPScxJyB0bz0nMCcgZHVyPScxcycgYmVnaW49JzAuNXMnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJy8+PC9yZWN0PjxyZWN0ICB4PSc0Ni41JyB5PSc0MCcgd2lkdGg9JzcnIGhlaWdodD0nMjAnIHJ4PSc1JyByeT0nNScgZmlsbD0nIzAwOTQ5OScgdHJhbnNmb3JtPSdyb3RhdGUoMjEwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMC41ODMzMzMzMzMzMzMzMzM0cycgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnLz48L3JlY3Q+PHJlY3QgIHg9JzQ2LjUnIHk9JzQwJyB3aWR0aD0nNycgaGVpZ2h0PScyMCcgcng9JzUnIHJ5PSc1JyBmaWxsPScjMDA5NDk5JyB0cmFuc2Zvcm09J3JvdGF0ZSgyNDAgNTAgNTApIHRyYW5zbGF0ZSgwIC0zMCknPiAgPGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nb3BhY2l0eScgZnJvbT0nMScgdG89JzAnIGR1cj0nMXMnIGJlZ2luPScwLjY2NjY2NjY2NjY2NjY2NjZzJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScvPjwvcmVjdD48cmVjdCAgeD0nNDYuNScgeT0nNDAnIHdpZHRoPSc3JyBoZWlnaHQ9JzIwJyByeD0nNScgcnk9JzUnIGZpbGw9JyMwMDk0OTknIHRyYW5zZm9ybT0ncm90YXRlKDI3MCA1MCA1MCkgdHJhbnNsYXRlKDAgLTMwKSc+ICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdvcGFjaXR5JyBmcm9tPScxJyB0bz0nMCcgZHVyPScxcycgYmVnaW49JzAuNzVzJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScvPjwvcmVjdD48cmVjdCAgeD0nNDYuNScgeT0nNDAnIHdpZHRoPSc3JyBoZWlnaHQ9JzIwJyByeD0nNScgcnk9JzUnIGZpbGw9JyMwMDk0OTknIHRyYW5zZm9ybT0ncm90YXRlKDMwMCA1MCA1MCkgdHJhbnNsYXRlKDAgLTMwKSc+ICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdvcGFjaXR5JyBmcm9tPScxJyB0bz0nMCcgZHVyPScxcycgYmVnaW49JzAuODMzMzMzMzMzMzMzMzMzNHMnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJy8+PC9yZWN0PjxyZWN0ICB4PSc0Ni41JyB5PSc0MCcgd2lkdGg9JzcnIGhlaWdodD0nMjAnIHJ4PSc1JyByeT0nNScgZmlsbD0nIzAwOTQ5OScgdHJhbnNmb3JtPSdyb3RhdGUoMzMwIDUwIDUwKSB0cmFuc2xhdGUoMCAtMzApJz4gIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J29wYWNpdHknIGZyb209JzEnIHRvPScwJyBkdXI9JzFzJyBiZWdpbj0nMC45MTY2NjY2NjY2NjY2NjY2cycgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnLz48L3JlY3Q+PC9zdmc+';
-            content = `<div class="dialogify-ajax-content"><img class="dialogify-ajax-loading" src="${loadingSvg}"></div>`;
+            content = `<div class="dialogify-ajax-content" role="status" aria-live="polite"><img class="dialogify-ajax-loading" src="${LOADING_IMAGE}" alt="${escapeHtml(getLocale().loading)}"></div>`;
             ajax = true;
         } else {
             content = source;
@@ -91,6 +137,15 @@ class Dialogify {
         let dialogClass = 'dialogify';
         if (options.fixed !== false) {
             dialogClass += ' fixed';
+        }
+
+        // Drawer mode slides the dialog in from an edge instead of centring it.
+        if (DRAWER_POSITIONS.indexOf(options.position) >= 0) {
+            dialogClass += ` dialogify--drawer dialogify--${options.position}`;
+        }
+
+        if (options.variant) {
+            dialogClass += ` dialogify--${options.variant}`;
         }
 
         let dialogHtml = `<div class="dialogify__content ${widthClass}"><div></div></div>`;
@@ -108,6 +163,7 @@ class Dialogify {
             .addClass(dialogClass)
             .append(dialogHtml)
             .on('close', function () {
+                self._teardownAnchor();
                 $(self).triggerHandler('close');
                 if (options.autoRemove !== false) {
                     if (self._resizeObserver) {
@@ -118,19 +174,31 @@ class Dialogify {
                 if (options.backgroundScroll === false) {
                     $('body').css({ overflow: '', 'padding-right': '' });
                 }
+                self._resolveClosePromise();
             })
             .on('cancel', function (e) {
                 $(self).triggerHandler('cancel');
-                if (options.closable === false) {
+                if (options.closable === false || !self._fireBeforeClose()) {
                     e.preventDefault();
                 }
             })
             .click(function (e) {
                 if (options.closable !== false && e.target == dialog) {
-                    dispatchDomEvent(dialog, 'cancel');
-                    nativeDialogCall(dialog, 'close');
+                    if (dispatchDomEvent(dialog, 'cancel')) {
+                        self.close();
+                    }
                 }
             });
+
+        // A <form method="dialog"> submit closes the dialog natively, bypassing
+        // close(); intercept it so beforeclose can veto that path too.
+        if (options.useDialogForm !== false) {
+            $dialog.find('form[method="dialog"]').on('submit', function (e) {
+                if (!self._fireBeforeClose(this.returnValue)) {
+                    e.preventDefault();
+                }
+            });
+        }
 
         if (setupOptions.append !== false) {
             $dialog.appendTo('body');
@@ -150,14 +218,24 @@ class Dialogify {
                 closeButtonStyle = closeButton.style || closeButtonStyle;
             }
 
-            let $closeImage = $('<img>').attr('src', closeButtonImage);
+            let $closeImage = $('<img>').attr({ src: closeButtonImage, alt: '' });
+            // <a> without href is not keyboard focusable, so the button role,
+            // tabindex, accessible name and key handling are added explicitly.
             let $closeButton = $('<a>')
                 .addClass('dialogify__close')
+                .attr({ role: 'button', tabindex: 0, 'aria-label': getLocale().close })
                 .css(closeButtonStyle)
                 .append($closeImage)
                 .click(function () {
-                    dispatchDomEvent(dialog, 'cancel');
-                    nativeDialogCall(dialog, 'close');
+                    if (dispatchDomEvent(dialog, 'cancel')) {
+                        self.close();
+                    }
+                })
+                .on('keydown', function (e) {
+                    if (e.key == 'Enter' || e.key == ' ' || e.key == 'Spacebar') {
+                        e.preventDefault();
+                        $(this).click();
+                    }
                 });
 
             if (closeButtonClassName) {
@@ -189,6 +267,10 @@ class Dialogify {
         } else {
             this.$content.append(content);
         }
+
+        // convenient handles for the content body and the dialog form
+        this.$body = this.$content.find('.dialogify__body');
+        this.$form = $(dialog).find('form[method="dialog"]');
 
         // ajax content
         if (ajax) {
@@ -233,27 +315,157 @@ class Dialogify {
         }
     }
 
+    // Fire the cancelable `beforeclose` event on both the instance (jQuery) and
+    // the element (DOM). Returns false when either side vetoed the close.
+    _fireBeforeClose(returnValue) {
+        const jqEvent = $.Event('beforeclose');
+        jqEvent.returnValue = returnValue;
+        $(this).triggerHandler(jqEvent);
+
+        const allowed = dispatchDomEvent(this.dialog, 'beforeclose', { returnValue: returnValue });
+        return allowed && !jqEvent.isDefaultPrevented();
+    }
+
+    _resolveClosePromise() {
+        if (this._closeResolver) {
+            const resolve = this._closeResolver;
+            this._closeResolver = null;
+            this._closePromise = null;
+            resolve(this.dialog.returnValue);
+        }
+    }
+
+    // show()/showModal() resolve with the dialog's returnValue once it closes.
+    _openPromise() {
+        const self = this;
+        if (!this._closePromise) {
+            this._closePromise = new Promise(function (resolve) {
+                self._closeResolver = resolve;
+            });
+        }
+        return this._closePromise;
+    }
+
     // public methods
     showModal() {
         if (this.options.backgroundScroll === false) {
             preventScroll();
         }
+        const promise = this._openPromise();
         nativeDialogCall(this.dialog, 'showModal');
         dispatchDomEvent(this.dialog, 'show');
         $(this).triggerHandler('show');
+        return promise;
     }
 
     show() {
         if (this.options.backgroundScroll === false) {
             preventScroll();
         }
+        const promise = this._openPromise();
         nativeDialogCall(this.dialog, 'show');
         dispatchDomEvent(this.dialog, 'show');
         $(this).triggerHandler('show');
+        return promise;
+    }
+
+    // Show the dialog anchored next to `anchor` instead of centred.
+    showAt(anchor, options) {
+        const $anchor = $(anchor);
+        if (!$anchor.length) {
+            return this.show();
+        }
+
+        if (options == null || typeof options != 'object') {
+            options = {};
+        }
+
+        this._anchor = $anchor[0];
+        this._anchorOptions = options;
+        $(this.dialog).addClass('dialogify--popover').removeClass('fixed');
+
+        const promise = this.show();
+        this.reposition();
+
+        const self = this;
+        this._anchorListener = function () {
+            self.reposition();
+        };
+        window.addEventListener('scroll', this._anchorListener, true);
+        window.addEventListener('resize', this._anchorListener);
+
+        return promise;
+    }
+
+    // Recompute the anchored position. Flips to the opposite side when the
+    // preferred placement would overflow the viewport.
+    reposition() {
+        if (!this._anchor || !this.dialog.open) {
+            return this;
+        }
+
+        const options = this._anchorOptions || {};
+        const offset = options.offset === undefined ? 8 : options.offset;
+        const align = options.align || 'start';
+        const rect = this._anchor.getBoundingClientRect();
+        const box = this.dialog.getBoundingClientRect();
+        const viewportWidth = window.innerWidth || 0;
+        const viewportHeight = window.innerHeight || 0;
+
+        let placement = options.placement || 'bottom';
+        if (placement == 'bottom' && rect.bottom + offset + box.height > viewportHeight) {
+            placement = 'top';
+        } else if (placement == 'top' && rect.top - offset - box.height < 0) {
+            placement = 'bottom';
+        } else if (placement == 'right' && rect.right + offset + box.width > viewportWidth) {
+            placement = 'left';
+        } else if (placement == 'left' && rect.left - offset - box.width < 0) {
+            placement = 'right';
+        }
+
+        let top;
+        let left;
+        if (placement == 'top' || placement == 'bottom') {
+            top = placement == 'bottom' ? rect.bottom + offset : rect.top - offset - box.height;
+            left = alignAxis(align, rect.left, rect.width, box.width);
+        } else {
+            left = placement == 'right' ? rect.right + offset : rect.left - offset - box.width;
+            top = alignAxis(align, rect.top, rect.height, box.height);
+        }
+
+        left = clamp(left, 0, Math.max(0, viewportWidth - box.width));
+        top = clamp(top, 0, Math.max(0, viewportHeight - box.height));
+
+        $(this.dialog)
+            .attr('data-placement', placement)
+            .css({
+                position: 'fixed',
+                top: `${Math.round(top)}px`,
+                left: `${Math.round(left)}px`,
+                right: 'auto',
+                bottom: 'auto',
+                transform: 'none',
+                margin: 0
+            });
+
+        return this;
+    }
+
+    _teardownAnchor() {
+        if (this._anchorListener) {
+            window.removeEventListener('scroll', this._anchorListener, true);
+            window.removeEventListener('resize', this._anchorListener);
+            this._anchorListener = null;
+        }
+        this._anchor = null;
     }
 
     close(returnValue) {
+        if (!this._fireBeforeClose(returnValue)) {
+            return this;
+        }
         nativeDialogCall(this.dialog, 'close', returnValue === undefined ? [] : [returnValue]);
+        return this;
     }
 
     isOpen() {
@@ -265,12 +477,134 @@ class Dialogify {
         return this;
     }
 
+    off(event, handler) {
+        $(this).off(event, handler);
+        return this;
+    }
+
+    // Replace the dialog body, keeping the title and buttons in place.
+    setContent(content) {
+        if (content instanceof window.Node || content instanceof $) {
+            this.$body.empty().append(content);
+        } else {
+            this.$body.html(content == null ? '' : content);
+        }
+        return this;
+    }
+
+    getContent() {
+        return this.$body.html();
+    }
+
+    // Load new body content over ajax, showing the loading state while in flight.
+    load(url, data) {
+        const self = this;
+        let requestUrl = url;
+
+        try {
+            const parsed = new URL(url, window.location.href);
+            const params = data || {};
+            Object.keys(params).forEach(function (key) {
+                parsed.searchParams.append(key, params[key]);
+            });
+            requestUrl = parsed.toString();
+        } catch {
+            // keep the original url if it is not a valid URL
+        }
+
+        this.setLoading(true);
+
+        return window
+            .fetch(requestUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (response) {
+                return response.text();
+            })
+            .then(function (html) {
+                self.setContent(html);
+                self.setLoading(false);
+                if (self.options.ajaxComplete) {
+                    self.options.ajaxComplete.call(self);
+                }
+                return self;
+            })
+            .catch(function (error) {
+                self.setLoading(false);
+                throw error;
+            });
+    }
+
+    // Toggle a loading overlay over the dialog content.
+    setLoading(loading) {
+        if (loading === false) {
+            this.$content.find('.dialogify__loading').remove();
+            $(this.dialog).removeClass('is-loading');
+            return this;
+        }
+
+        if (!this.$content.find('.dialogify__loading').length) {
+            const label = typeof loading == 'string' ? loading : getLocale().loading;
+            this.$content.append(
+                $('<div>')
+                    .addClass('dialogify__loading')
+                    .attr({ role: 'status', 'aria-live': 'polite' })
+                    .append($('<img>').attr({ src: LOADING_IMAGE, alt: label }))
+            );
+            $(this.dialog).addClass('is-loading');
+        }
+
+        return this;
+    }
+
+    isLoading() {
+        return this.$content.find('.dialogify__loading').length > 0;
+    }
+
+    // Run native form validation, reporting the first invalid field.
+    validate() {
+        const form = this.$form[0];
+        if (!form || typeof form.reportValidity != 'function') {
+            return true;
+        }
+        return form.reportValidity();
+    }
+
+    formData() {
+        const form = this.$form[0];
+        if (!form || typeof window.FormData != 'function') {
+            return null;
+        }
+        return new window.FormData(form);
+    }
+
+    // Plain-object view of the form, with repeated fields collected into arrays.
+    formValues() {
+        const data = this.formData();
+        if (!data) {
+            return {};
+        }
+
+        const values = {};
+        data.forEach(function (value, key) {
+            if (Object.prototype.hasOwnProperty.call(values, key)) {
+                if (!Array.isArray(values[key])) {
+                    values[key] = [values[key]];
+                }
+                values[key].push(value);
+            } else {
+                values[key] = value;
+            }
+        });
+        return values;
+    }
+
     // set title
     title(title) {
+        const titleId = `${this.id}_title`;
         let $titleBox = $('<h5>')
             .addClass('dialogify_title')
+            .attr('id', titleId)
             .append(
-                '<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/PjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iJiN4NTcxNjsmI3g1QzY0O18xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDEyIDEwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAxMiAxMDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxnPjxyZWN0IHk9IjEiIHN0eWxlPSJmaWxsOiM4RDhEOEQ7IiB3aWR0aD0iMyIgaGVpZ2h0PSIzIi8+PHJlY3QgeT0iNyIgc3R5bGU9ImZpbGw6IzhEOEQ4RDsiIHdpZHRoPSIzIiBoZWlnaHQ9IjMiLz48cmVjdCB4PSIzIiB5PSI0IiBzdHlsZT0iZmlsbDojOEQ4RDhEOyIgd2lkdGg9IjMiIGhlaWdodD0iMyIvPjwvZz48L3N2Zz4=">'
+                '<img alt="" aria-hidden="true" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/PjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iJiN4NTcxNjsmI3g1QzY0O18xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDEyIDEwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAxMiAxMDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxnPjxyZWN0IHk9IjEiIHN0eWxlPSJmaWxsOiM4RDhEOEQ7IiB3aWR0aD0iMyIgaGVpZ2h0PSIzIi8+PHJlY3QgeT0iNyIgc3R5bGU9ImZpbGw6IzhEOEQ4RDsiIHdpZHRoPSIzIiBoZWlnaHQ9IjMiLz48cmVjdCB4PSIzIiB5PSI0IiBzdHlsZT0iZmlsbDojOEQ4RDhEOyIgd2lkdGg9IjMiIGhlaWdodD0iMyIvPjwvZz48L3N2Zz4=">'
             )
             .append(title);
 
@@ -280,12 +614,70 @@ class Dialogify {
             this.$content.prepend($titleBox);
         }
 
+        // Give assistive technology an accessible name for the dialog.
+        $(this.dialog).attr('aria-labelledby', titleId);
+
         return this;
+    }
+
+    // Build a single button from its definition object.
+    _createButton(definition, fallbackId) {
+        const self = this;
+
+        if (typeof definition == 'string') {
+            const $existing = $(definition);
+            return { id: $existing.attr('id') || fallbackId, $button: $existing };
+        }
+
+        if (definition == null || typeof definition != 'object') {
+            definition = {};
+        }
+
+        const $btn = $('<button type="button">')
+            .addClass('btn btn-insert')
+            .addClass(definition.type || '')
+            .data('click', definition.click);
+
+        if (definition.type == Dialogify.BUTTON_PRIMARY && this.options.useDialogForm !== false) {
+            $btn.attr('type', 'submit');
+        }
+
+        if (definition.focused) {
+            $btn.prop('autofocus', true);
+        }
+
+        if (definition.disabled) {
+            $btn.disable();
+        }
+
+        if (definition.loadingText) {
+            $btn.attr('data-loading-text', definition.loadingText);
+        }
+
+        $btn.text(definition.text || getLocale().close);
+        $btn.click(function (e) {
+            if (typeof $(this).data('click') == 'function') {
+                $(this).data('click').call(self, e);
+            }
+        });
+
+        return { id: definition.id || fallbackId, $button: $btn };
+    }
+
+    // Return the button box, creating it if the dialog has none yet.
+    _buttonBox(position) {
+        let $buttonBox = this.$content.find('.btn-box');
+        if (!$buttonBox.length) {
+            $buttonBox = $('<div>')
+                .addClass('btn-box')
+                .addClass(position || 'text-right');
+            this.$content.append($buttonBox);
+        }
+        return $buttonBox;
     }
 
     // set buttons
     buttons(buttons, options) {
-        const config = getConfig();
         if (!Array.isArray(buttons)) {
             buttons = [];
         }
@@ -300,54 +692,111 @@ class Dialogify {
             .addClass('btn-box')
             .addClass(options.position || 'text-right');
 
-        let self = this;
         for (let i = 0; i < buttons.length; i++) {
-            if (typeof buttons[i] == 'string') {
-                let $btn = $(buttons[i]);
-                let btnId = $btn.attr('id') || i;
-                this.$buttonList[btnId] = $btn;
-                $buttonBox.append($btn);
-            } else {
-                if (buttons[i] == null || typeof buttons[i] != 'object') {
-                    buttons[i] = {};
-                }
-
-                let $btn = $('<button type="button">')
-                    .addClass('btn btn-insert')
-                    .addClass(buttons[i].type || '')
-                    .data('click', buttons[i].click);
-
-                if (
-                    buttons[i].type == Dialogify.BUTTON_PRIMARY &&
-                    this.options.useDialogForm !== false
-                ) {
-                    $btn.attr('type', 'submit');
-                }
-
-                if (buttons[i].focused) {
-                    $btn.prop('autofocus', true);
-                }
-
-                if (buttons[i].disabled) {
-                    $btn.disable();
-                }
-
-                $btn.text(buttons[i].text || Dialogify.LOCALE[config.locale].close);
-                $btn.click(function (e) {
-                    if (typeof $(this).data('click') == 'function') {
-                        $(this).data('click').call(self, e);
-                    }
-                });
-
-                this.$buttonList[buttons[i].id || i] = $btn;
-                $buttonBox.append($btn);
-            }
+            const built = this._createButton(buttons[i], i);
+            this.$buttonList[built.id] = built.$button;
+            $buttonBox.append(built.$button);
         }
 
         if (this.$content.find('.btn-box').length) {
             this.$content.find('.btn-box').replaceWith($buttonBox);
         } else {
             this.$content.append($buttonBox);
+        }
+
+        return this;
+    }
+
+    // Append a single button without rebuilding the whole button box.
+    addButton(button, options) {
+        if (options == null || typeof options != 'object') {
+            options = {};
+        }
+
+        if (this.$buttonList == null) {
+            this.$buttonList = {};
+        }
+
+        const $buttonBox = this._buttonBox(options.position);
+        const fallbackId = Object.keys(this.$buttonList).length;
+        const built = this._createButton(button, fallbackId);
+
+        this.$buttonList[built.id] = built.$button;
+
+        if (options.prepend) {
+            $buttonBox.prepend(built.$button);
+        } else {
+            $buttonBox.append(built.$button);
+        }
+
+        return this;
+    }
+
+    getButton(id) {
+        return (this.$buttonList && this.$buttonList[id]) || $();
+    }
+
+    removeButton(id) {
+        const $btn = this.getButton(id);
+        if ($btn.length) {
+            $btn.remove();
+            delete this.$buttonList[id];
+        }
+        return this;
+    }
+
+    // Update an existing button in place. `loading` disables the button and
+    // swaps in its data-loading-text, restoring the original text afterwards.
+    updateButton(id, changes) {
+        const $btn = this.getButton(id);
+        if (!$btn.length || changes == null || typeof changes != 'object') {
+            return this;
+        }
+
+        if (changes.text !== undefined) {
+            $btn.text(changes.text);
+        }
+
+        if (changes.type !== undefined) {
+            $btn.removeClass(`${Dialogify.BUTTON_PRIMARY} ${Dialogify.BUTTON_DANGER}`).addClass(
+                changes.type || ''
+            );
+        }
+
+        if (changes.click !== undefined) {
+            $btn.data('click', changes.click);
+        }
+
+        if (changes.loadingText !== undefined) {
+            $btn.attr('data-loading-text', changes.loadingText);
+        }
+
+        if (changes.loading !== undefined) {
+            if (changes.loading) {
+                if ($btn.data('originalText') === undefined) {
+                    $btn.data('originalText', $btn.text());
+                }
+                const loadingText = $btn.attr('data-loading-text');
+                if (loadingText) {
+                    $btn.text(loadingText);
+                }
+                $btn.addClass('is-loading').attr('aria-busy', 'true').disable();
+            } else {
+                const originalText = $btn.data('originalText');
+                if (originalText !== undefined) {
+                    $btn.text(originalText);
+                    $btn.removeData('originalText');
+                }
+                $btn.removeClass('is-loading').removeAttr('aria-busy').enable();
+            }
+        }
+
+        if (changes.disabled !== undefined) {
+            if (changes.disabled) {
+                $btn.disable();
+            } else {
+                $btn.enable();
+            }
         }
 
         return this;
@@ -366,9 +815,19 @@ Dialogify.BUTTON_PRIMARY = 'btn-primary';
 Dialogify.BUTTON_DANGER = 'btn-danger';
 
 Dialogify.LOCALE = {};
-Dialogify.LOCALE['zh_TW'] = { ok: '確定', cancel: '取消', close: '關閉' };
-Dialogify.LOCALE['zh_CN'] = { ok: '确定', cancel: '取消', close: '关闭' };
-Dialogify.LOCALE['en_US'] = { ok: 'Ok', cancel: 'Cancel', close: 'Close' };
+Dialogify.LOCALE['zh_TW'] = { ok: '確定', cancel: '取消', close: '關閉', loading: '載入中' };
+Dialogify.LOCALE['zh_CN'] = { ok: '确定', cancel: '取消', close: '关闭', loading: '加载中' };
+Dialogify.LOCALE['en_US'] = { ok: 'Ok', cancel: 'Cancel', close: 'Close', loading: 'Loading' };
+
+Dialogify.POSITION_LEFT = 'left';
+Dialogify.POSITION_RIGHT = 'right';
+Dialogify.POSITION_TOP = 'top';
+Dialogify.POSITION_BOTTOM = 'bottom';
+
+Dialogify.TOAST_INFO = 'info';
+Dialogify.TOAST_SUCCESS = 'success';
+Dialogify.TOAST_WARNING = 'warning';
+Dialogify.TOAST_ERROR = 'error';
 
 // Registry for declarative event handlers referenced by name from markup,
 // e.g. <dialog is="bahamut-dialogify" onshow="myHandler">.
@@ -510,6 +969,109 @@ Dialogify.closeAll = function () {
         nativeDialogCall(this, 'close');
     });
 };
+
+// Lightweight auto-dismissing notification. Toasts are non-modal dialogs kept
+// in a fixed corner container so several can stack.
+Dialogify.toast = function (message, options) {
+    if (options == null || typeof options != 'object') {
+        options = {};
+    }
+
+    const position =
+        TOAST_POSITIONS.indexOf(options.position) >= 0 ? options.position : 'top-right';
+    const duration = options.duration === undefined ? 3000 : options.duration;
+    const type = options.type || Dialogify.TOAST_INFO;
+
+    const dialogOptions = Object.assign(
+        {
+            closable: false,
+            useDialogForm: false,
+            backgroundScroll: true,
+            fixed: false,
+            variant: 'toast'
+        },
+        options.dialogOptions
+    );
+
+    const toast = new Dialogify(message, dialogOptions);
+    $(toast.dialog).addClass(`dialogify--toast-${type}`).attr('role', 'status');
+
+    if (options.title) {
+        toast.title(options.title);
+    }
+
+    if (options.closable) {
+        $(toast.dialog)
+            .addClass('dialogify--toast-closable')
+            .append(
+                $('<button type="button">')
+                    .addClass('dialogify__toast-close')
+                    .attr('aria-label', getLocale().close)
+                    .text('\u00d7')
+                    .on('click', function () {
+                        toast.close();
+                    })
+            );
+    }
+
+    $(toast.dialog).appendTo(toastContainer(position));
+
+    let timer = null;
+    const clearTimer = function () {
+        if (timer) {
+            window.clearTimeout(timer);
+            timer = null;
+        }
+    };
+
+    if (duration > 0) {
+        timer = window.setTimeout(function () {
+            toast.close();
+        }, duration);
+
+        // Keep the toast on screen while the pointer rests on it.
+        $(toast.dialog)
+            .on('mouseenter', clearTimer)
+            .on('mouseleave', function () {
+                clearTimer();
+                timer = window.setTimeout(function () {
+                    toast.close();
+                }, duration);
+            });
+    }
+
+    toast.on('close', function () {
+        clearTimer();
+        // The instance close handler removes the dialog after this runs, so
+        // detach it here to prune an empty container in the same tick.
+        $(toast.dialog).remove();
+        pruneToastContainers();
+    });
+
+    const promise = toast.show();
+    toast.promise = promise;
+    return toast;
+};
+
+function toastContainer(position) {
+    const id = `dialogify-toasts-${position}`;
+    let $container = $(`#${id}`);
+    if (!$container.length) {
+        $container = $('<div>')
+            .attr('id', id)
+            .addClass(`dialogify-toast-container dialogify-toast-container--${position}`)
+            .appendTo('body');
+    }
+    return $container;
+}
+
+function pruneToastContainers() {
+    $('.dialogify-toast-container').each(function () {
+        if (!$(this).children().length) {
+            $(this).remove();
+        }
+    });
+}
 
 function preventScroll() {
     // 防止body滾動
