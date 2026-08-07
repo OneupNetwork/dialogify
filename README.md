@@ -197,6 +197,17 @@ new Dialogify('<ul>...</ul>', { closable: false, useDialogForm: false }).showAt(
 document.querySelector('dialog[is="bahamut-dialogify"]').showAt();
 ```
 
+A popover is dismissed by a click anywhere outside it, including on the element
+that opened it. Pass `closable: false` to keep it open until you close it
+yourself.
+
+### Animation
+
+Drawers slide in and out from their edge, toasts fade and scale, and popovers
+fade in place. The exit animation runs after the dialog has closed, so a dialog
+with `autoRemove` stays in the DOM until it finishes. All of them are disabled
+under `prefers-reduced-motion: reduce`.
+
 ## Accessibility
 
 - `title()` links the heading to the dialog with `aria-labelledby`.
@@ -401,9 +412,22 @@ Dialogify.handlers.myHandler = function () {
 
 ### Browser support
 
-Customized built-in elements are not supported in Safari/WebKit. Load a polyfill
-such as [`@ungap/custom-elements`](https://github.com/ungap/custom-elements)
-**before** dialogify to enable the declarative syntax there. The programmatic
+Customized built-in elements are not supported in Safari/WebKit, so
+`<dialog is="bahamut-dialogify">` is never upgraded there. An optional bundle of
+[`@ungap/custom-elements`](https://github.com/ungap/custom-elements) ships with
+dialogify; load it **before** dialogify to enable the declarative syntax:
+
+```html
+<script src="path/to/custom-elements.min.js"></script>
+<script src="path/to/dialogify.min.js"></script>
+```
+
+```javascript
+import '@oneup_network/dialogify/custom-elements';
+import Dialogify from '@oneup_network/dialogify';
+```
+
+It is a no-op in browsers that already support the feature, and the programmatic
 API works everywhere without it.
 
 ## Optional legacy polyfill

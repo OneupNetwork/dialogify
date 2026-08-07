@@ -359,7 +359,8 @@ dialogify.isOpen();</code></pre>
             <td class="mdl-data-table__cell--non-numeric">
                 錨定在指定元素旁顯示，適合做下拉選單、popover 卡片<br>
                 options: {placement: 'top|bottom|left|right', align: 'start|center|end', offset: 8}<br>
-                空間不足時會自動翻到另一側，捲動與改變視窗大小時會跟著移動
+                空間不足時會自動翻到另一側，捲動與改變視窗大小時會跟著移動<br>
+                點擊 popover 以外的地方（含觸發它的元素）就會關閉，設 closable: false 可停用
             </td>
         </tr>
         <tr>
@@ -512,6 +513,16 @@ dialogify.isOpen();</code></pre>
 <p>設定 position 就會從指定邊緣滑入，而不是置中顯示：</p>
 <pre><code class="javascript">new Dialogify('&lt;h4&gt;篩選條件&lt;/h4&gt;', {position: Dialogify.POSITION_RIGHT}).showModal();
 // position: 'left' | 'right' | 'top' | 'bottom'</code></pre>
+<p>
+    只有點到 drawer 以外的區域（背景遮罩）才會關閉，點 drawer 內部沒有內容的地方不會誤關。
+</p>
+
+<h6>動畫</h6>
+<p>
+    drawer 從邊緣滑入滑出、toast 淡入淡出並帶縮放、popover 淡入淡出。
+    離場動畫是在燈箱關閉後才播放，所以有 autoRemove 的燈箱會等動畫結束才從 DOM 移除。
+    使用者若開啟 <code>prefers-reduced-motion: reduce</code>，這些動畫都會自動停用。
+</p>
 
                         </div>
                         <div class="mdl-layout-spacer"></div>
@@ -800,8 +811,13 @@ dialog.onbeforeclose = function(){ return false; };</code></pre>
 <p>
     Safari/WebKit 不支援 customized built-in elements，需要在 dialogify 之前載入
     <a href="https://github.com/ungap/custom-elements" target="_blank" rel="noopener">@ungap/custom-elements</a>
-    之類的 polyfill 才能使用宣告式寫法。JavaScript API 則不受影響。
+    才能使用宣告式寫法。dialogify 有附一份打包好的選用檔案：
 </p>
+<pre><code class="html">&lt;script src="path/to/custom-elements.min.js"&gt;&lt;/script&gt;
+&lt;script src="path/to/dialogify.min.js"&gt;&lt;/script&gt;</code></pre>
+<pre><code class="javascript">import '@oneup_network/dialogify/custom-elements';
+import Dialogify from '@oneup_network/dialogify';</code></pre>
+<p>已經支援的瀏覽器載入它不會有任何作用，JavaScript API 則本來就不受影響。</p>
 
                         </div>
                         <div class="mdl-layout-spacer"></div>

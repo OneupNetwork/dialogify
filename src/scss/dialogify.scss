@@ -1,3 +1,7 @@
+$dialogify-drawer-duration: 260ms;
+$dialogify-popover-duration: 150ms;
+$dialogify-toast-duration: 220ms;
+
 .dialogify {
     display: none;
     position: absolute;
@@ -407,13 +411,23 @@
     &.dialogify--left {
         left: 0;
         right: auto;
-        animation: dialogify-slide-left 220ms ease-out;
+        &[open] {
+            animation: dialogify-slide-left-in $dialogify-drawer-duration ease-out;
+        }
+        &.dialogify--closing {
+            animation: dialogify-slide-left-out $dialogify-drawer-duration ease-in forwards;
+        }
     }
 
     &.dialogify--right {
         right: 0;
         left: auto;
-        animation: dialogify-slide-right 220ms ease-out;
+        &[open] {
+            animation: dialogify-slide-right-in $dialogify-drawer-duration ease-out;
+        }
+        &.dialogify--closing {
+            animation: dialogify-slide-right-out $dialogify-drawer-duration ease-in forwards;
+        }
     }
 
     &.dialogify--top,
@@ -427,33 +441,63 @@
     &.dialogify--top {
         top: 0;
         bottom: auto;
-        animation: dialogify-slide-top 220ms ease-out;
+        &[open] {
+            animation: dialogify-slide-top-in $dialogify-drawer-duration ease-out;
+        }
+        &.dialogify--closing {
+            animation: dialogify-slide-top-out $dialogify-drawer-duration ease-in forwards;
+        }
     }
 
     &.dialogify--bottom {
         bottom: 0;
         top: auto;
-        animation: dialogify-slide-bottom 220ms ease-out;
+        &[open] {
+            animation: dialogify-slide-bottom-in $dialogify-drawer-duration ease-out;
+        }
+        &.dialogify--closing {
+            animation: dialogify-slide-bottom-out $dialogify-drawer-duration ease-in forwards;
+        }
     }
 }
 
-@keyframes dialogify-slide-left {
+@keyframes dialogify-slide-left-in {
     from {
         transform: translateX(-100%);
     }
 }
-@keyframes dialogify-slide-right {
+@keyframes dialogify-slide-left-out {
+    to {
+        transform: translateX(-100%);
+    }
+}
+@keyframes dialogify-slide-right-in {
     from {
         transform: translateX(100%);
     }
 }
-@keyframes dialogify-slide-top {
+@keyframes dialogify-slide-right-out {
+    to {
+        transform: translateX(100%);
+    }
+}
+@keyframes dialogify-slide-top-in {
     from {
         transform: translateY(-100%);
     }
 }
-@keyframes dialogify-slide-bottom {
+@keyframes dialogify-slide-top-out {
+    to {
+        transform: translateY(-100%);
+    }
+}
+@keyframes dialogify-slide-bottom-in {
     from {
+        transform: translateY(100%);
+    }
+}
+@keyframes dialogify-slide-bottom-out {
+    to {
         transform: translateY(100%);
     }
 }
@@ -464,10 +508,32 @@
     position: fixed;
     min-width: 0;
     transform: none;
-    animation: dialogify-fade-in 140ms ease-out;
+    overflow: hidden;
+
+    &[open] {
+        animation: dialogify-pop-in $dialogify-popover-duration ease-out;
+    }
+
+    &.dialogify--closing {
+        animation: dialogify-pop-out $dialogify-popover-duration ease-in forwards;
+    }
 
     .dialogify__content {
         padding: 12px 16px;
+        // leave room for the close button, which overlaps in a small popover
+        padding-right: 34px;
+    }
+
+    // the shared 40px floor is meant for full-size dialogs
+    .dialogify__body {
+        min-height: 0;
+        line-height: 1.5;
+    }
+
+    // the decorative corner mark does not fit at this size
+    > div:after,
+    form > div:after {
+        display: none;
     }
 
     .dialogify__fixedwidth {
@@ -475,9 +541,16 @@
     }
 }
 
-@keyframes dialogify-fade-in {
+@keyframes dialogify-pop-in {
     from {
         opacity: 0;
+        transform: translateY(-6px);
+    }
+}
+@keyframes dialogify-pop-out {
+    to {
+        opacity: 0;
+        transform: translateY(-6px);
     }
 }
 
@@ -536,10 +609,30 @@
     min-width: 240px;
     max-width: 380px;
     pointer-events: auto;
-    animation: dialogify-toast-in 200ms ease-out;
+    overflow: hidden;
+
+    &[open] {
+        animation: dialogify-toast-in $dialogify-toast-duration ease-out;
+    }
+
+    &.dialogify--closing {
+        animation: dialogify-toast-out $dialogify-toast-duration ease-in forwards;
+    }
 
     .dialogify__content {
         padding: 12px 16px;
+    }
+
+    // the shared 40px floor would make a one-line toast unnecessarily tall
+    .dialogify__body {
+        min-height: 0;
+        line-height: 1.5;
+    }
+
+    // the decorative corner mark does not fit at this size
+    > div:after,
+    form > div:after {
+        display: none;
     }
 
     .dialogify_title {
@@ -596,15 +689,36 @@
 @keyframes dialogify-toast-in {
     from {
         opacity: 0;
-        transform: translateY(-8px);
+        transform: translateY(-8px) scale(0.97);
     }
+}
+@keyframes dialogify-toast-out {
+    to {
+        opacity: 0;
+        transform: scale(0.97);
+    }
+}
+
+// The dialog is closed but kept in the DOM until its exit animation ends, so
+// it has to stay rendered while no longer accepting input.
+.dialogify.dialogify--closing {
+    display: block;
+    pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
     .dialogify.dialogify--drawer,
     .dialogify.dialogify--popover,
     .dialogify.dialogify--toast {
-        animation: none;
+        &[open],
+        &.dialogify--closing {
+            animation: none;
+        }
+    }
+
+    // without an exit animation there is nothing to wait for, so hide it at once
+    .dialogify.dialogify--closing {
+        display: none;
     }
 }
 

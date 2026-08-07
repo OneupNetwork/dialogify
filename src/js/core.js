@@ -87,6 +87,53 @@ function alignAxis(align, start, anchorSize, boxSize) {
     return start;
 }
 
+// Upper bound for the exit animation, in case `finished` never settles.
+const EXIT_ANIMATION_TIMEOUT = 600;
+
+// Run `done` once every animation currently running on `el` has finished.
+// Falls through synchronously when nothing is animating (which is also the
+// case under `prefers-reduced-motion`, where the exit animations are off).
+function whenAnimationsDone(el, done) {
+    const animations = typeof el.getAnimations == 'function' ? el.getAnimations() : [];
+    if (!animations.length) {
+        done();
+        return;
+    }
+
+    let settled = false;
+    const finish = function () {
+        if (!settled) {
+            settled = true;
+            done();
+        }
+    };
+
+    Promise.all(
+        animations.map(function (animation) {
+            return animation.finished.catch(function () {});
+        })
+    ).then(finish);
+    window.setTimeout(finish, EXIT_ANIMATION_TIMEOUT);
+}
+
+// True when the click happened outside the element's box. Pointer coordinates
+// are compared against the rect instead of relying on `event.target`, because a
+// click on the padding of a full-height drawer also targets the dialog itself.
+function isOutsideRect(el, event) {
+    const rect = el.getBoundingClientRect();
+    // Without layout information there is nothing to compare against, so keep
+    // the historical behaviour of trusting the event target.
+    if (!rect.width && !rect.height) {
+        return true;
+    }
+    return (
+        event.clientX < rect.left ||
+        event.clientX > rect.right ||
+        event.clientY < rect.top ||
+        event.clientY > rect.bottom
+    );
+}
+
 class Dialogify {
     constructor(source, options) {
         this._setup(window.document.createElement('dialog'), source, options, { append: true });
@@ -165,15 +212,24 @@ class Dialogify {
             .on('close', function () {
                 self._teardownAnchor();
                 $(self).triggerHandler('close');
-                if (options.autoRemove !== false) {
-                    if (self._resizeObserver) {
-                        self._resizeObserver.disconnect();
-                    }
-                    $(this).remove();
-                }
                 if (options.backgroundScroll === false) {
                     $('body').css({ overflow: '', 'padding-right': '' });
                 }
+                // Keep the dialog rendered while the exit animation plays; it
+                // is already out of the top layer at this point.
+                $(dialog).addClass('dialogify--closing');
+                whenAnimationsDone(dialog, function () {
+                    $(dialog).removeClass('dialogify--closing');
+                    if (options.autoRemove !== false) {
+                        if (self._resizeObserver) {
+                            self._resizeObserver.disconnect();
+                        }
+                        $(dialog).remove();
+                    }
+                    if (self._onExit) {
+                        self._onExit();
+                    }
+                });
                 self._resolveClosePromise();
             })
             .on('cancel', function (e) {
@@ -183,7 +239,9 @@ class Dialogify {
                 }
             })
             .click(function (e) {
-                if (options.closable !== false && e.target == dialog) {
+                // A backdrop click targets the dialog element but lands outside
+                // its box; a click on the dialog's own padding must not close it.
+                if (options.closable !== false && e.target == dialog && isOutsideRect(dialog, e)) {
                     if (dispatchDomEvent(dialog, 'cancel')) {
                         self.close();
                     }
@@ -307,9 +365,14 @@ class Dialogify {
 
         // fix blurry render caused by sub-pixel translate in some browsers
         // see also https://stackoverflow.com/a/42256897/3188956
-        if (window.ResizeObserver) {
+        // Only centred dialogs use a translate; drawers, popovers and toasts
+        // position themselves and would have their animation frozen by the
+        // rounded matrix being written back as an inline style.
+        if (window.ResizeObserver && !$(dialog).is('.dialogify--drawer, .dialogify--toast')) {
             this._resizeObserver = new window.ResizeObserver(function () {
-                roundCssTransformMatrix(dialog);
+                if (!$(dialog).is('.dialogify--popover')) {
+                    roundCssTransformMatrix(dialog);
+                }
             });
             this._resizeObserver.observe(dialog);
         }
@@ -338,6 +401,9 @@ class Dialogify {
     // show()/showModal() resolve with the dialog's returnValue once it closes.
     _openPromise() {
         const self = this;
+        // A dialog reopened during its exit animation must not stay in the
+        // closing state.
+        $(this.dialog).removeClass('dialogify--closing');
         if (!this._closePromise) {
             this._closePromise = new Promise(function (resolve) {
                 self._closeResolver = resolve;
@@ -393,6 +459,25 @@ class Dialogify {
         };
         window.addEventListener('scroll', this._anchorListener, true);
         window.addEventListener('resize', this._anchorListener);
+
+        // A popover is not modal, so there is no backdrop to catch clicks.
+        // Dismiss it when anything outside it is clicked, including the anchor
+        // that opened it. Bound on the next tick so the click that triggered
+        // showAt() does not immediately close it again.
+        if (this.options.closable !== false) {
+            this._outsideListener = function (e) {
+                if (!self.dialog.contains(e.target)) {
+                    if (dispatchDomEvent(self.dialog, 'cancel')) {
+                        self.close();
+                    }
+                }
+            };
+            this._outsideTimer = window.setTimeout(function () {
+                if (self._outsideListener) {
+                    window.document.addEventListener('click', self._outsideListener, true);
+                }
+            }, 0);
+        }
 
         return promise;
     }
@@ -456,6 +541,14 @@ class Dialogify {
             window.removeEventListener('scroll', this._anchorListener, true);
             window.removeEventListener('resize', this._anchorListener);
             this._anchorListener = null;
+        }
+        if (this._outsideTimer) {
+            window.clearTimeout(this._outsideTimer);
+            this._outsideTimer = null;
+        }
+        if (this._outsideListener) {
+            window.document.removeEventListener('click', this._outsideListener, true);
+            this._outsideListener = null;
         }
         this._anchor = null;
     }
@@ -1042,11 +1135,14 @@ Dialogify.toast = function (message, options) {
 
     toast.on('close', function () {
         clearTimer();
-        // The instance close handler removes the dialog after this runs, so
-        // detach it here to prune an empty container in the same tick.
+    });
+
+    // Runs after the exit animation, once the instance close handler has
+    // detached the toast, so an emptied container is pruned in the same tick.
+    toast._onExit = function () {
         $(toast.dialog).remove();
         pruneToastContainers();
-    });
+    };
 
     const promise = toast.show();
     toast.promise = promise;

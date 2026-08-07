@@ -612,4 +612,185 @@ describe('anchored popover', () => {
         expect(el.classList.contains('dialogify--popover')).toBe(true);
         expect(el.getAttribute('data-placement')).toBe('right');
     });
+
+    it('closes on a click outside the popover', async () => {
+        const anchor = anchorAt({ top: 10, left: 10, width: 10, height: 10 });
+        const d = new Dialogify('content', { useDialogForm: false });
+        d.dialog.getBoundingClientRect = () => ({ width: 10, height: 10 });
+
+        d.showAt(anchor);
+        await new Promise((r) => setTimeout(r, 0));
+
+        document.body.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+
+        expect(d.isOpen()).toBe(false);
+    });
+
+    it('closes when the anchor that opened it is clicked again', async () => {
+        const anchor = anchorAt({ top: 10, left: 10, width: 10, height: 10 });
+        const d = new Dialogify('content', { useDialogForm: false });
+        d.dialog.getBoundingClientRect = () => ({ width: 10, height: 10 });
+
+        d.showAt(anchor);
+        await new Promise((r) => setTimeout(r, 0));
+
+        anchor.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+
+        expect(d.isOpen()).toBe(false);
+    });
+
+    it('is not closed by the click that opened it', () => {
+        const anchor = anchorAt({ top: 10, left: 10, width: 10, height: 10 });
+        const d = new Dialogify('content', { useDialogForm: false });
+        d.dialog.getBoundingClientRect = () => ({ width: 10, height: 10 });
+
+        anchor.addEventListener('click', () => d.showAt(anchor));
+        anchor.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+
+        expect(d.isOpen()).toBe(true);
+    });
+
+    it('stays open when the click is inside the popover', async () => {
+        const anchor = anchorAt({ top: 10, left: 10, width: 10, height: 10 });
+        const d = new Dialogify('content', { useDialogForm: false });
+        d.dialog.getBoundingClientRect = () => ({ width: 10, height: 10 });
+
+        d.showAt(anchor);
+        await new Promise((r) => setTimeout(r, 0));
+
+        d.$content
+            .find('.dialogify__body')[0]
+            .dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+
+        expect(d.isOpen()).toBe(true);
+    });
+
+    it('does not install the outside listener when closable is false', async () => {
+        const anchor = anchorAt({ top: 10, left: 10, width: 10, height: 10 });
+        const d = new Dialogify('content', { useDialogForm: false, closable: false });
+        d.dialog.getBoundingClientRect = () => ({ width: 10, height: 10 });
+
+        d.showAt(anchor);
+        await new Promise((r) => setTimeout(r, 0));
+
+        document.body.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+
+        expect(d.isOpen()).toBe(true);
+    });
+});
+
+describe('backdrop click', () => {
+    function rectFor(el, rect) {
+        el.getBoundingClientRect = () => ({
+            top: rect.top,
+            left: rect.left,
+            right: rect.left + rect.width,
+            bottom: rect.top + rect.height,
+            width: rect.width,
+            height: rect.height
+        });
+    }
+
+    function clickDialog(d, x, y) {
+        d.dialog.dispatchEvent(
+            new window.MouseEvent('click', { bubbles: true, clientX: x, clientY: y })
+        );
+    }
+
+    it('closes when the click lands outside the dialog box', () => {
+        const d = new Dialogify('content', { useDialogForm: false });
+        rectFor(d.dialog, { top: 100, left: 100, width: 200, height: 200 });
+        d.showModal();
+
+        clickDialog(d, 10, 10);
+
+        expect(d.isOpen()).toBe(false);
+    });
+
+    it('stays open when an empty area of the dialog itself is clicked', () => {
+        const d = new Dialogify('content', {
+            useDialogForm: false,
+            position: Dialogify.POSITION_RIGHT
+        });
+        rectFor(d.dialog, { top: 0, left: 800, width: 420, height: 800 });
+        d.showModal();
+
+        // bottom of a tall drawer whose content only fills the top
+        clickDialog(d, 900, 700);
+
+        expect(d.isOpen()).toBe(true);
+    });
+
+    it('does not close when closable is false', () => {
+        const d = new Dialogify('content', { useDialogForm: false, closable: false });
+        rectFor(d.dialog, { top: 100, left: 100, width: 200, height: 200 });
+        d.showModal();
+
+        clickDialog(d, 10, 10);
+
+        expect(d.isOpen()).toBe(true);
+    });
+});
+
+describe('exit animation', () => {
+    it('keeps the dialog in the dom until its exit animation ends', async () => {
+        const d = new Dialogify('content', { position: Dialogify.POSITION_RIGHT });
+        let finish;
+        d.dialog.getAnimations = () => [{ finished: new Promise((resolve) => (finish = resolve)) }];
+
+        d.showModal();
+        d.close();
+
+        expect(d.dialog.classList.contains('dialogify--closing')).toBe(true);
+        expect(document.body.contains(d.dialog)).toBe(true);
+
+        finish();
+        await new Promise((r) => setTimeout(r, 0));
+
+        expect(document.body.contains(d.dialog)).toBe(false);
+    });
+
+    it('removes the dialog at once when nothing is animating', () => {
+        const d = new Dialogify('content', { position: Dialogify.POSITION_RIGHT });
+        d.dialog.getAnimations = () => [];
+
+        d.showModal();
+        d.close();
+
+        expect(document.body.contains(d.dialog)).toBe(false);
+    });
+
+    it('drops the closing state when the dialog is reopened', async () => {
+        const d = new Dialogify('content', {
+            position: Dialogify.POSITION_RIGHT,
+            autoRemove: false
+        });
+        d.dialog.getAnimations = () => [{ finished: new Promise(() => {}) }];
+
+        d.showModal();
+        d.close();
+        expect(d.dialog.classList.contains('dialogify--closing')).toBe(true);
+
+        d.showModal();
+
+        expect(d.dialog.classList.contains('dialogify--closing')).toBe(false);
+        expect(d.isOpen()).toBe(true);
+    });
+
+    it('prunes the toast container only after the toast has animated out', async () => {
+        const toast = Dialogify.toast('hi');
+        let finish;
+        toast.dialog.getAnimations = () => [
+            { finished: new Promise((resolve) => (finish = resolve)) }
+        ];
+
+        toast.close();
+
+        expect(document.querySelector('.dialogify-toast-container')).not.toBe(null);
+
+        finish();
+        await new Promise((r) => setTimeout(r, 0));
+
+        expect(document.querySelector('.dialogify-toast-container')).toBe(null);
+    });
 });
