@@ -358,9 +358,12 @@ dialogify.isOpen();</code></pre>
             <td class="mdl-data-table__cell--non-numeric">.showAt(anchor, options)</td>
             <td class="mdl-data-table__cell--non-numeric">
                 錨定在指定元素旁顯示，適合做下拉選單、popover 卡片<br>
-                options: {placement: 'top|bottom|left|right', align: 'start|center|end', offset: 8}<br>
+                options: {placement: 'top|bottom|left|right', align: 'start|center|end', offset: 8, toggle: true}<br>
                 空間不足時會自動翻到另一側，捲動與改變視窗大小時會跟著移動<br>
-                點擊 popover 以外的地方（含觸發它的元素）就會關閉，設 closable: false 可停用
+                點擊 popover 以外的地方就會關閉；點擊原本觸發它的元素則是切換（toggle）關閉，
+                該次點擊會被吃掉，所以呼叫 showAt() 的 handler 不會再次開啟它<br>
+                點擊「其他」觸發元素則會關閉這個、開啟新的。設 toggle: false 可讓觸發元素的點擊照常傳遞，
+                設 closable: false 則完全不自動關閉
             </td>
         </tr>
         <tr>
@@ -521,6 +524,7 @@ dialogify.isOpen();</code></pre>
 <p>
     drawer 從邊緣滑入滑出、toast 淡入淡出並帶縮放、popover 淡入淡出。
     離場動畫是在燈箱關閉後才播放，所以有 autoRemove 的燈箱會等動畫結束才從 DOM 移除。
+    關閉中的 toast 會同步把自己的高度收合起來，堆疊在下面的 toast 才不會在它被移除的瞬間跳一下。
     使用者若開啟 <code>prefers-reduced-motion: reduce</code>，這些動畫都會自動停用。
 </p>
 

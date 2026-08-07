@@ -218,6 +218,9 @@ class Dialogify {
                 // Keep the dialog rendered while the exit animation plays; it
                 // is already out of the top layer at this point.
                 $(dialog).addClass('dialogify--closing');
+                if (self._onClosing) {
+                    self._onClosing();
+                }
                 whenAnimationsDone(dialog, function () {
                     $(dialog).removeClass('dialogify--closing');
                     if (options.autoRemove !== false) {
@@ -466,11 +469,22 @@ class Dialogify {
         // showAt() does not immediately close it again.
         if (this.options.closable !== false) {
             this._outsideListener = function (e) {
-                if (!self.dialog.contains(e.target)) {
-                    if (dispatchDomEvent(self.dialog, 'cancel')) {
-                        self.close();
-                    }
+                if (self.dialog.contains(e.target)) {
+                    return;
                 }
+                const onAnchor = options.toggle !== false && self._anchor.contains(e.target);
+                if (!dispatchDomEvent(self.dialog, 'cancel')) {
+                    return;
+                }
+                // Clicking the anchor again toggles the popover shut. The click
+                // is swallowed so the handler that called showAt() does not run
+                // and immediately reopen it; a click on a different trigger is
+                // left alone, so that one closes this popover and opens its own.
+                if (onAnchor) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                }
+                self.close();
             };
             this._outsideTimer = window.setTimeout(function () {
                 if (self._outsideListener) {
@@ -922,6 +936,13 @@ Dialogify.TOAST_SUCCESS = 'success';
 Dialogify.TOAST_WARNING = 'warning';
 Dialogify.TOAST_ERROR = 'error';
 
+Dialogify.TOAST_TOP_LEFT = 'top-left';
+Dialogify.TOAST_TOP_CENTER = 'top-center';
+Dialogify.TOAST_TOP_RIGHT = 'top-right';
+Dialogify.TOAST_BOTTOM_LEFT = 'bottom-left';
+Dialogify.TOAST_BOTTOM_CENTER = 'bottom-center';
+Dialogify.TOAST_BOTTOM_RIGHT = 'bottom-right';
+
 // Registry for declarative event handlers referenced by name from markup,
 // e.g. <dialog is="bahamut-dialogify" onshow="myHandler">.
 Dialogify.handlers = {};
@@ -1137,6 +1158,13 @@ Dialogify.toast = function (message, options) {
         clearTimer();
     });
 
+    // A closing toast holds its slot until the exit animation ends, which would
+    // make the rest of the stack jump when it is finally removed. Collapse the
+    // slot over the same period so the toasts below slide up instead.
+    toast._onClosing = function () {
+        collapseToastSlot(toast.dialog);
+    };
+
     // Runs after the exit animation, once the instance close handler has
     // detached the toast, so an emptied container is pruned in the same tick.
     toast._onExit = function () {
@@ -1148,6 +1176,30 @@ Dialogify.toast = function (message, options) {
     toast.promise = promise;
     return toast;
 };
+
+function collapseToastSlot(el) {
+    const container = el.parentNode;
+    if (!container || typeof el.animate != 'function') {
+        return;
+    }
+
+    // Match the exit animation the stylesheet just applied; it is zero under
+    // `prefers-reduced-motion`, where the toast disappears at once anyway.
+    const duration = parseFloat(window.getComputedStyle(el).animationDuration) * 1000;
+    const height = el.getBoundingClientRect().height;
+    if (!duration || !height) {
+        return;
+    }
+
+    const gap = parseFloat(window.getComputedStyle(container).rowGap) || 0;
+    el.animate(
+        [
+            { height: `${height}px`, marginBlockEnd: '0px' },
+            { height: '0px', marginBlockEnd: `-${gap}px` }
+        ],
+        { duration: duration, easing: 'ease-in', fill: 'forwards' }
+    );
+}
 
 function toastContainer(position) {
     const id = `dialogify-toasts-${position}`;

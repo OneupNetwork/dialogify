@@ -241,6 +241,11 @@ declare namespace Dialogify {
         align?: 'start' | 'center' | 'end';
         /** Gap between the anchor and the dialog, in pixels. Defaults to 8. */
         offset?: number;
+        /**
+         * Whether clicking the anchor again closes the popover instead of
+         * letting that click reopen it. Defaults to `true`.
+         */
+        toggle?: boolean;
     }
 
     interface ToastOptions {
@@ -293,6 +298,13 @@ declare namespace Dialogify {
     const TOAST_SUCCESS: string;
     const TOAST_WARNING: string;
     const TOAST_ERROR: string;
+
+    const TOAST_TOP_LEFT: string;
+    const TOAST_TOP_CENTER: string;
+    const TOAST_TOP_RIGHT: string;
+    const TOAST_BOTTOM_LEFT: string;
+    const TOAST_BOTTOM_CENTER: string;
+    const TOAST_BOTTOM_RIGHT: string;
 
     const LOCALE: Record<
         string,

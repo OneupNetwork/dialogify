@@ -3,10 +3,12 @@
 ## 2.2.0
     feat: optional custom-elements bundle so Safari/WebKit can use <dialog is="bahamut-dialogify">
     feat: enter and exit animations for drawers, toasts and popovers, skipped under prefers-reduced-motion
-    feat: an anchored popover is dismissed by any click outside it, including on its trigger
+    feat: an anchored popover is dismissed by any click outside it; clicking its anchor toggles it shut
+    feat: Dialogify.TOAST_TOP_LEFT and the five other toast position constants
     fix: the blurry-render ResizeObserver pinned drawers off screen by writing the mid-animation transform back as an inline style
     fix: a click on the dialog's own empty area no longer closes it; only clicks outside its box count as backdrop clicks
     fix: toasts and popovers no longer inherit the 40px content floor and scroll bars
+    fix: a closing toast collapses its slot so the stack below it does not jump on removal
     feat(a11y): aria-labelledby from title(), focusable and labelled close button
     feat(a11y): role=status on loading and toasts, aria-busy on loading buttons, reduced-motion support
     feat: show()/showModal() return a promise resolving with the dialog returnValue

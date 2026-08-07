@@ -509,6 +509,86 @@ describe('toast', () => {
         const toast = Dialogify.toast('body text', { duration: 0, title: 'Heads up' });
         expect(toast.dialog.querySelector('.dialogify_title').textContent).toContain('Heads up');
     });
+
+    it('exposes a constant for every supported position', () => {
+        const constants = [
+            Dialogify.TOAST_TOP_LEFT,
+            Dialogify.TOAST_TOP_CENTER,
+            Dialogify.TOAST_TOP_RIGHT,
+            Dialogify.TOAST_BOTTOM_LEFT,
+            Dialogify.TOAST_BOTTOM_CENTER,
+            Dialogify.TOAST_BOTTOM_RIGHT
+        ];
+
+        expect(constants).toEqual([
+            'top-left',
+            'top-center',
+            'top-right',
+            'bottom-left',
+            'bottom-center',
+            'bottom-right'
+        ]);
+
+        constants.forEach((position) => {
+            Dialogify.toast('x', { duration: 0, position });
+            expect(
+                document.querySelector(`.dialogify-toast-container--${position}`)
+            ).not.toBeNull();
+        });
+    });
+
+    it('collapses its slot in step with the exit animation', () => {
+        const toast = Dialogify.toast('one', { duration: 0 });
+        const dialog = toast.dialog;
+        const container = dialog.parentNode;
+        const calls = [];
+
+        dialog.getBoundingClientRect = () => ({ width: 200, height: 45 });
+        dialog.animate = (keyframes, timing) => {
+            calls.push({ keyframes, timing });
+            return { finished: new Promise(() => {}) };
+        };
+
+        const original = window.getComputedStyle.bind(window);
+        const spy = vi.spyOn(window, 'getComputedStyle').mockImplementation((el) => {
+            if (el === dialog) return { animationDuration: '0.22s' };
+            if (el === container) return { rowGap: '10px' };
+            return original(el);
+        });
+
+        toast.close();
+        spy.mockRestore();
+
+        expect(calls.length).toBe(1);
+        expect(calls[0].timing.duration).toBe(220);
+        expect(calls[0].keyframes).toEqual([
+            { height: '45px', marginBlockEnd: '0px' },
+            { height: '0px', marginBlockEnd: '-10px' }
+        ]);
+    });
+
+    it('does not collapse the slot when the exit animation is off', () => {
+        const toast = Dialogify.toast('one', { duration: 0 });
+        const dialog = toast.dialog;
+        const calls = [];
+
+        dialog.getBoundingClientRect = () => ({ width: 200, height: 45 });
+        dialog.animate = (keyframes) => {
+            calls.push(keyframes);
+            return { finished: new Promise(() => {}) };
+        };
+
+        const original = window.getComputedStyle.bind(window);
+        const spy = vi.spyOn(window, 'getComputedStyle').mockImplementation((el) => {
+            if (el === dialog) return { animationDuration: '0s' };
+            return original(el);
+        });
+
+        toast.close();
+        spy.mockRestore();
+
+        expect(calls.length).toBe(0);
+    });
 });
 
 describe('anchored popover', () => {
@@ -676,6 +756,67 @@ describe('anchored popover', () => {
         document.body.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
 
         expect(d.isOpen()).toBe(true);
+    });
+
+    it('swallows the anchor click so the trigger does not reopen it', async () => {
+        const anchor = anchorAt({ top: 10, left: 10, width: 10, height: 10 });
+        let opened = 0;
+        let current;
+        anchor.addEventListener('click', () => {
+            opened++;
+            current = new Dialogify('content', { useDialogForm: false });
+            current.dialog.getBoundingClientRect = () => ({ width: 10, height: 10 });
+            current.showAt(anchor);
+        });
+
+        anchor.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+        await new Promise((r) => setTimeout(r, 0));
+        expect(opened).toBe(1);
+        expect(current.isOpen()).toBe(true);
+
+        // second click toggles it shut without the trigger running again
+        anchor.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+        expect(opened).toBe(1);
+        expect(current.isOpen()).toBe(false);
+
+        // a third click opens a fresh one
+        anchor.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+        await new Promise((r) => setTimeout(r, 0));
+        expect(opened).toBe(2);
+        expect(current.isOpen()).toBe(true);
+    });
+
+    it('lets a click on a different anchor close this one and open that one', async () => {
+        const first = anchorAt({ top: 10, left: 10, width: 10, height: 10 });
+        const second = anchorAt({ top: 10, left: 90, width: 10, height: 10 });
+        let opened = 0;
+        second.addEventListener('click', () => opened++);
+
+        const d = new Dialogify('content', { useDialogForm: false });
+        d.dialog.getBoundingClientRect = () => ({ width: 10, height: 10 });
+        d.showAt(first);
+        await new Promise((r) => setTimeout(r, 0));
+
+        second.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+
+        expect(d.isOpen()).toBe(false);
+        expect(opened).toBe(1);
+    });
+
+    it('keeps closing on the anchor click when toggle is false', async () => {
+        const anchor = anchorAt({ top: 10, left: 10, width: 10, height: 10 });
+        let clicks = 0;
+        anchor.addEventListener('click', () => clicks++);
+
+        const d = new Dialogify('content', { useDialogForm: false });
+        d.dialog.getBoundingClientRect = () => ({ width: 10, height: 10 });
+        d.showAt(anchor, { toggle: false });
+        await new Promise((r) => setTimeout(r, 0));
+
+        anchor.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+
+        expect(d.isOpen()).toBe(false);
+        expect(clicks).toBe(1);
     });
 });
 

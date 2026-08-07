@@ -165,7 +165,7 @@ container and are not modal, so they never block the page:
 Dialogify.toast('Saved');
 Dialogify.toast('Could not save', {
     type: Dialogify.TOAST_ERROR, // TOAST_INFO (default), TOAST_SUCCESS, TOAST_WARNING
-    position: 'bottom-right', // top/bottom + left/center/right, default top-right
+    position: 'bottom-right', // or Dialogify.TOAST_BOTTOM_RIGHT; default top-right
     duration: 5000, // 0 keeps it open until closed
     title: 'Error',
     closable: true
@@ -185,7 +185,8 @@ would overflow the viewport, and follows the anchor on scroll and resize:
 new Dialogify('<ul>...</ul>', { closable: false, useDialogForm: false }).showAt('#menu-button', {
     placement: 'bottom', // top | bottom | left | right
     align: 'start', // start | center | end
-    offset: 8
+    offset: 8,
+    toggle: true // clicking the anchor again closes it, default true
 });
 ```
 
@@ -197,16 +198,21 @@ new Dialogify('<ul>...</ul>', { closable: false, useDialogForm: false }).showAt(
 document.querySelector('dialog[is="bahamut-dialogify"]').showAt();
 ```
 
-A popover is dismissed by a click anywhere outside it, including on the element
-that opened it. Pass `closable: false` to keep it open until you close it
-yourself.
+A popover is dismissed by a click anywhere outside it. Clicking the anchor that
+opened it toggles it shut: that click is swallowed, so the handler that called
+`showAt()` does not run and immediately reopen it. Clicking a _different_
+trigger is left alone, so it closes this popover and opens its own. Pass
+`toggle: false` to let the anchor click through, or `closable: false` to keep
+the popover open until you close it yourself.
 
 ### Animation
 
 Drawers slide in and out from their edge, toasts fade and scale, and popovers
 fade in place. The exit animation runs after the dialog has closed, so a dialog
-with `autoRemove` stays in the DOM until it finishes. All of them are disabled
-under `prefers-reduced-motion: reduce`.
+with `autoRemove` stays in the DOM until it finishes. A closing toast collapses
+its own height at the same time, so the toasts stacked below it slide up instead
+of jumping when it is removed. All of them are disabled under
+`prefers-reduced-motion: reduce`.
 
 ## Accessibility
 
