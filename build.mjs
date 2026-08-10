@@ -99,6 +99,18 @@ async function buildPolyfill() {
         outfile: 'dist/dialog-polyfill.min.js',
         target: ['es2018']
     });
+
+    // Customized built-in elements polyfill for Safari/WebKit, needed only for
+    // the declarative `<dialog is="bahamut-dialogify">` syntax.
+    await esbuild.build({
+        entryPoints: ['src/js/custom-elements.browser.js'],
+        bundle: true,
+        minify: true,
+        sourcemap: true,
+        format: 'iife',
+        outfile: 'dist/custom-elements.min.js',
+        target: ['es2018']
+    });
 }
 
 async function main() {
@@ -119,6 +131,7 @@ async function main() {
     fs.mkdirSync('docs/css', { recursive: true });
     fs.copyFileSync('dist/dialogify.min.js', 'docs/js/dialogify.min.js');
     fs.copyFileSync('dist/dialog-polyfill.min.js', 'docs/js/dialog-polyfill.min.js');
+    fs.copyFileSync('dist/custom-elements.min.js', 'docs/js/custom-elements.min.js');
     fs.copyFileSync('dist/dialogify.css', 'docs/css/dialogify.css');
 }
 

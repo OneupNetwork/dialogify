@@ -1,5 +1,40 @@
 # Changelog
 
+## 2.2.0
+    fix: the dialog no longer blinks out and back in before its exit animation; the closing state is now set before the native close, which fires its event asynchronously
+    feat: optional custom-elements bundle so Safari/WebKit can use <dialog is="bahamut-dialogify">
+    feat: enter and exit animations for drawers, toasts and popovers, skipped under prefers-reduced-motion
+    feat: an anchored popover is dismissed by any click outside it; clicking its anchor toggles it shut
+    feat: Dialogify.TOAST_TOP_LEFT and the five other toast position constants
+    fix: the blurry-render ResizeObserver pinned drawers off screen by writing the mid-animation transform back as an inline style
+    fix: a click on the dialog's own empty area no longer closes it; only clicks outside its box count as backdrop clicks
+    fix: toasts and popovers no longer inherit the 40px content floor and scroll bars
+    fix: a closing toast collapses its slot so the stack below it does not jump on removal
+    feat(a11y): aria-labelledby from title(), focusable and labelled close button
+    feat(a11y): role=status on loading and toasts, aria-busy on loading buttons, reduced-motion support
+    feat: show()/showModal() return a promise resolving with the dialog returnValue
+    feat: cancelable beforeclose event covering every close path (button, ESC, backdrop, form submit, close())
+    feat: setContent()/getContent()/load() to update a dialog after it is created
+    feat: setLoading()/isLoading() overlay and per-button loading state via updateButton()
+    feat: validate()/formData()/formValues() on top of the existing <form method="dialog">
+    feat: addButton()/updateButton()/removeButton()/getButton(); declarative buttons join the button list
+    feat: drawer mode via the position option and attribute (left/right/top/bottom)
+    feat: Dialogify.toast() auto-dismissing notifications with stacking and types
+    feat: showAt() anchored popover positioning with viewport flipping and follow-on-scroll
+    feat: off() to unbind instance events, and onbeforeclose on the custom element
+    feat: anchor/placement/align/offset and loading-text attributes on the custom element
+
+## 2.1.0
+    feat: declarative `<dialog is="bahamut-dialogify">` customized built-in element
+    feat: dialogify API (show/showModal/isOpen/setTitle/buttons/on) on the element itself
+    feat: options as attributes (dialog-title, size, closable, src, options='{...}', ...)
+    feat: declarative buttons via `<button ok>` / `cancel` / `close` / `primary` / `danger`
+    feat: events via addEventListener, on* properties, or `onshow="handlerName"` markup
+    feat: Dialogify.handlers registry for named declarative handlers
+    feat: Dialogify.adopt() to wrap an existing <dialog> element
+    feat: autoRemove option (defaults to false for declarative dialogs, so they are reusable)
+    refactor: split core into src/js/core.js, element into src/js/element.js
+
 ## 2.0.0
     **BREAKING**: entry points and dependency model changed
     docs: document that dialog content is HTML (with XSS caveat)
