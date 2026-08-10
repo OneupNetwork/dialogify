@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2.2.0
+    fix: the dialog no longer blinks out and back in before its exit animation; the closing state is now set before the native close, which fires its event asynchronously
     feat: optional custom-elements bundle so Safari/WebKit can use <dialog is="bahamut-dialogify">
     feat: enter and exit animations for drawers, toasts and popovers, skipped under prefers-reduced-motion
     feat: an anchored popover is dismissed by any click outside it; clicking its anchor toggles it shut

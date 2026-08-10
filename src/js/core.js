@@ -216,7 +216,9 @@ class Dialogify {
                     $('body').css({ overflow: '', 'padding-right': '' });
                 }
                 // Keep the dialog rendered while the exit animation plays; it
-                // is already out of the top layer at this point.
+                // is already out of the top layer at this point. Normally the
+                // class is already there (see `_markClosing`), this is the
+                // safety net for closes triggered outside of Dialogify.
                 $(dialog).addClass('dialogify--closing');
                 if (self._onClosing) {
                     self._onClosing();
@@ -239,6 +241,8 @@ class Dialogify {
                 $(self).triggerHandler('cancel');
                 if (options.closable === false || !self._fireBeforeClose()) {
                     e.preventDefault();
+                } else {
+                    self._markClosing();
                 }
             })
             .click(function (e) {
@@ -257,6 +261,8 @@ class Dialogify {
             $dialog.find('form[method="dialog"]').on('submit', function (e) {
                 if (!self._fireBeforeClose(this.returnValue)) {
                     e.preventDefault();
+                } else {
+                    self._markClosing();
                 }
             });
         }
@@ -567,10 +573,22 @@ class Dialogify {
         this._anchor = null;
     }
 
+    // Flag the dialog as closing *before* it actually closes. The native
+    // `close` event is queued as a task, so between `close()` and the handler
+    // the dialog has already lost its `open` attribute and would be hidden by
+    // `display: none`. A paint landing in that gap makes the dialog blink out
+    // and back in at full opacity before the exit animation runs.
+    _markClosing() {
+        if (this.dialog.open) {
+            $(this.dialog).addClass('dialogify--closing');
+        }
+    }
+
     close(returnValue) {
         if (!this._fireBeforeClose(returnValue)) {
             return this;
         }
+        this._markClosing();
         nativeDialogCall(this.dialog, 'close', returnValue === undefined ? [] : [returnValue]);
         return this;
     }
@@ -1080,6 +1098,9 @@ Dialogify.prompt = function (message, options) {
 
 Dialogify.closeAll = function () {
     $('dialog.dialogify').each(function () {
+        if (this.open) {
+            $(this).addClass('dialogify--closing');
+        }
         nativeDialogCall(this, 'close');
     });
 };

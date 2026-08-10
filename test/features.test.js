@@ -891,6 +891,26 @@ describe('exit animation', () => {
         expect(document.body.contains(d.dialog)).toBe(false);
     });
 
+    it('marks the dialog as closing before the native close runs', () => {
+        const d = new Dialogify('content', { position: Dialogify.POSITION_RIGHT });
+        d.dialog.getAnimations = () => [{ finished: new Promise(() => {}) }];
+        d.showModal();
+
+        let closingAtNativeClose = null;
+        const nativeClose = window.HTMLDialogElement.prototype.close;
+        window.HTMLDialogElement.prototype.close = function (...args) {
+            closingAtNativeClose = this.classList.contains('dialogify--closing');
+            return nativeClose.apply(this, args);
+        };
+        try {
+            d.close();
+        } finally {
+            window.HTMLDialogElement.prototype.close = nativeClose;
+        }
+
+        expect(closingAtNativeClose).toBe(true);
+    });
+
     it('removes the dialog at once when nothing is animating', () => {
         const d = new Dialogify('content', { position: Dialogify.POSITION_RIGHT });
         d.dialog.getAnimations = () => [];
