@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.2.1
     chore: build target raised from es2018 to es2022, matching the browsers that ship a native <dialog>
     chore: replaced the deprecated jQuery `.click()` shorthand with `.on('click')`/`.trigger('click')`, so the library is clean under jQuery 4
     chore: npm audit fix for brace-expansion, nanoid, postcss and undici (transitive dev dependencies)
