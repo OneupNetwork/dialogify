@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.1
+    chore: build target raised from es2018 to es2022, matching the browsers that ship a native <dialog>
+    chore: replaced the deprecated jQuery `.click()` shorthand with `.on('click')`/`.trigger('click')`, so the library is clean under jQuery 4
+    chore: npm audit fix for brace-expansion, nanoid, postcss and undici (transitive dev dependencies)
+
 ## 2.2.0
     fix: the dialog no longer blinks out and back in before its exit animation; the closing state is now set before the native close, which fires its event asynchronously
     feat: optional custom-elements bundle so Safari/WebKit can use <dialog is="bahamut-dialogify">

@@ -245,7 +245,7 @@ class Dialogify {
                     self._markClosing();
                 }
             })
-            .click(function (e) {
+            .on('click', function (e) {
                 // A backdrop click targets the dialog element but lands outside
                 // its box; a click on the dialog's own padding must not close it.
                 if (options.closable !== false && e.target == dialog && isOutsideRect(dialog, e)) {
@@ -293,7 +293,7 @@ class Dialogify {
                 .attr({ role: 'button', tabindex: 0, 'aria-label': getLocale().close })
                 .css(closeButtonStyle)
                 .append($closeImage)
-                .click(function () {
+                .on('click', function () {
                     if (dispatchDomEvent(dialog, 'cancel')) {
                         self.close();
                     }
@@ -301,7 +301,7 @@ class Dialogify {
                 .on('keydown', function (e) {
                     if (e.key == 'Enter' || e.key == ' ' || e.key == 'Spacebar') {
                         e.preventDefault();
-                        $(this).click();
+                        $(this).trigger('click');
                     }
                 });
 
@@ -780,7 +780,7 @@ class Dialogify {
         }
 
         $btn.text(definition.text || getLocale().close);
-        $btn.click(function (e) {
+        $btn.on('click', function (e) {
             if (typeof $(this).data('click') == 'function') {
                 $(this).data('click').call(self, e);
             }

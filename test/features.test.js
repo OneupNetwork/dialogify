@@ -371,7 +371,7 @@ describe('button api', () => {
         const d = new Dialogify('content').buttons([{ id: 'a', text: 'A', click: first }]);
 
         d.updateButton('a', { click: second });
-        d.getButton('a').click();
+        d.getButton('a').trigger('click');
 
         expect(first).not.toHaveBeenCalled();
         expect(second).toHaveBeenCalled();

@@ -9,6 +9,10 @@ import { replace } from 'esbuild-plugin-replace';
 
 const jqueryGlobalShim = path.resolve('src/js/jquery-global.js');
 
+// Matches the browsers that ship a native <dialog> element (Chrome 94+,
+// Firefox 98+, Safari 15.4+), so nothing is downlevelled needlessly.
+const TARGET = ['es2022'];
+
 // Build the CSS once, reuse for the standalone file and the embedded builds.
 async function buildCss() {
     const result = await esbuild.build({
@@ -51,7 +55,7 @@ async function buildJs(cssLiteral) {
         sourcemap: true,
         format: 'iife',
         outfile: 'dist/dialogify.min.js',
-        target: ['es2018'],
+        target: TARGET,
         alias: { jquery: jqueryGlobalShim },
         plugins: [cssReplace]
     });
@@ -64,7 +68,7 @@ async function buildJs(cssLiteral) {
         sourcemap: true,
         format: 'esm',
         outfile: 'dist/dialogify.mjs',
-        target: ['es2018'],
+        target: TARGET,
         external: ['jquery'],
         plugins: [cssReplace]
     });
@@ -79,7 +83,7 @@ async function buildJs(cssLiteral) {
         sourcemap: true,
         format: 'cjs',
         outfile: 'dist/dialogify.cjs',
-        target: ['es2018'],
+        target: TARGET,
         external: ['jquery'],
         footer: {
             js: 'if(module.exports&&module.exports.default){module.exports=module.exports.default}'
@@ -97,7 +101,7 @@ async function buildPolyfill() {
         sourcemap: true,
         format: 'iife',
         outfile: 'dist/dialog-polyfill.min.js',
-        target: ['es2018']
+        target: TARGET
     });
 
     // Customized built-in elements polyfill for Safari/WebKit, needed only for
@@ -109,7 +113,7 @@ async function buildPolyfill() {
         sourcemap: true,
         format: 'iife',
         outfile: 'dist/custom-elements.min.js',
-        target: ['es2018']
+        target: TARGET
     });
 }
 

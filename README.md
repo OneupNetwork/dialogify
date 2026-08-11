@@ -453,11 +453,13 @@ exposes `window.dialogPolyfill`, which dialogify detects at runtime:
 
 ## Dependencies
 
-- [jQuery](https://jquery.com/) (peer dependency, `>=3.0.0`)
+- [jQuery](https://jquery.com/) (peer dependency, `>=3.0.0`, jQuery 4 included)
 
 ## Browser compatibility
 
-All modern browser
+Every browser with a native `<dialog>` element (Chrome 94+, Firefox 98+,
+Safari 15.4+); the bundles are built for `es2022`. Older browsers can load the
+optional `dialog-polyfill` bundle.
 
 ## Designed by
 

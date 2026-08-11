@@ -1387,7 +1387,7 @@ toast.close();</code></pre>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script src="js/dialogify.min.js"></script>
     <script>
-        $('#demo1').click(function(e){
+        $('#demo1').on('click', function(e){
             new Dialogify('#demo1_template')
                 .title('Dialogify')
                 .buttons([
@@ -1409,7 +1409,7 @@ toast.close();</code></pre>
                 .show();
         });
 
-        $('#demo2').click(function(){
+        $('#demo2').on('click', function(){
             let html = '<b>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a sapien lacus. Ut a eros quis lacus auctor aliquet eu.</b>';
             let dialogify = new Dialogify(html)
                 .title('Modal Dialogify')
@@ -1439,7 +1439,7 @@ toast.close();</code></pre>
             dialogify.showModal();
         });
 
-        $('#demo3').click(function(){
+        $('#demo3').on('click', function(){
             let options = {
                 ajaxPrefix: '',
                 ajaxComplete: function(){
@@ -1455,7 +1455,7 @@ toast.close();</code></pre>
                 .show();
         });
 
-        $('#demo7').click(function(){
+        $('#demo7').on('click', function(){
             let options = {
                 dialog: {
                     style: {'background-color': 'transparent', 'box-shadow': 'none'},
@@ -1492,7 +1492,7 @@ toast.close();</code></pre>
             console.log('closed');
         });
 
-        $('#demo9').click(function(){
+        $('#demo9').on('click', function(){
             new Dialogify('#demo9_template', {position: Dialogify.POSITION_RIGHT})
                 .title('篩選條件')
                 .buttons([
@@ -1502,7 +1502,7 @@ toast.close();</code></pre>
                 .showModal();
         });
 
-        $('#demo10').click(function(){
+        $('#demo10').on('click', function(){
             Dialogify.toast('儲存成功', {type: 'success'});
             Dialogify.toast('有 3 個欄位需要確認', {type: 'warning', duration: 4000});
             Dialogify.toast('連線失敗', {
@@ -1512,12 +1512,12 @@ toast.close();</code></pre>
             });
         });
 
-        $('#demo11').click(function(){
+        $('#demo11').on('click', function(){
             new Dialogify('<p>錨定在按鈕旁邊的小卡片，捲動時會跟著移動，空間不夠會自動翻面。</p>')
                 .showAt('#demo11', {placement: 'bottom', align: 'start', offset: 8});
         });
 
-        $('#demo12').click(function(){
+        $('#demo12').on('click', function(){
             const dialogify = new Dialogify('#demo12_template')
                 .title('編輯文章')
                 .buttons([
@@ -1549,12 +1549,12 @@ toast.close();</code></pre>
             });
         });
 
-        $('#demo4').click(async function() {
+        $('#demo4').on('click', async function() {
             await Dialogify.alert('Alert <i>Message</i>');
             console.log('alert close');
         });
 
-        $('#demo5').click(async function() {
+        $('#demo5').on('click', async function() {
             if(await Dialogify.confirm('Do you like Dialogify ?')) {
                 Dialogify.alert('Yes, I do');
             } else {
@@ -1562,7 +1562,7 @@ toast.close();</code></pre>
             }
         });
 
-        $('#demo6').click(async function() {
+        $('#demo6').on('click', async function() {
             const name = await Dialogify.prompt('What\'s your name ?', {
                 placeholder: 'Enter your name'
             });
