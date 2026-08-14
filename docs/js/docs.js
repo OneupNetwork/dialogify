@@ -6,6 +6,15 @@
     const THEME_KEY = 'dialogify-docs-theme';
     const LANG_KEY = 'dialogify-docs-lang';
     const THEMES = ['auto', 'light', 'dark'];
+    const GH_BUTTONS_SRC = 'https://buttons.github.io/buttons.js';
+
+    let lang = 'zh-TW';
+
+    // Picks the string for the language in force. Used for the handful of
+    // strings that live in this file rather than in the markup.
+    function t(zh, en) {
+        return lang === 'en' ? en : zh;
+    }
 
     /* --- theme --------------------------------------------------------- */
 
@@ -16,7 +25,13 @@
         return THEMES.indexOf(value) >= 0 ? value : 'auto';
     }
 
+    function isDark(theme) {
+        return theme === 'dark' || (theme === 'auto' && prefersDark.matches);
+    }
+
     function applyTheme(theme) {
+        // Which icon shows is driven by CSS off this attribute: the hidden
+        // attribute has no effect on SVG, which has no HTML UA stylesheet.
         root.dataset.theme = theme;
         try {
             if (theme === 'auto') {
@@ -28,11 +43,7 @@
             /* storage can be blocked */
         }
 
-        document.querySelectorAll('[data-theme-icon]').forEach(function (icon) {
-            icon.hidden = icon.dataset.themeIcon !== theme;
-        });
-
-        const dark = theme === 'dark' || (theme === 'auto' && prefersDark.matches);
+        const dark = isDark(theme);
 
         // highlight.js ships one stylesheet per theme, so they are swapped
         // rather than re-declared.
@@ -40,8 +51,6 @@
             sheet.disabled = (sheet.dataset.hljs === 'dark') !== dark;
         });
 
-        // The star button is an iframe: its colour scheme is baked in when it
-        // renders, so it has to be rebuilt on every change.
         renderGitHubButtons(dark ? 'dark' : 'light');
     }
 
@@ -52,51 +61,69 @@
         }
     });
 
+    const THEME_LABELS = {
+        auto: function () {
+            return t(
+                '跟隨系統（目前為' + (prefersDark.matches ? '暗色' : '亮色') + '）',
+                'Follow the system (currently ' + (prefersDark.matches ? 'dark' : 'light') + ')'
+            );
+        },
+        light: function () {
+            return t('亮色主題', 'Light theme');
+        },
+        dark: function () {
+            return t('暗色主題', 'Dark theme');
+        }
+    };
+
     document.querySelector('[data-theme-toggle]').addEventListener('click', function () {
-        applyTheme(THEMES[(THEMES.indexOf(currentTheme()) + 1) % THEMES.length]);
+        const next = THEMES[(THEMES.indexOf(currentTheme()) + 1) % THEMES.length];
+        applyTheme(next);
+        Dialogify.toast(THEME_LABELS[next](), { position: Dialogify.TOAST_TOP_CENTER });
     });
 
+    // github-buttons exposes no API for re-rendering, so the anchors are put
+    // back and the script is run again. It renders every a.github-button it
+    // finds when it executes, which is exactly what is needed here.
     function renderGitHubButtons(scheme) {
         const host = document.querySelector('[data-gh-buttons]');
         if (!host) {
             return;
         }
 
-        if (!host.dataset.template) {
+        if (host.dataset.template == null) {
             host.dataset.template = host.innerHTML;
         }
 
-        if (!window.GitHubButton || !window.GitHubButton.render) {
-            // buttons.js is async: try again once it has landed.
-            clearTimeout(renderGitHubButtons.retry);
-            renderGitHubButtons.retry = setTimeout(function () {
-                renderGitHubButtons(scheme);
-            }, 100);
+        if (host.dataset.scheme === scheme) {
             return;
         }
+        host.dataset.scheme = scheme;
 
         host.innerHTML = host.dataset.template;
-        host.querySelectorAll('.github-button').forEach(function (anchor) {
-            // buttons.js expects a full scheme map, not a bare keyword.
+        host.querySelectorAll('a.github-button').forEach(function (anchor) {
             anchor.setAttribute(
                 'data-color-scheme',
                 'no-preference: ' + scheme + '; light: ' + scheme + '; dark: ' + scheme + ';'
             );
-            window.GitHubButton.render(anchor);
         });
-    }
 
-    // buttons.js renders on load; re-render once it is available so the very
-    // first paint also matches the current theme.
-    window.addEventListener('load', function () {
-        applyTheme(currentTheme());
-    });
+        const previous = document.querySelector('script[data-gh-script]');
+        if (previous) {
+            previous.remove();
+        }
+
+        const script = document.createElement('script');
+        script.src = GH_BUTTONS_SRC;
+        script.async = true;
+        script.dataset.ghScript = '';
+        document.head.appendChild(script);
+    }
 
     /* --- language ------------------------------------------------------ */
 
     const dictionary = window.DIALOGIFY_DOCS_EN || {};
     const originals = new Map();
-    let lang = 'zh-TW';
 
     function captureOriginals() {
         document.querySelectorAll('[data-i18n]').forEach(function (el) {
@@ -275,7 +302,32 @@
         if (changed) {
             buildToc();
             updateTocCurrent();
+            revealCurrentInSidebar();
         }
+    }
+
+    // The section list is taller than its scroll container, so following the
+    // page means scrolling the sidebar too. Only done when the entry has left
+    // the visible part, otherwise every section change would nudge the list.
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    function revealCurrentInSidebar() {
+        const anchor = navList.querySelector('a[aria-current]');
+        if (!anchor || sidebar.scrollHeight <= sidebar.clientHeight) {
+            return;
+        }
+
+        const entry = anchor.getBoundingClientRect();
+        const view = sidebar.getBoundingClientRect();
+        const margin = 24;
+        if (entry.top >= view.top + margin && entry.bottom <= view.bottom - margin) {
+            return;
+        }
+
+        sidebar.scrollTo({
+            top: sidebar.scrollTop + entry.top - view.top - (view.height - entry.height) / 2,
+            behavior: reducedMotion.matches ? 'auto' : 'smooth'
+        });
     }
 
     function updateTocCurrent() {
@@ -451,16 +503,16 @@
         'token.fieldFocus': '<code>.text-field</code> 聚焦邊框',
         'token.placeholder': '<code>.text-field</code> 提示文字',
         'token.error': '<code>.is-error</code> 欄位',
-        'token.toastInfo': '吐司狀態條 info',
-        'token.toastSuccess': '吐司狀態條 success',
-        'token.toastWarning': '吐司狀態條 warning',
-        'token.toastError': '吐司狀態條 error',
-        'token.toastClose': '吐司關閉鈕',
-        'token.toastCloseHover': '吐司關閉鈕 hover',
+        'token.toastInfo': 'toast 狀態條 info',
+        'token.toastSuccess': 'toast 狀態條 success',
+        'token.toastWarning': 'toast 狀態條 warning',
+        'token.toastError': 'toast 狀態條 error',
+        'token.toastClose': 'toast 關閉鈕',
+        'token.toastCloseHover': 'toast 關閉鈕 hover',
         'token.backdrop': 'modal 背景遮罩',
         'token.backdropOpacity': 'modal 背景遮罩透明度',
-        'token.z': '非 modal 燈箱與浮層',
-        'token.toastZ': '吐司容器'
+        'token.z': '非 modal 燈箱與 popover',
+        'token.toastZ': 'toast 容器'
     };
 
     function buildTokenTable() {
@@ -495,10 +547,6 @@
     }
 
     /* --- demos --------------------------------------------------------- */
-
-    const t = function (zh, en) {
-        return lang === 'en' ? en : zh;
-    };
 
     let toastCorner = 0;
 
@@ -572,7 +620,10 @@
                     {
                         text: t('下一步', 'Next'),
                         type: Dialogify.BUTTON_PRIMARY,
-                        click: function () {
+                        click: function (e) {
+                            // A primary button submits the dialog form, which
+                            // would close it before the new content is seen.
+                            e.preventDefault();
                             dialog.setContent(
                                 '<p>' +
                                     t(
@@ -614,7 +665,8 @@
                     {
                         text: 'OK',
                         type: Dialogify.BUTTON_PRIMARY,
-                        click: function () {
+                        click: function (e) {
+                            e.preventDefault();
                             dialog.setLoading(true);
                             setTimeout(function () {
                                 dialog.setLoading(false);
@@ -638,7 +690,10 @@
                         text: t('儲存', 'Save'),
                         type: Dialogify.BUTTON_PRIMARY,
                         loadingText: t('儲存中…', 'Saving…'),
-                        click: function () {
+                        click: function (e) {
+                            // Keep the dialog open while the save is running;
+                            // the primary button would otherwise submit it.
+                            e.preventDefault();
                             if (!dialog.validate()) {
                                 return;
                             }
@@ -695,7 +750,9 @@
                     id: 'target',
                     text: t('目標按鈕', 'Target'),
                     type: Dialogify.BUTTON_PRIMARY,
-                    click: function () {}
+                    click: function (e) {
+                        e.preventDefault();
+                    }
                 },
                 {
                     text: t('停用它', 'Disable it'),
@@ -749,7 +806,7 @@
                 '<h4>' +
                     t('篩選條件', 'Filters') +
                     '</h4><p>' +
-                    t('抽屜會從指定的邊緣滑入。', 'A drawer slides in from the edge you pick.') +
+                    t('drawer 會從指定的邊緣滑入。', 'A drawer slides in from the edge you pick.') +
                     '</p>',
                 { position: button.dataset.position }
             ).showModal();
@@ -783,7 +840,7 @@
             // path before this runs.
             new Dialogify(
                 '<strong>' +
-                    t('錨定浮層', 'Anchored popover') +
+                    t('popover', 'Anchored popover') +
                     '</strong><p>' +
                     t(
                         '它會跟著錨點捲動，空間不足時自動翻面。',

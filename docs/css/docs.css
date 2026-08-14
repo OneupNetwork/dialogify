@@ -193,10 +193,6 @@ a:hover {
     margin-left: auto;
 }
 
-.topbar__menu {
-    display: none;
-}
-
 .gh-buttons {
     display: flex;
     align-items: center;
@@ -222,6 +218,12 @@ a:hover {
     background: var(--bg-soft);
 }
 
+/* The sidebar is permanently open at this width, so the button would do
+   nothing. Declared after .icon-button, which would otherwise win on order. */
+.topbar__menu {
+    display: none;
+}
+
 .icon-button svg {
     width: 18px;
     height: 18px;
@@ -229,6 +231,19 @@ a:hover {
     stroke: currentColor;
     stroke-width: 1.7;
     stroke-linecap: round;
+}
+
+/* Only the icon for the mode in force is shown. This is done in CSS rather
+   than with the hidden attribute, which does nothing on an SVG element: the
+   [hidden] rule lives in the HTML UA stylesheet and is namespaced to HTML. */
+[data-theme-icon] {
+    display: none;
+}
+
+:root[data-theme='light'] [data-theme-icon='light'],
+:root[data-theme='dark'] [data-theme-icon='dark'],
+:root[data-theme='auto'] [data-theme-icon='auto'] {
+    display: block;
 }
 
 .segmented {
@@ -277,8 +292,17 @@ a:hover {
     align-self: start;
     max-height: calc(100vh - var(--topbar-height));
     overflow-y: auto;
-    padding: 24px 0 48px;
+    /* overflow-y alone makes overflow-x compute to auto, which would clip the
+       focus ring of the filter box against the sides. */
+    padding: 24px 3px 48px;
     font-size: 14px;
+}
+
+.sidebar__filter:focus-visible,
+.sidebar__filter:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 0;
+    border-color: var(--accent);
 }
 
 .sidebar__filter {

@@ -1,10 +1,5 @@
 # Changelog
 
-## Unreleased
-    docs: rewrote the documentation site — every option, method, event and theme property is now listed with a runnable example, replacing the unmaintained Material Design Lite layout
-    docs: light/dark theme switch on the site, wired to the same data-theme attribute the dialog itself reads
-    docs: Traditional Chinese and English, switchable at runtime and remembered; Chinese ships in the markup so the page reads without JavaScript
-
 ## 2.3.0
     feat: a dark palette behind data-theme="dark", with data-theme="auto" following prefers-color-scheme; opt-in, so an existing site is unchanged on upgrade
     feat: every colour in the stylesheet is now a --dialogify-* custom property, so a page can retheme the dialog without overriding rules

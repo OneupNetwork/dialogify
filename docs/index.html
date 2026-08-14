@@ -6,9 +6,8 @@
         <title>Dialogify — 以 &lt;dialog&gt; 打造的燈箱工具</title>
         <meta
             name="description"
-            content="Dialogify 是以原生 HTMLDialogElement 實作的燈箱工具，支援 modal、抽屜、吐司、錨定浮層、表單與宣告式用法。"
+            content="Dialogify 是以原生 HTMLDialogElement 實作的燈箱工具，支援 modal、drawer、toast、popover、表單與宣告式用法。"
         />
-        <link rel="icon" href="img/x.png" />
         <link rel="stylesheet" href="css/docs.css" />
         <link rel="stylesheet" href="css/dialogify.css" />
         <link
@@ -64,6 +63,7 @@
                         class="github-button"
                         href="https://github.com/OneupNetwork/dialogify"
                         data-icon="octicon-star"
+                        data-size="large"
                         data-show-count="true"
                         aria-label="Star OneupNetwork/dialogify on GitHub"
                         >Star</a
@@ -83,10 +83,10 @@
                             d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"
                         />
                     </svg>
-                    <svg viewBox="0 0 24 24" aria-hidden="true" data-theme-icon="dark" hidden>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" data-theme-icon="dark">
                         <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" />
                     </svg>
-                    <svg viewBox="0 0 24 24" aria-hidden="true" data-theme-icon="auto" hidden>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" data-theme-icon="auto">
                         <circle cx="12" cy="12" r="8.5" />
                         <path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor" />
                     </svg>
@@ -115,7 +115,7 @@
                     <h1>Dialogify</h1>
                     <p class="hero__lead" data-i18n="hero.lead">
                         以原生 <code>&lt;dialog&gt;</code> 元素實作的燈箱工具。提供 modal
-                        對話框、抽屜、吐司通知、錨定浮層與表單處理，也支援直接寫在 HTML
+                        對話框、drawer、toast 通知、popover 與表單處理，也支援直接寫在 HTML
                         裡的宣告式用法。
                     </p>
                     <div class="hero__actions">
@@ -297,7 +297,7 @@ const answer = await dialog.showModal(); // 'yes' 或 'no'</code></pre>
                                     <td><code>string</code></td>
                                     <td>—</td>
                                     <td data-i18n="opt.position">
-                                        設定後改以抽屜形式呈現，可用 <code>left</code> /
+                                        設定後改以 drawer 形式呈現，可用 <code>left</code> /
                                         <code>right</code> / <code>top</code> / <code>bottom</code>
                                     </td>
                                 </tr>
@@ -514,6 +514,16 @@ dialog.isLoading();</code></pre>
                         <code>Dialogify.BUTTON_LEFT</code
                         >、<code>Dialogify.BUTTON_CENTER</code>，預設靠右。
                     </p>
+                    <div class="callout" data-i18n="buttons.submit">
+                        <strong>注意</strong>：<code>BUTTON_PRIMARY</code> 會被渲染成
+                        <code>type="submit"</code>，按下時會送出燈箱內建的
+                        <code>&lt;form method="dialog"&gt;</code> 並關閉燈箱，即使有自訂
+                        <code>click</code>
+                        也一樣。若要在按下後繼續留在燈箱裡（例如顯示載入狀態或更換內容），請在
+                        <code>click</code> 中呼叫
+                        <code>e.preventDefault()</code>，或改用一般按鈕、或建立燈箱時設定
+                        <code>useDialogForm: false</code>。
+                    </div>
 
                     <h3 id="buttons-manage" data-i18n="buttons.manage.h">動態管理</h3>
                     <div class="demo">
@@ -595,9 +605,9 @@ dialog.getButton('save'); // 該按鈕的 jQuery 物件</code></pre>
 
                 <!-- ================= 變化型 ================= -->
                 <section id="variants">
-                    <h2 data-i18n="variants.h">抽屜、吐司與錨定浮層</h2>
+                    <h2 data-i18n="variants.h">drawer、toast 與 popover</h2>
 
-                    <h3 id="drawer" data-i18n="variants.drawer.h">抽屜 Drawer</h3>
+                    <h3 id="drawer" data-i18n="variants.drawer.h">Drawer</h3>
                     <p data-i18n="variants.drawer.p">
                         指定 <code>position</code> 後，燈箱會改從該側邊緣滑入，而不是置中顯示。
                     </p>
@@ -611,9 +621,9 @@ dialog.getButton('save'); // 該按鈕的 jQuery 物件</code></pre>
                     </div>
                     <pre><code data-i18n="code.drawer" class="language-javascript">new Dialogify('&lt;h4&gt;篩選條件&lt;/h4&gt;', { position: Dialogify.POSITION_RIGHT }).showModal();</code></pre>
 
-                    <h3 id="toast" data-i18n="variants.toast.h">吐司 Toast</h3>
+                    <h3 id="toast" data-i18n="variants.toast.h">Toast</h3>
                     <p data-i18n="variants.toast.p">
-                        輕量、會自動消失的通知。吐司是非 modal
+                        輕量、會自動消失的通知。toast 是非 modal
                         的，會堆疊在畫面角落的容器中，不會阻擋頁面。滑鼠停留其上時會暫停倒數。
                     </p>
                     <div class="demo">
@@ -643,7 +653,7 @@ Dialogify.toast('儲存失敗', {
                         <code>close()</code> 與各種事件都可以照常使用。
                     </p>
 
-                    <h3 id="popover" data-i18n="variants.popover.h">錨定浮層 Popover</h3>
+                    <h3 id="popover" data-i18n="variants.popover.h">Popover</h3>
                     <p data-i18n="variants.popover.p">
                         <code>showAt()</code> 會把非 modal
                         燈箱定位在指定元素旁，適合做下拉選單與說明卡片。空間不足時會自動翻到反向，並在捲動與縮放時跟隨錨點。
@@ -671,15 +681,18 @@ Dialogify.toast('儲存失敗', {
 // 注意：closable: false 除了拿掉右上角關閉鈕，
 // 也會一併關掉「點擊外部關閉」，此時只能自行呼叫 close()。</code></pre>
                     <p data-i18n="variants.popover.dismiss">
-                        點擊浮層以外的任何地方都會關閉它。點擊開啟它的那個錨點會收合浮層，且該次點擊會被吞掉，因此不會馬上又被重新開啟；點擊
+                        點擊 popover 以外的任何地方都會關閉它。點擊開啟它的那個錨點會收合
+                        popover，且該次點擊會被吞掉，因此不會馬上又被重新開啟；點擊
                         <em>另一個</em> 觸發元素則不受影響，會關掉舊的並開啟新的。
                     </p>
 
                     <h3 id="animation" data-i18n="variants.anim.h">動畫</h3>
                     <p data-i18n="variants.anim.p">
-                        抽屜由邊緣滑入滑出、吐司淡入並帶縮放、浮層則原地淡入。離場動畫在燈箱關閉之後才播放，所以帶
+                        drawer 由邊緣滑入滑出、toast 淡入並帶縮放、popover
+                        則原地淡入。離場動畫在燈箱關閉之後才播放，所以帶
                         <code>autoRemove</code>
-                        的燈箱會等動畫結束才移除。關閉中的吐司會同步收合自己的高度，讓下方的吐司平順上移。以上動畫在
+                        的燈箱會等動畫結束才移除。關閉中的 toast 會同步收合自己的高度，讓下方的
+                        toast 平順上移。以上動畫在
                         <code>prefers-reduced-motion: reduce</code> 下全部停用。
                     </p>
                 </section>
@@ -782,7 +795,7 @@ dialog.showModal();</code></pre>
                                 <tr>
                                     <td><code>position</code></td>
                                     <td><code>position</code></td>
-                                    <td data-i18n="attr.position">抽屜邊緣</td>
+                                    <td data-i18n="attr.position">drawer 邊緣</td>
                                 </tr>
                                 <tr>
                                     <td><code>closable</code></td>
@@ -844,7 +857,7 @@ dialog.showModal();</code></pre>
                                         <code>offset</code>
                                     </td>
                                     <td>—</td>
-                                    <td data-i18n="attr.place">錨定浮層的方位、對齊與間距</td>
+                                    <td data-i18n="attr.place">popover 的方位、對齊與間距</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1066,7 +1079,9 @@ dialog.onbeforeclose = () =&gt; false;                               // 同上</
                     <p data-i18n="theme.z.p">
                         <code>showModal()</code> 會把燈箱推進瀏覽器的 top layer，那裡不受
                         <code>z-index</code> 影響；其餘的 <code>show()</code>、<code>showAt()</code>
-                        浮層與吐司都留在一般堆疊脈絡，必須蓋過頁面上的其他元件。預設值刻意設得很高，避免吐司被固定頁首擋住。
+                        popover 與 toast
+                        都留在一般堆疊脈絡，必須蓋過頁面上的其他元件。預設值刻意設得很高，避免 toast
+                        被固定頁首擋住。
                     </p>
                     <div class="table-wrap">
                         <table>
@@ -1081,12 +1096,12 @@ dialog.onbeforeclose = () =&gt; false;                               // 同上</
                                 <tr>
                                     <td><code>--dialogify-z-index</code></td>
                                     <td><code>1000</code></td>
-                                    <td data-i18n="z.dialog">非 modal 燈箱與浮層</td>
+                                    <td data-i18n="z.dialog">非 modal 燈箱與 popover</td>
                                 </tr>
                                 <tr>
                                     <td><code>--dialogify-toast-z-index</code></td>
                                     <td><code>1010</code></td>
-                                    <td data-i18n="z.toast">吐司容器</td>
+                                    <td data-i18n="z.toast">toast 容器</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1123,7 +1138,7 @@ dialog.onbeforeclose = () =&gt; false;                               // 同上</
                             <kbd>Space</kbd> 觸發，標籤取自語系設定。
                         </li>
                         <li data-i18n="a11y.icons">
-                            裝飾性圖示會對輔助科技隱藏；載入指示與吐司則以
+                            裝飾性圖示會對輔助科技隱藏；載入指示與 toast 則以
                             <code>role="status"</code> 主動播報。
                         </li>
                         <li data-i18n="a11y.busy">忙碌狀態的按鈕會標記 <code>aria-busy</code>。</li>
@@ -1291,7 +1306,7 @@ window.dialogifyConfig = { locale: 'ja_JP' };</code></pre>
                                 </tr>
                                 <tr>
                                     <td><code>Dialogify.toast(message, options?)</code></td>
-                                    <td data-i18n="api.toast">顯示吐司通知，回傳燈箱實例</td>
+                                    <td data-i18n="api.toast">顯示 toast 通知，回傳燈箱實例</td>
                                 </tr>
                                 <tr>
                                     <td><code>Dialogify.closeAll()</code></td>
@@ -1324,21 +1339,21 @@ window.dialogifyConfig = { locale: 'ja_JP' };</code></pre>
                                         <code>POSITION_LEFT</code> / <code>POSITION_RIGHT</code> /
                                         <code>POSITION_TOP</code> / <code>POSITION_BOTTOM</code>
                                     </td>
-                                    <td data-i18n="api.const3">抽屜方位常數</td>
+                                    <td data-i18n="api.const3">drawer 方位常數</td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <code>TOAST_INFO</code> / <code>TOAST_SUCCESS</code> /
                                         <code>TOAST_WARNING</code> / <code>TOAST_ERROR</code>
                                     </td>
-                                    <td data-i18n="api.const4">吐司樣式常數</td>
+                                    <td data-i18n="api.const4">toast 樣式常數</td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <code>TOAST_TOP_LEFT</code> …
                                         <code>TOAST_BOTTOM_RIGHT</code>
                                     </td>
-                                    <td data-i18n="api.const5">吐司位置常數，共六種</td>
+                                    <td data-i18n="api.const5">toast 位置常數，共六種</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1364,7 +1379,6 @@ window.dialogifyConfig = { locale: 'ja_JP' };</code></pre>
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script src="js/dialogify.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-        <script async defer src="https://buttons.github.io/buttons.js"></script>
         <script src="js/i18n.en.js"></script>
         <script src="js/docs.js"></script>
     </body>

@@ -84,6 +84,8 @@ window.DIALOGIFY_DOCS_EN = {
     'buttons.define.h': 'Defining buttons',
     'buttons.position':
         'The second argument takes a <code>position</code> of <code>Dialogify.BUTTON_LEFT</code> or <code>Dialogify.BUTTON_CENTER</code>; the default is right-aligned.',
+    'buttons.submit':
+        '<strong>Note</strong>: <code>BUTTON_PRIMARY</code> renders as <code>type="submit"</code>, so pressing it submits the built-in <code>&lt;form method="dialog"&gt;</code> and closes the dialog — even when a custom <code>click</code> handler is given. To stay open (to show a loading state or swap the content, say), call <code>e.preventDefault()</code> inside <code>click</code>, use a plain button, or create the dialog with <code>useDialogForm: false</code>.',
     'buttons.manage.h': 'Managing them at runtime',
     'btn.text': 'Button label; falls back to the localized default',
     'btn.type':
