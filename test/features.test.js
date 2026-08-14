@@ -975,3 +975,48 @@ describe('stacking', () => {
         expect(css).not.toMatch(/--dialogify(-toast)?-z-index\s*:/);
     });
 });
+
+describe('theming', () => {
+    const css = readFileSync('src/css/dialogify.css', 'utf8');
+
+    // Everything after the light rules; the dark rules only add declarations.
+    const darkBlock = css.slice(css.indexOf('[data-theme=dark]'));
+
+    it('reads every colour through a custom property with the light value as fallback', () => {
+        expect(css).toContain('background-color:var(--dialogify-surface, #fff)');
+        expect(css).toContain('color:var(--dialogify-text, #464646)');
+        expect(css).toContain('background:var(--dialogify-toast-success, #2f9e44)');
+    });
+
+    it('never declares a theme property outside of [data-theme]', () => {
+        const beforeDark = css.slice(0, css.indexOf('[data-theme=dark]'));
+        expect(beforeDark).not.toMatch(/--dialogify-[a-z-]+\s*:/);
+    });
+
+    it('only sets custom properties in the dark rules, so specificity is unchanged', () => {
+        const declarations = darkBlock.match(/[{;]\s*([a-z-]+)\s*:/g) || [];
+        expect(declarations.length).toBeGreaterThan(0);
+        for (const declaration of declarations) {
+            expect(declaration.replace(/^[{;]\s*/, '').startsWith('--dialogify-')).toBe(true);
+        }
+    });
+
+    it('is opt-in: dark styling never applies without a data-theme attribute', () => {
+        const media = css.match(/@media\(prefers-color-scheme:dark\)\{([^}]*)\{/);
+        expect(media).not.toBeNull();
+        expect(media[1]).toContain('[data-theme=auto]');
+    });
+
+    it('re-tints every built-in icon instead of swapping it', () => {
+        // the fill is baked into the inline SVGs, so CSS cannot recolour them
+        const tinted = css.match(/[^{}]*\{[^{}]*--dialogify-icon-filter, none\)/g) || [];
+        const selectors = tinted.map((rule) => rule.split('{')[0].trim());
+        expect(selectors).toEqual([
+            '.dialogify .dialogify__close img',
+            '.dialogify .dialogify__loading img',
+            '.dialogify img.dialogify-ajax-loading',
+            '.dialogify h5.dialogify_title img'
+        ]);
+        expect(darkBlock).toContain('--dialogify-icon-filter: invert(1) hue-rotate(180deg)');
+    });
+});

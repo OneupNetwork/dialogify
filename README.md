@@ -242,6 +242,102 @@ The bundled stylesheet only reads these properties (they are `var()` fallbacks,
 never declared by the library), so your declaration wins regardless of source
 order — even though the browser build injects its stylesheet last.
 
+## Theming
+
+Every colour in the bundled stylesheet is read through a custom property, so you
+can retheme the dialog without fighting selectors:
+
+```css
+:root {
+    --dialogify-primary: #6741d9;
+    --dialogify-primary-hover: #7950f2;
+    --dialogify-surface: #fdfdfd;
+}
+```
+
+The library never declares these properties itself — the light values are only
+`var()` fallbacks — so your declaration wins regardless of source order, even
+though the browser build injects its stylesheet last.
+
+<details>
+<summary>All theme properties</summary>
+
+| Custom property                  | Default                    | Applies to                           |
+| -------------------------------- | -------------------------- | ------------------------------------ |
+| `--dialogify-surface`            | `#fff`                     | Dialog background                    |
+| `--dialogify-text`               | `#464646`                  | Body text                            |
+| `--dialogify-heading`            | `#00555f`                  | `title()` and the close button       |
+| `--dialogify-muted`              | `#a6a6a6`                  | Secondary text                       |
+| `--dialogify-divider`            | `#e0e6e8`                  | `<hr>`                               |
+| `--dialogify-link`               | `#117e96`                  | Links in the body                    |
+| `--dialogify-link-hover`         | `#126e7d`                  | Links on hover                       |
+| `--dialogify-focus-ring`         | `#117e96`                  | `:focus-visible` outlines            |
+| `--dialogify-icon-filter`        | `none`                     | Filter applied to the built-in icons |
+| `--dialogify-shadow`             | three-layer drop shadow    | Dialog shadow                        |
+| `--dialogify-loading-overlay`    | `rgba(255, 255, 255, .75)` | `setLoading()` overlay               |
+| `--dialogify-button-bg`          | `#e5e5e5`                  | Default button                       |
+| `--dialogify-button-hover-bg`    | `#dcdcdc`                  | Default button on hover              |
+| `--dialogify-button-text`        | `#a6a6a6`                  | Default button label                 |
+| `--dialogify-primary`            | `#117e96`                  | `BUTTON_PRIMARY`                     |
+| `--dialogify-primary-hover`      | `#126e7d`                  | `BUTTON_PRIMARY` on hover            |
+| `--dialogify-on-primary`         | `#fff`                     | `BUTTON_PRIMARY` label               |
+| `--dialogify-danger`             | `#f44336`                  | `BUTTON_DANGER`                      |
+| `--dialogify-danger-hover`       | `#de2427`                  | `BUTTON_DANGER` on hover             |
+| `--dialogify-on-danger`          | `#fff`                     | `BUTTON_DANGER` label                |
+| `--dialogify-danger-shadow`      | red-tinted drop shadow     | `.btn-danger-shadow`                 |
+| `--dialogify-field-bg`           | `#fff`                     | `.text-field` background             |
+| `--dialogify-field-border`       | `#d9d9d9`                  | `.text-field` border                 |
+| `--dialogify-field-text`         | `#00555f`                  | `.text-field` text                   |
+| `--dialogify-field-focus-border` | `#117e96`                  | `.text-field` border on focus        |
+| `--dialogify-field-placeholder`  | `#b3b3b3`                  | `.text-field` placeholder            |
+| `--dialogify-error`              | `#de2427`                  | `.is-error` fields                   |
+| `--dialogify-toast-info`         | `#117e96`                  | Toast status bar, `info`             |
+| `--dialogify-toast-success`      | `#2f9e44`                  | Toast status bar, `success`          |
+| `--dialogify-toast-warning`      | `#e8a33d`                  | Toast status bar, `warning`          |
+| `--dialogify-toast-error`        | `#de2427`                  | Toast status bar, `error`            |
+| `--dialogify-toast-close`        | `#8d8d8d`                  | Toast close button                   |
+| `--dialogify-toast-close-hover`  | `#464646`                  | Toast close button on hover          |
+| `--dialogify-backdrop`           | `#000`                     | Modal backdrop                       |
+| `--dialogify-backdrop-opacity`   | `0.7`                      | Modal backdrop opacity               |
+
+</details>
+
+### Dark theme
+
+A dark palette ships with the stylesheet, behind `data-theme`:
+
+```html
+<html data-theme="dark"></html>
+```
+
+| `data-theme` | Result                                               |
+| ------------ | ---------------------------------------------------- |
+| absent       | Light (the default, unchanged from earlier releases) |
+| `light`      | Light                                                |
+| `dark`       | Dark                                                 |
+| `auto`       | Follows `prefers-color-scheme`                       |
+
+The attribute can sit on any ancestor of the dialog — `<html>` is the usual
+choice — and can be flipped at runtime without reloading:
+
+```js
+document.documentElement.dataset.theme = 'dark';
+```
+
+Dark mode is **opt-in on purpose**: without the attribute the dialog stays light
+even when the visitor's system is set to dark, so an existing site never changes
+appearance on upgrade. Use `data-theme="auto"` to follow the system.
+
+The dark rules only set custom properties, never a real declaration, so if you
+already ship your own overrides for `.dialogify` they keep winning by source
+order exactly as before. Be aware that anything your stylesheet leaves alone
+will pick up the dark palette, which can mix the two; declare
+`--dialogify-*` properties instead of rules if you want full control.
+
+The built-in icons are single-colour SVGs with the fill baked in, so they are
+re-tinted with `--dialogify-icon-filter` rather than swapped. This also applies
+to a custom `closeButton.image`; set `--dialogify-icon-filter: none` to opt out.
+
 ## Accessibility
 
 - `title()` links the heading to the dialog with `aria-labelledby`.
