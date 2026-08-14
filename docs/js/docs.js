@@ -161,9 +161,11 @@
         document.documentElement.lang = english ? 'en' : 'zh-Hant-TW';
         document.title = english ? dictionary['page.title'] : originals.get('page.title');
 
-        // Replacing innerHTML wipes the highlighting, so code blocks are redone.
+        // Replacing innerHTML wipes the highlighting, so blocks that were
+        // already highlighted are redone. Untouched ones are left to
+        // decorateCode(), which runs once after this on boot.
         document.querySelectorAll('code[data-i18n]').forEach(function (code) {
-            if (window.hljs) {
+            if (window.hljs && code.dataset.highlighted) {
                 delete code.dataset.highlighted;
                 code.classList.remove('hljs');
                 window.hljs.highlightElement(code);
@@ -411,7 +413,7 @@
 
     function decorateCode() {
         document.querySelectorAll('pre > code').forEach(function (code) {
-            if (window.hljs) {
+            if (window.hljs && !code.dataset.highlighted) {
                 window.hljs.highlightElement(code);
             }
 

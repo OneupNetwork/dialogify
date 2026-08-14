@@ -200,18 +200,6 @@ window.DIALOGIFY_DOCS_EN = {
     'theme.tokens.h': 'All theme properties',
     'theme.tokens.sum': 'Show the full list',
 
-    'a11y.h': 'Accessibility',
-    'a11y.title':
-        '<code>title()</code> links the heading to the dialog with <code>aria-labelledby</code>.',
-    'a11y.close':
-        'The close button is exposed as a button, is keyboard focusable, activates with <kbd>Enter</kbd> / <kbd>Space</kbd>, and is labelled from the locale.',
-    'a11y.icons':
-        'Decorative icons are hidden from assistive technology; the loading indicator and toasts announce themselves with <code>role="status"</code>.',
-    'a11y.busy': 'Buttons in their loading state are marked <code>aria-busy</code>.',
-    'a11y.motion': 'Animations are disabled under <code>prefers-reduced-motion</code>.',
-    'a11y.focus':
-        'Focus trapping and focus restoration for modal dialogs come from the native <code>&lt;dialog&gt;</code> element itself.',
-
     'locale.h': 'Locale',
     'locale.p':
         '<code>zh_TW</code> (the default), <code>zh_CN</code> and <code>en_US</code> ship with the library. The locale drives the default button labels, the close button label and the loading text.',

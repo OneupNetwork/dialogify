@@ -1125,33 +1125,6 @@ dialog.onbeforeclose = () =&gt; false;                               // 同上</
                     </details>
                 </section>
 
-                <!-- ================= 無障礙 ================= -->
-                <section id="accessibility">
-                    <h2 data-i18n="a11y.h">無障礙</h2>
-                    <ul>
-                        <li data-i18n="a11y.title">
-                            <code>title()</code> 會以
-                            <code>aria-labelledby</code> 把標題與燈箱關聯起來。
-                        </li>
-                        <li data-i18n="a11y.close">
-                            關閉鈕以按鈕語意呈現，可用鍵盤聚焦，並支援 <kbd>Enter</kbd> /
-                            <kbd>Space</kbd> 觸發，標籤取自語系設定。
-                        </li>
-                        <li data-i18n="a11y.icons">
-                            裝飾性圖示會對輔助科技隱藏；載入指示與 toast 則以
-                            <code>role="status"</code> 主動播報。
-                        </li>
-                        <li data-i18n="a11y.busy">忙碌狀態的按鈕會標記 <code>aria-busy</code>。</li>
-                        <li data-i18n="a11y.motion">
-                            動畫在 <code>prefers-reduced-motion</code> 下全部停用。
-                        </li>
-                        <li data-i18n="a11y.focus">
-                            modal 燈箱的焦點鎖定與焦點還原，直接由原生
-                            <code>&lt;dialog&gt;</code> 元素提供。
-                        </li>
-                    </ul>
-                </section>
-
                 <!-- ================= 語系 ================= -->
                 <section id="locale">
                     <h2 data-i18n="locale.h">語系</h2>
