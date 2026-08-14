@@ -1,4 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
 import Dialogify from '../src/js/dialogify.js';
 
 const TAG = 'bahamut-dialogify';
@@ -953,5 +954,24 @@ describe('exit animation', () => {
         await new Promise((r) => setTimeout(r, 0));
 
         expect(document.querySelector('.dialogify-toast-container')).toBe(null);
+    });
+});
+
+describe('stacking', () => {
+    // The built stylesheet is committed, so it can be asserted directly; jsdom
+    // never loads it, which rules out a getComputedStyle test.
+    const css = readFileSync('src/css/dialogify.css', 'utf8');
+
+    it('stacks non-modal dialogs and toasts above ordinary page chrome', () => {
+        expect(css).toContain('z-index:var(--dialogify-z-index, 1000)');
+        expect(css).toContain('z-index:var(--dialogify-toast-z-index, 1010)');
+    });
+
+    it('keeps the polyfill backdrop just below its dialog', () => {
+        expect(css).toContain('z-index:calc(var(--dialogify-z-index, 1000) - 1)');
+    });
+
+    it('never declares the custom properties itself, so a page override wins', () => {
+        expect(css).not.toMatch(/--dialogify(-toast)?-z-index\s*:/);
     });
 });

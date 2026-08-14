@@ -25,7 +25,14 @@ async function buildCss() {
                 async transform(source) {
                     const { css } = await postcss([
                         autoprefixer,
-                        postcssPresetEnv({ stage: 0 })
+                        // Custom properties are the public theming hook. The
+                        // transform would prepend a static fallback to every
+                        // var(), which is dead weight for the browsers this
+                        // build targets.
+                        postcssPresetEnv({
+                            stage: 0,
+                            features: { 'custom-properties': false }
+                        })
                     ]).process(source, { from: undefined });
                     return css;
                 }

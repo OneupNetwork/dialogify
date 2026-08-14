@@ -2,6 +2,16 @@ $dialogify-drawer-duration: 260ms;
 $dialogify-popover-duration: 150ms;
 $dialogify-toast-duration: 220ms;
 
+// Modal dialogs are promoted to the top layer, where z-index does not apply,
+// but non-modal ones (show(), showAt() popovers and toasts) stay in the normal
+// stacking context and have to out-stack site chrome such as a sticky nav.
+// Both values are exposed as custom properties: set --dialogify-z-index or
+// --dialogify-toast-z-index on :root to fit another layering scheme. The
+// defaults are only fallbacks inside var(), so a page-level declaration always
+// wins, even though the bundled stylesheet is injected last.
+$dialogify-z-index: 1000;
+$dialogify-toast-z-index: 1010;
+
 .dialogify {
     display: none;
     position: absolute;
@@ -24,7 +34,7 @@ $dialogify-toast-duration: 220ms;
         0 3px 4px rgba(0, 0, 0, 0.1),
         0 1px 8px rgba(0, 0, 0, 0.05),
         0 2px 20px rgba(0, 0, 0, 0.1);
-    z-index: 2;
+    z-index: var(--dialogify-z-index, #{$dialogify-z-index});
     padding: 0;
     line-height: 100%;
     font-family:
@@ -557,7 +567,8 @@ $dialogify-toast-duration: 220ms;
 // --- toast --------------------------------------------------------------
 .dialogify-toast-container {
     position: fixed;
-    z-index: 10;
+    // above dialogs, so a toast raised from an open dialog stays visible
+    z-index: var(--dialogify-toast-z-index, #{$dialogify-toast-z-index});
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -735,4 +746,7 @@ dialog + .backdrop {
     bottom: 0;
     background: #000;
     opacity: 0.7;
+    // the polyfill backdrop is a sibling, so it has to be lifted with the
+    // dialog it belongs to while still painting behind it
+    z-index: calc(var(--dialogify-z-index, #{$dialogify-z-index}) - 1);
 }

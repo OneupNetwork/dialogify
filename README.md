@@ -214,6 +214,34 @@ its own height at the same time, so the toasts stacked below it slide up instead
 of jumping when it is removed. All of them are disabled under
 `prefers-reduced-motion: reduce`.
 
+### Stacking (`z-index`)
+
+`showModal()` promotes a dialog to the browser's top layer, which always paints
+above the page, so `z-index` never applies to modal dialogs. Everything else —
+`show()`, `showAt()` popovers and toasts — stays in the normal stacking context
+and has to out-stack the rest of the page.
+
+The defaults are deliberately high so a toast is not hidden behind a sticky
+header:
+
+| Custom property             | Default | Applies to                     |
+| --------------------------- | ------- | ------------------------------ |
+| `--dialogify-z-index`       | `1000`  | Non-modal dialogs and popovers |
+| `--dialogify-toast-z-index` | `1010`  | The toast container            |
+
+Override them anywhere in your own CSS to fit a different layering scheme:
+
+```css
+:root {
+    --dialogify-z-index: 500;
+    --dialogify-toast-z-index: 510;
+}
+```
+
+The bundled stylesheet only reads these properties (they are `var()` fallbacks,
+never declared by the library), so your declaration wins regardless of source
+order — even though the browser build injects its stylesheet last.
+
 ## Accessibility
 
 - `title()` links the heading to the dialog with `aria-labelledby`.

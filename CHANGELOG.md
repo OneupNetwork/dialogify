@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.2
+    fix: toasts and non-modal dialogs no longer hide behind site chrome such as a sticky nav; the z-index defaults are now 1010 and 1000
+    feat: --dialogify-z-index and --dialogify-toast-z-index custom properties to fit another layering scheme
+    chore: postcss no longer emits a static fallback next to every var(), which is dead weight for the browsers this build targets
+
 ## 2.2.1
     chore: build target raised from es2018 to es2022, matching the browsers that ship a native <dialog>
     chore: replaced the deprecated jQuery `.click()` shorthand with `.on('click')`/`.trigger('click')`, so the library is clean under jQuery 4
