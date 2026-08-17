@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.3.0
+    feat: a dark palette behind data-theme="dark", with data-theme="auto" following prefers-color-scheme; opt-in, so an existing site is unchanged on upgrade
+    feat: every colour in the stylesheet is now a --dialogify-* custom property, so a page can retheme the dialog without overriding rules
+    feat: --dialogify-icon-filter re-tints the built-in single-colour icons, whose fill is baked into the inline SVGs
+
+## 2.2.2
+    fix: toasts and non-modal dialogs no longer hide behind site chrome such as a sticky nav; the z-index defaults are now 1010 and 1000
+    feat: --dialogify-z-index and --dialogify-toast-z-index custom properties to fit another layering scheme
+    chore: postcss no longer emits a static fallback next to every var(), which is dead weight for the browsers this build targets
+
 ## 2.2.1
     chore: build target raised from es2018 to es2022, matching the browsers that ship a native <dialog>
     chore: replaced the deprecated jQuery `.click()` shorthand with `.on('click')`/`.trigger('click')`, so the library is clean under jQuery 4

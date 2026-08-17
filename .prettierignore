@@ -1,5 +1,8 @@
 dist/
-docs/
+docs/css/dialogify.css
+docs/js/dialogify.min.js
+docs/js/custom-elements.min.js
+docs/js/dialog-polyfill.min.js
 node_modules/
 src/css/
 src/js/dialog-polyfill.esm.js

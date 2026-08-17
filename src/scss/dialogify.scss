@@ -1,6 +1,130 @@
+@use 'sass:map';
+
+// Every colour is read through a custom property so a page can retheme the
+// dialog without overriding rules. The library never declares these properties
+// itself: the light values below are only var() fallbacks, so a page-level
+// declaration wins regardless of source order (the bundled stylesheet is
+// injected last). Dark values are declared, but only on [data-theme] and only
+// as custom properties, which leaves the specificity of every real declaration
+// untouched for stylesheets that already override .dialogify directly.
+$dialogify-light: (
+    surface: #fff,
+    text: #464646,
+    heading: #00555f,
+    muted: #a6a6a6,
+    divider: #e0e6e8,
+    link: #117e96,
+    link-hover: #126e7d,
+    focus-ring: #117e96,
+    icon-filter: none,
+    shadow: (
+        0 3px 4px rgba(0, 0, 0, 0.1),
+        0 1px 8px rgba(0, 0, 0, 0.05),
+        0 2px 20px rgba(0, 0, 0, 0.1)
+    ),
+    loading-overlay: rgba(255, 255, 255, 0.75),
+    button-bg: #e5e5e5,
+    button-hover-bg: #dcdcdc,
+    button-text: #a6a6a6,
+    primary: #117e96,
+    primary-hover: #126e7d,
+    on-primary: #fff,
+    danger: #f44336,
+    danger-hover: #de2427,
+    on-danger: #fff,
+    danger-shadow: (
+        0 16px 26px -10px rgba(244, 67, 54, 0.56),
+        0 4px 25px 0 rgba(0, 0, 0, 0.12),
+        0 8px 10px -5px rgba(244, 67, 54, 0.2)
+    ),
+    field-bg: #fff,
+    field-border: #d9d9d9,
+    field-text: #00555f,
+    field-focus-border: #117e96,
+    field-placeholder: #b3b3b3,
+    error: #de2427,
+    toast-info: #117e96,
+    toast-success: #2f9e44,
+    toast-warning: #e8a33d,
+    toast-error: #de2427,
+    toast-close: #8d8d8d,
+    toast-close-hover: #464646,
+    backdrop: #000,
+    backdrop-opacity: 0.7
+);
+
+$dialogify-dark: (
+    surface: #1f2226,
+    text: #e3e5e8,
+    heading: #8fd6e0,
+    muted: #9aa0a6,
+    divider: #3a4046,
+    link: #4fb8cf,
+    link-hover: #7fd3e4,
+    focus-ring: #4fb8cf,
+    // the bundled icons are single-colour SVGs with the fill baked in, so they
+    // are re-tinted rather than swapped. This also hits a custom closeButton
+    // image; set --dialogify-icon-filter: none to opt out of that.
+    icon-filter: invert(1) hue-rotate(180deg),
+    shadow: (
+        0 3px 4px rgba(0, 0, 0, 0.4),
+        0 1px 8px rgba(0, 0, 0, 0.3),
+        0 2px 20px rgba(0, 0, 0, 0.4)
+    ),
+    loading-overlay: rgba(31, 34, 38, 0.75),
+    button-bg: #3a4046,
+    button-hover-bg: #464d54,
+    button-text: #c3c8cd,
+    primary: #1791ac,
+    primary-hover: #20a6c3,
+    on-primary: #fff,
+    danger: #e5484d,
+    danger-hover: #f26a6e,
+    on-danger: #fff,
+    danger-shadow: (
+        0 16px 26px -10px rgba(229, 72, 77, 0.45),
+        0 4px 25px 0 rgba(0, 0, 0, 0.35),
+        0 8px 10px -5px rgba(229, 72, 77, 0.2)
+    ),
+    field-bg: #2a2f34,
+    field-border: #454c53,
+    field-text: #e3e5e8,
+    field-focus-border: #4fb8cf,
+    field-placeholder: #7d858c,
+    error: #f2777a,
+    toast-info: #4fb8cf,
+    toast-success: #51cf66,
+    toast-warning: #ffc85c,
+    toast-error: #ff8787,
+    toast-close: #9aa0a6,
+    toast-close-hover: #e3e5e8,
+    backdrop: #000,
+    backdrop-opacity: 0.8
+);
+
+@function token($name) {
+    @return var(--dialogify-#{$name}, #{map.get($dialogify-light, $name)});
+}
+
+@mixin dialogify-dark-tokens {
+    @each $name, $value in $dialogify-dark {
+        --dialogify-#{$name}: #{$value};
+    }
+}
+
 $dialogify-drawer-duration: 260ms;
 $dialogify-popover-duration: 150ms;
 $dialogify-toast-duration: 220ms;
+
+// Modal dialogs are promoted to the top layer, where z-index does not apply,
+// but non-modal ones (show(), showAt() popovers and toasts) stay in the normal
+// stacking context and have to out-stack site chrome such as a sticky nav.
+// Both values are exposed as custom properties: set --dialogify-z-index or
+// --dialogify-toast-z-index on :root to fit another layering scheme. The
+// defaults are only fallbacks inside var(), so a page-level declaration always
+// wins, even though the bundled stylesheet is injected last.
+$dialogify-z-index: 1000;
+$dialogify-toast-z-index: 1010;
 
 .dialogify {
     display: none;
@@ -14,17 +138,14 @@ $dialogify-toast-duration: 220ms;
     max-width: 1100px;
     min-width: 300px;
     max-height: 100vh;
-    background-color: #fff;
+    background-color: token(surface);
     font-size: 14px;
-    color: #464646;
+    color: token(text);
     border: none;
     border-radius: 4px;
     overflow: auto;
-    box-shadow:
-        0 3px 4px rgba(0, 0, 0, 0.1),
-        0 1px 8px rgba(0, 0, 0, 0.05),
-        0 2px 20px rgba(0, 0, 0, 0.1);
-    z-index: 2;
+    box-shadow: token(shadow);
+    z-index: var(--dialogify-z-index, #{$dialogify-z-index});
     padding: 0;
     line-height: 100%;
     font-family:
@@ -70,7 +191,7 @@ $dialogify-toast-duration: 220ms;
         hr {
             border: none;
             height: 1px;
-            background: #e0e6e8;
+            background: token(divider);
         }
     }
     .dialogify__body {
@@ -85,9 +206,9 @@ $dialogify-toast-duration: 220ms;
             visibility: hidden;
         }
         a {
-            color: #117e96;
+            color: token(link);
             &:hover {
-                color: #126e7d;
+                color: token(link-hover);
             }
         }
     }
@@ -123,11 +244,12 @@ $dialogify-toast-duration: 220ms;
         position: absolute;
         top: 8px;
         right: 8px;
-        color: #00555f;
+        color: token(heading);
         img {
             width: 16px;
             height: 16px;
             opacity: 0.85;
+            filter: token(icon-filter);
         }
         &:hover {
             cursor: pointer;
@@ -136,7 +258,7 @@ $dialogify-toast-duration: 220ms;
             opacity: 1;
         }
         &:focus-visible {
-            outline: 2px solid #117e96;
+            outline: 2px solid token(focus-ring);
             outline-offset: 2px;
             border-radius: 2px;
         }
@@ -151,11 +273,12 @@ $dialogify-toast-duration: 220ms;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(255, 255, 255, 0.75);
+        background: token(loading-overlay);
         z-index: 3;
         img {
             width: 36px;
             height: 36px;
+            filter: token(icon-filter);
         }
     }
     img.dialogify-ajax-loading {
@@ -165,16 +288,14 @@ $dialogify-toast-duration: 220ms;
         width: 24px;
         height: 24px;
         transform: translateX(-50%);
+        filter: token(icon-filter);
     }
     a:focus {
         outline: none;
         text-decoration: none;
     }
     .btn-danger-shadow {
-        box-shadow:
-            0 16px 26px -10px rgba(244, 67, 54, 0.56),
-            0 4px 25px 0px rgba(0, 0, 0, 0.12),
-            0 8px 10px -5px rgba(244, 67, 54, 0.2);
+        box-shadow: token(danger-shadow);
     }
     .btn-box {
         margin-top: 20px;
@@ -190,12 +311,12 @@ $dialogify-toast-duration: 220ms;
         .check-group input[type='checkbox'] + label {
             h6 {
                 font-size: 13px;
-                color: #a6a6a6;
+                color: token(muted);
             }
             a {
-                color: #117e96;
+                color: token(link);
                 &:hover {
-                    color: #126e7d;
+                    color: token(link-hover);
                     text-decoration: none;
                     transition: all 0.3s;
                 }
@@ -211,7 +332,7 @@ $dialogify-toast-duration: 220ms;
             font-weight: normal;
         }
         .link-text {
-            color: #117e96;
+            color: token(link);
         }
     }
 
@@ -231,13 +352,13 @@ $dialogify-toast-duration: 220ms;
         line-height: 1.5;
         letter-spacing: 1px;
         cursor: pointer;
-        background-color: #e5e5e5;
-        color: #a6a6a6;
+        background-color: token(button-bg);
+        color: token(button-text);
         outline: none;
         text-decoration: none;
         &:hover {
-            background: #dcdcdc;
-            color: #a6a6a6;
+            background: token(button-hover-bg);
+            color: token(button-text);
         }
         &.is-disabled {
             opacity: 0.5;
@@ -281,26 +402,26 @@ $dialogify-toast-duration: 220ms;
             }
         }
         &.btn-primary {
-            background-color: #117e96;
-            color: #fff;
+            background-color: token(primary);
+            color: token(on-primary);
             &:hover {
-                background-color: #126e7d;
+                background-color: token(primary-hover);
             }
         }
         &.btn-danger {
-            background-color: #f44336;
-            color: #fff;
+            background-color: token(danger);
+            color: token(on-danger);
             &:hover {
-                background: #de2427;
+                background: token(danger-hover);
             }
             &.is-disabled:hover {
-                background-color: #f44336;
+                background-color: token(danger);
             }
         }
     } //標題
     h5.dialogify_title {
         font-size: 18px;
-        color: #00555f;
+        color: token(heading);
         line-height: 1;
         margin: 0 0 18px;
         font-family:
@@ -313,6 +434,7 @@ $dialogify-toast-duration: 220ms;
             position: relative;
             top: -2px;
             margin-right: 3px;
+            filter: token(icon-filter);
         }
         .post__text-small img {
             width: 12px;
@@ -322,7 +444,7 @@ $dialogify-toast-duration: 220ms;
     }
 
     hr {
-        background: #e0e6e8;
+        background: token(divider);
         border: none;
         height: 1px;
         width: 100%;
@@ -342,28 +464,28 @@ $dialogify-toast-duration: 220ms;
     //輸入框
     .text-field {
         margin: 10px 0;
-        border: 1px solid #d9d9d9;
+        border: 1px solid token(field-border);
         border-radius: 3px;
         padding: 8px;
         box-sizing: border-box;
         width: 100%;
-        background-color: #fff;
+        background-color: token(field-bg);
         font-size: 14px;
-        color: #00555f;
+        color: token(field-text);
         &:hover,
         &:focus {
             outline: none;
-            border-color: #117e96;
+            border-color: token(field-focus-border);
         }
         &::-webkit-input-placeholder,
         &:-moz-placeholder,
         &:-ms-input-placeholder,
         &::-moz-placeholder {
-            color: #b3b3b3 !important;
+            color: token(field-placeholder) !important;
         }
         &.is-error {
-            border-color: #de2427;
-            color: #de2427;
+            border-color: token(error);
+            color: token(error);
         }
     }
 
@@ -557,7 +679,8 @@ $dialogify-toast-duration: 220ms;
 // --- toast --------------------------------------------------------------
 .dialogify-toast-container {
     position: fixed;
-    z-index: 10;
+    // above dialogs, so a toast raised from an open dialog stays visible
+    z-index: var(--dialogify-toast-z-index, #{$dialogify-toast-z-index});
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -648,17 +771,17 @@ $dialogify-toast-duration: 220ms;
         left: 0;
         width: 4px;
         border-radius: 4px 0 0 4px;
-        background: #117e96;
+        background: token(toast-info);
     }
 
     &.dialogify--toast-success:before {
-        background: #2f9e44;
+        background: token(toast-success);
     }
     &.dialogify--toast-warning:before {
-        background: #e8a33d;
+        background: token(toast-warning);
     }
     &.dialogify--toast-error:before {
-        background: #de2427;
+        background: token(toast-error);
     }
 
     &.dialogify--toast-closable .dialogify__content {
@@ -674,13 +797,13 @@ $dialogify-toast-duration: 220ms;
         padding: 0 4px;
         font-size: 18px;
         line-height: 1;
-        color: #8d8d8d;
+        color: token(toast-close);
         cursor: pointer;
         &:hover {
-            color: #464646;
+            color: token(toast-close-hover);
         }
         &:focus-visible {
-            outline: 2px solid #117e96;
+            outline: 2px solid token(focus-ring);
             outline-offset: 2px;
         }
     }
@@ -723,8 +846,8 @@ $dialogify-toast-duration: 220ms;
 }
 
 dialog::backdrop {
-    background: #000;
-    opacity: 0.7;
+    background: token(backdrop);
+    opacity: token(backdrop-opacity);
 }
 
 dialog + .backdrop {
@@ -733,6 +856,26 @@ dialog + .backdrop {
     left: 0;
     right: 0;
     bottom: 0;
-    background: #000;
-    opacity: 0.7;
+    background: token(backdrop);
+    opacity: token(backdrop-opacity);
+    // the polyfill backdrop is a sibling, so it has to be lifted with the
+    // dialog it belongs to while still painting behind it
+    z-index: calc(var(--dialogify-z-index, #{$dialogify-z-index}) - 1);
+}
+
+// --- dark theme ---------------------------------------------------------
+// Opt-in only: a page has to set data-theme itself. Following
+// prefers-color-scheme unconditionally would restyle every existing site the
+// moment its visitor switches the OS to dark, so "auto" is a separate value.
+// Only custom properties are declared here, never a real property, so the
+// specificity of the rules above is unchanged and a stylesheet that already
+// overrides .dialogify keeps winning by source order.
+[data-theme='dark'] {
+    @include dialogify-dark-tokens;
+}
+
+[data-theme='auto'] {
+    @media (prefers-color-scheme: dark) {
+        @include dialogify-dark-tokens;
+    }
 }
