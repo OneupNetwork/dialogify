@@ -13,7 +13,14 @@ function clickButton(dialog, selector) {
 }
 
 afterEach(() => {
-    document.querySelectorAll('dialog[id^="dialogify_"]').forEach((dialog) => dialog.remove());
+    document.querySelectorAll('dialog[id^="dialogify_"]').forEach((dialog) => {
+        // Closing rather than just detaching lets the dialog run its teardown,
+        // so the background scroll lock is released with it.
+        if (dialog.open) {
+            dialog.close();
+        }
+        dialog.remove();
+    });
 });
 
 describe('Dialogify constructor', () => {

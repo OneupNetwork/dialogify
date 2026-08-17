@@ -275,8 +275,15 @@ const answer = await dialog.showModal(); // 'yes' 或 'no'</code></pre>
                                 <tr>
                                     <td><code>backgroundScroll</code></td>
                                     <td><code>boolean</code></td>
-                                    <td><code>true</code></td>
-                                    <td data-i18n="opt.bgScroll">燈箱開啟時是否允許背景捲動</td>
+                                    <td data-i18n="opt.bgScroll.default">
+                                        modal 為 <code>false</code>，其餘為 <code>true</code>
+                                    </td>
+                                    <td data-i18n="opt.bgScroll">
+                                        燈箱開啟時是否允許背景捲動。modal 燈箱預設會鎖住背景，設為
+                                        <code>true</code>
+                                        即可解除；非 modal 燈箱預設不鎖，設為
+                                        <code>false</code> 就會鎖住。
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><code>autoRemove</code></td>

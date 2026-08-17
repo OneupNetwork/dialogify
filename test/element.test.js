@@ -17,7 +17,14 @@ beforeAll(() => {
 });
 
 afterEach(() => {
-    document.querySelectorAll('dialog').forEach((d) => d.remove());
+    document.querySelectorAll('dialog').forEach((d) => {
+        // Closing rather than just detaching lets the dialog run its teardown,
+        // so the background scroll lock is released with it.
+        if (d.open) {
+            d.close();
+        }
+        d.remove();
+    });
     Dialogify.handlers = {};
 });
 

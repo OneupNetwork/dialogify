@@ -641,7 +641,8 @@
         },
 
         load: function () {
-            const dialog = new Dialogify(t('準備載入…', 'About to load…')).title('load()').show();
+            const dialog = new Dialogify(t('準備載入…', 'About to load…')).title('load()');
+            dialog.show();
 
             // The docs site is static, so the request is simulated rather than real.
             dialog.setLoading(true);
