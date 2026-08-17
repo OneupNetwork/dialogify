@@ -13,7 +13,15 @@ function mount(html) {
 }
 
 afterEach(() => {
-    document.querySelectorAll('dialog').forEach((d) => d.remove());
+    document.querySelectorAll('dialog').forEach((d) => {
+        // Closing rather than just detaching lets each dialog run its own
+        // teardown, so state shared across instances — the background scroll
+        // lock in particular — does not leak into the next test.
+        if (d.open) {
+            d.close();
+        }
+        d.remove();
+    });
     document.querySelectorAll('.dialogify-toast-container').forEach((c) => c.remove());
     Dialogify.handlers = {};
     vi.useRealTimers();
@@ -645,14 +653,60 @@ describe('anchored popover', () => {
         expect(d.dialog.style.left).toBe('125px');
     });
 
-    it('keeps the dialog inside the viewport', () => {
+    it('repositions itself as the anchor scrolls away', () => {
+        const anchor = anchorAt({ top: 100, left: 50, width: 80, height: 20 });
+        const d = new Dialogify('content', { useDialogForm: false });
+        d.dialog.getBoundingClientRect = () => ({ width: 200, height: 100 });
+
+        d.showAt(anchor, { placement: 'bottom' });
+        expect(d.dialog.style.top).toBe('128px');
+
+        // The page scrolls down by 400, taking the anchor above the fold.
+        anchor.getBoundingClientRect = () => ({
+            top: -300,
+            left: 50,
+            right: 130,
+            bottom: -280,
+            width: 80,
+            height: 20
+        });
+        window.dispatchEvent(new Event('scroll'));
+
+        expect(d.dialog.style.top).toBe('-272px');
+    });
+
+    it('nudges the dialog back inside the viewport', () => {
+        const anchor = anchorAt({ top: 100, left: 980, width: 10, height: 10 });
+        const d = new Dialogify('content', { useDialogForm: false });
+        d.dialog.getBoundingClientRect = () => ({ width: 100, height: 40 });
+
+        d.showAt(anchor);
+
+        // 980 would overflow the 1024px viewport, so it is pulled back.
+        expect(d.dialog.style.left).toBe('924px');
+    });
+
+    it('follows an anchor that has scrolled out of view', () => {
+        const anchor = anchorAt({ top: -300, left: 50, width: 80, height: 20 });
+        const d = new Dialogify('content', { useDialogForm: false });
+        d.dialog.getBoundingClientRect = () => ({ width: 200, height: 100 });
+
+        d.showAt(anchor, { placement: 'bottom' });
+
+        // Off screen with the anchor rather than parked against the edge.
+        expect(d.dialog.getAttribute('data-placement')).toBe('bottom');
+        expect(d.dialog.style.top).toBe('-272px');
+    });
+
+    it('stays attached when the anchor leaves the viewport sideways', () => {
         const anchor = anchorAt({ top: 100, left: -500, width: 10, height: 10 });
         const d = new Dialogify('content', { useDialogForm: false });
         d.dialog.getBoundingClientRect = () => ({ width: 100, height: 40 });
 
         d.showAt(anchor);
 
-        expect(parseInt(d.dialog.style.left, 10)).toBeGreaterThanOrEqual(0);
+        // Touching the anchor's right edge, not clamped to 0.
+        expect(d.dialog.style.left).toBe('-490px');
     });
 
     it('detaches its reposition listeners on close', () => {
@@ -954,6 +1008,86 @@ describe('exit animation', () => {
         await new Promise((r) => setTimeout(r, 0));
 
         expect(document.querySelector('.dialogify-toast-container')).toBe(null);
+    });
+});
+
+describe('background scroll lock', () => {
+    const html = document.documentElement;
+
+    // jsdom reports no scrollbar (innerWidth === clientWidth), so the gutter
+    // compensation stays out of the way of these assertions.
+    afterEach(() => {
+        html.style.overflow = '';
+        html.style.removeProperty('scrollbar-gutter');
+        html.style.paddingRight = '';
+    });
+
+    it('freezes the page behind a modal dialog by default', () => {
+        const d = new Dialogify('content');
+        d.showModal();
+
+        expect(html.style.overflow).toBe('hidden');
+        d.close();
+    });
+
+    it('releases the page once the dialog closes', () => {
+        const d = new Dialogify('content');
+        d.showModal();
+        d.close();
+
+        expect(html.style.overflow).toBe('');
+    });
+
+    it('honours backgroundScroll: true on a modal dialog', () => {
+        const d = new Dialogify('content', { backgroundScroll: true });
+        d.showModal();
+
+        expect(html.style.overflow).toBe('');
+    });
+
+    it('leaves the page alone for a non-modal dialog', () => {
+        const d = new Dialogify('content');
+        d.show();
+
+        expect(html.style.overflow).toBe('');
+    });
+
+    it('freezes the page for a non-modal dialog that opts in', () => {
+        const d = new Dialogify('content', { backgroundScroll: false });
+        d.show();
+
+        expect(html.style.overflow).toBe('hidden');
+        d.close();
+    });
+
+    it('does not lock toasts out of the page', () => {
+        Dialogify.toast('hi');
+
+        expect(html.style.overflow).toBe('');
+    });
+
+    it('keeps the page frozen until the last stacked dialog closes', () => {
+        const first = new Dialogify('first');
+        const second = new Dialogify('second');
+        first.showModal();
+        second.showModal();
+
+        second.close();
+        expect(html.style.overflow).toBe('hidden');
+
+        first.close();
+        expect(html.style.overflow).toBe('');
+    });
+
+    it('restores whatever the page had set itself', () => {
+        html.style.overflow = 'scroll';
+
+        const d = new Dialogify('content');
+        d.showModal();
+        expect(html.style.overflow).toBe('hidden');
+
+        d.close();
+        expect(html.style.overflow).toBe('scroll');
     });
 });
 

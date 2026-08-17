@@ -1,6 +1,21 @@
 # Dialogify
 
-A javascript plugin for creating dialog, implements with HTMLDialogElement.
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/OneupNetwork/dialogify/ci.yml?branch=master)](https://github.com/OneupNetwork/dialogify/actions/workflows/ci.yml)
+[![NPM Version](https://img.shields.io/npm/v/%40oneup_network%2Fdialogify)](https://www.npmjs.com/package/@oneup_network/dialogify)
+[![GitHub License](https://img.shields.io/github/license/OneupNetwork/dialogify)](LICENSE)
+
+A dialog plugin built on the native `<dialog>` element.
+
+[繁體中文](README.zh-TW.md)
+
+The browser does the heavy lifting — the top layer, the backdrop, focus trapping
+and <kbd>Esc</kbd> to close all come from `<dialog>` itself. Dialogify adds the
+chrome around it: a title bar, a button row, ajax content, forms, drawers,
+toasts and anchored popovers.
+
+**[Documentation and live examples →](https://oneupnetwork.github.io/dialogify/)**
+
+![basic dialogify](docs/img/screenshot1.png)
 
 ## Installation
 
@@ -8,373 +23,56 @@ A javascript plugin for creating dialog, implements with HTMLDialogElement.
 npm install @oneup_network/dialogify jquery
 ```
 
-`jquery` is a **peer dependency** — install it alongside dialogify (or load it
-globally before the browser bundle).
+jQuery is a **peer dependency**, so install it alongside dialogify.
 
-### Browser (global build)
+### Browser
 
 ```html
 <script src="path/to/jquery.min.js"></script>
 <script src="path/to/dialogify.min.js"></script>
 ```
 
-The browser build injects its own CSS, so no extra stylesheet is required.
+The browser build reads jQuery from the global scope.
 
 ### Module (ESM / CommonJS)
 
 ```javascript
 import Dialogify from '@oneup_network/dialogify';
-// optionally link the standalone stylesheet: @oneup_network/dialogify/css
 ```
 
+### Styles
+
+Every build carries its own CSS, so no extra stylesheet is required. To style
+the dialog yourself, link the standalone `@oneup_network/dialogify/css` with
+`id="dialogifyCss"` before dialogify loads and the injection is skipped.
+
 ## Basic usage
+
+Build a dialog by chaining, then open it. `show()` and `showModal()` return a
+promise that resolves with the dialog's `returnValue` once it closes.
 
 ```javascript
 new Dialogify('dialog content')
     .title('dialog title')
     .buttons([{ type: Dialogify.BUTTON_PRIMARY }])
     .showModal();
-
-// alternate alert, confirm and prompt
-(async function () {
-    await Dialogify.alert('Alert!!');
-
-    if (await Dialogify.confirm('Yes or no？')) {
-        // blah..
-    }
-
-    const answer = await Dialogify.prompt('Question？');
-    // if (answer == blah...)
-})();
 ```
 
-![basic dialogify](docs/img/screenshot1.png)
-
-## Working with an open dialog
-
-### Awaiting the result
-
-`show()` and `showModal()` resolve with the dialog's `returnValue` once it closes:
+`alert`, `confirm` and `prompt` have one-line replacements:
 
 ```javascript
-const dialog = new Dialogify('Are you sure?').buttons([
-    { text: 'Yes', type: Dialogify.BUTTON_PRIMARY, click: () => dialog.close('yes') },
-    { text: 'No', click: () => dialog.close('no') }
-]);
+await Dialogify.alert('Alert!!');
 
-const answer = await dialog.showModal(); // 'yes' or 'no'
-```
-
-### Preventing a close
-
-`beforeclose` fires before every close — buttons, the close button, `ESC`, the
-backdrop, a `<form method="dialog">` submit and `close()` itself. Cancel it to
-keep the dialog open:
-
-```javascript
-dialog.on('beforeclose', async (event) => {
-    if (isDirty) {
-        event.preventDefault();
-        if (await Dialogify.confirm('Discard your changes?')) {
-            isDirty = false;
-            dialog.close();
-        }
-    }
-});
-```
-
-### Updating content
-
-```javascript
-dialog.setContent('<p>Step 2</p>'); // replaces the body, keeps title and buttons
-dialog.getContent();
-
-await dialog.load('/ajax/step2', { id: 7 }); // fetch into the body, with a loading state
-```
-
-### Loading state
-
-```javascript
-dialog.setLoading(true); // overlay across the dialog content
-dialog.setLoading(false);
-dialog.isLoading();
-
-dialog.updateButton('save', { loading: true }); // busy spinner, disabled, swaps in loadingText
-```
-
-### Forms
-
-The content is wrapped in `<form method="dialog">` by default, so native
-validation and `FormData` work out of the box:
-
-```javascript
-const dialog = new Dialogify('<input name="title" required>').buttons([
-    {
-        id: 'save',
-        text: 'Save',
-        type: Dialogify.BUTTON_PRIMARY,
-        loadingText: 'Saving...',
-        click: async () => {
-            if (!dialog.validate()) {
-                return; // reports the first invalid field
-            }
-
-            dialog.updateButton('save', { loading: true });
-            await save(dialog.formValues()); // { title: '...' }
-            dialog.close('saved');
-        }
-    }
-]);
-```
-
-`formValues()` returns a plain object (repeated fields become arrays);
-`formData()` returns a `FormData`, or `null` when `useDialogForm` is `false`.
-
-### Managing buttons
-
-```javascript
-dialog.addButton({ id: 'more', text: 'More' });
-dialog.addButton({ id: 'first', text: 'First' }, { prepend: true });
-dialog.updateButton('more', { text: 'Fewer', type: Dialogify.BUTTON_DANGER, disabled: true });
-dialog.removeButton('more');
-dialog.getButton('save'); // the button's jQuery object
-```
-
-## Drawers, toasts and popovers
-
-### Drawer
-
-`position` slides the dialog in from an edge instead of centring it:
-
-```javascript
-new Dialogify('<h4>Filters</h4>', { position: Dialogify.POSITION_RIGHT }).showModal();
-```
-
-```html
-<dialog is="bahamut-dialogify" position="right">Filters</dialog>
-```
-
-Accepts `left`, `right`, `top` and `bottom`.
-
-### Toast
-
-A lightweight, auto-dismissing notification. Toasts stack in a fixed corner
-container and are not modal, so they never block the page:
-
-```javascript
-Dialogify.toast('Saved');
-Dialogify.toast('Could not save', {
-    type: Dialogify.TOAST_ERROR, // TOAST_INFO (default), TOAST_SUCCESS, TOAST_WARNING
-    position: 'bottom-right', // or Dialogify.TOAST_BOTTOM_RIGHT; default top-right
-    duration: 5000, // 0 keeps it open until closed
-    title: 'Error',
-    closable: true
-});
-```
-
-Hovering a toast pauses its auto-dismiss timer. `Dialogify.toast()` returns the
-dialog instance, so `close()` and the usual events are available.
-
-### Anchored popover
-
-`showAt()` positions a non-modal dialog next to another element, for dropdowns
-and popover cards. It flips to the opposite side when the preferred placement
-would overflow the viewport, and follows the anchor on scroll and resize:
-
-```javascript
-new Dialogify('<ul>...</ul>', { closable: false, useDialogForm: false }).showAt('#menu-button', {
-    placement: 'bottom', // top | bottom | left | right
-    align: 'start', // start | center | end
-    offset: 8,
-    toggle: true // clicking the anchor again closes it, default true
-});
-```
-
-```html
-<dialog is="bahamut-dialogify" anchor="#menu-button" placement="bottom" align="end">…</dialog>
-```
-
-```javascript
-document.querySelector('dialog[is="bahamut-dialogify"]').showAt();
-```
-
-A popover is dismissed by a click anywhere outside it. Clicking the anchor that
-opened it toggles it shut: that click is swallowed, so the handler that called
-`showAt()` does not run and immediately reopen it. Clicking a _different_
-trigger is left alone, so it closes this popover and opens its own. Pass
-`toggle: false` to let the anchor click through, or `closable: false` to keep
-the popover open until you close it yourself.
-
-### Animation
-
-Drawers slide in and out from their edge, toasts fade and scale, and popovers
-fade in place. The exit animation runs after the dialog has closed, so a dialog
-with `autoRemove` stays in the DOM until it finishes. A closing toast collapses
-its own height at the same time, so the toasts stacked below it slide up instead
-of jumping when it is removed. All of them are disabled under
-`prefers-reduced-motion: reduce`.
-
-### Stacking (`z-index`)
-
-`showModal()` promotes a dialog to the browser's top layer, which always paints
-above the page, so `z-index` never applies to modal dialogs. Everything else —
-`show()`, `showAt()` popovers and toasts — stays in the normal stacking context
-and has to out-stack the rest of the page.
-
-The defaults are deliberately high so a toast is not hidden behind a sticky
-header:
-
-| Custom property             | Default | Applies to                     |
-| --------------------------- | ------- | ------------------------------ |
-| `--dialogify-z-index`       | `1000`  | Non-modal dialogs and popovers |
-| `--dialogify-toast-z-index` | `1010`  | The toast container            |
-
-Override them anywhere in your own CSS to fit a different layering scheme:
-
-```css
-:root {
-    --dialogify-z-index: 500;
-    --dialogify-toast-z-index: 510;
+if (await Dialogify.confirm('Yes or no?')) {
+    // ...
 }
+
+const answer = await Dialogify.prompt('Question?');
 ```
 
-The bundled stylesheet only reads these properties (they are `var()` fallbacks,
-never declared by the library), so your declaration wins regardless of source
-order — even though the browser build injects its stylesheet last.
-
-## Theming
-
-Every colour in the bundled stylesheet is read through a custom property, so you
-can retheme the dialog without fighting selectors:
-
-```css
-:root {
-    --dialogify-primary: #6741d9;
-    --dialogify-primary-hover: #7950f2;
-    --dialogify-surface: #fdfdfd;
-}
-```
-
-The library never declares these properties itself — the light values are only
-`var()` fallbacks — so your declaration wins regardless of source order, even
-though the browser build injects its stylesheet last.
-
-<details>
-<summary>All theme properties</summary>
-
-| Custom property                  | Default                    | Applies to                           |
-| -------------------------------- | -------------------------- | ------------------------------------ |
-| `--dialogify-surface`            | `#fff`                     | Dialog background                    |
-| `--dialogify-text`               | `#464646`                  | Body text                            |
-| `--dialogify-heading`            | `#00555f`                  | `title()` and the close button       |
-| `--dialogify-muted`              | `#a6a6a6`                  | Secondary text                       |
-| `--dialogify-divider`            | `#e0e6e8`                  | `<hr>`                               |
-| `--dialogify-link`               | `#117e96`                  | Links in the body                    |
-| `--dialogify-link-hover`         | `#126e7d`                  | Links on hover                       |
-| `--dialogify-focus-ring`         | `#117e96`                  | `:focus-visible` outlines            |
-| `--dialogify-icon-filter`        | `none`                     | Filter applied to the built-in icons |
-| `--dialogify-shadow`             | three-layer drop shadow    | Dialog shadow                        |
-| `--dialogify-loading-overlay`    | `rgba(255, 255, 255, .75)` | `setLoading()` overlay               |
-| `--dialogify-button-bg`          | `#e5e5e5`                  | Default button                       |
-| `--dialogify-button-hover-bg`    | `#dcdcdc`                  | Default button on hover              |
-| `--dialogify-button-text`        | `#a6a6a6`                  | Default button label                 |
-| `--dialogify-primary`            | `#117e96`                  | `BUTTON_PRIMARY`                     |
-| `--dialogify-primary-hover`      | `#126e7d`                  | `BUTTON_PRIMARY` on hover            |
-| `--dialogify-on-primary`         | `#fff`                     | `BUTTON_PRIMARY` label               |
-| `--dialogify-danger`             | `#f44336`                  | `BUTTON_DANGER`                      |
-| `--dialogify-danger-hover`       | `#de2427`                  | `BUTTON_DANGER` on hover             |
-| `--dialogify-on-danger`          | `#fff`                     | `BUTTON_DANGER` label                |
-| `--dialogify-danger-shadow`      | red-tinted drop shadow     | `.btn-danger-shadow`                 |
-| `--dialogify-field-bg`           | `#fff`                     | `.text-field` background             |
-| `--dialogify-field-border`       | `#d9d9d9`                  | `.text-field` border                 |
-| `--dialogify-field-text`         | `#00555f`                  | `.text-field` text                   |
-| `--dialogify-field-focus-border` | `#117e96`                  | `.text-field` border on focus        |
-| `--dialogify-field-placeholder`  | `#b3b3b3`                  | `.text-field` placeholder            |
-| `--dialogify-error`              | `#de2427`                  | `.is-error` fields                   |
-| `--dialogify-toast-info`         | `#117e96`                  | Toast status bar, `info`             |
-| `--dialogify-toast-success`      | `#2f9e44`                  | Toast status bar, `success`          |
-| `--dialogify-toast-warning`      | `#e8a33d`                  | Toast status bar, `warning`          |
-| `--dialogify-toast-error`        | `#de2427`                  | Toast status bar, `error`            |
-| `--dialogify-toast-close`        | `#8d8d8d`                  | Toast close button                   |
-| `--dialogify-toast-close-hover`  | `#464646`                  | Toast close button on hover          |
-| `--dialogify-backdrop`           | `#000`                     | Modal backdrop                       |
-| `--dialogify-backdrop-opacity`   | `0.7`                      | Modal backdrop opacity               |
-
-</details>
-
-### Dark theme
-
-A dark palette ships with the stylesheet, behind `data-theme`:
-
-```html
-<html data-theme="dark"></html>
-```
-
-| `data-theme` | Result                                               |
-| ------------ | ---------------------------------------------------- |
-| absent       | Light (the default, unchanged from earlier releases) |
-| `light`      | Light                                                |
-| `dark`       | Dark                                                 |
-| `auto`       | Follows `prefers-color-scheme`                       |
-
-The attribute can sit on any ancestor of the dialog — `<html>` is the usual
-choice — and can be flipped at runtime without reloading:
-
-```js
-document.documentElement.dataset.theme = 'dark';
-```
-
-Dark mode is **opt-in on purpose**: without the attribute the dialog stays light
-even when the visitor's system is set to dark, so an existing site never changes
-appearance on upgrade. Use `data-theme="auto"` to follow the system.
-
-The dark rules only set custom properties, never a real declaration, so if you
-already ship your own overrides for `.dialogify` they keep winning by source
-order exactly as before. Be aware that anything your stylesheet leaves alone
-will pick up the dark palette, which can mix the two; declare
-`--dialogify-*` properties instead of rules if you want full control.
-
-The built-in icons are single-colour SVGs with the fill baked in, so they are
-re-tinted with `--dialogify-icon-filter` rather than swapped. This also applies
-to a custom `closeButton.image`; set `--dialogify-icon-filter: none` to opt out.
-
-## Accessibility
-
-- `title()` links the heading to the dialog with `aria-labelledby`.
-- The close button is exposed as a button, is keyboard focusable and activates
-  with <kbd>Enter</kbd> / <kbd>Space</kbd>, and is labelled from the locale.
-- Decorative icons are hidden from assistive technology; the loading indicator
-  and toasts announce themselves with `role="status"`.
-- Buttons in their loading state are marked `aria-busy`.
-- Animations are disabled under `prefers-reduced-motion`.
-
-Modal dialogs get focus trapping and focus restoration from the native
-`<dialog>` element itself.
-
-## Dialog content is HTML
-
-The `source` passed to `new Dialogify(source)` and the `message` passed to
-`Dialogify.alert` / `confirm` / `prompt` are inserted as **HTML** — this is an
-intentional feature so you can render rich content:
-
-```javascript
-new Dialogify('<img src="hero.png"><p>Rich <strong>HTML</strong> content</p>').showModal();
-```
-
-`source` is resolved as follows:
-
-- a string starting with `#` is treated as a selector and its inner HTML is cloned;
-- a string starting with the ajax prefix (default `/ajax/`) is fetched and injected;
-- any other string is inserted as raw HTML.
-
-> ⚠️ **Security:** because content is rendered as HTML, always escape/sanitize any
-> untrusted or user-supplied input before passing it to Dialogify to avoid XSS.
-
-## Declarative usage (`<dialog is="bahamut-dialogify">`)
-
-Besides the programmatic API, a dialog can be written directly in HTML using a
-[customized built-in element](https://developer.mozilla.org/docs/Web/API/Web_components/Using_custom_elements#customized_built-in_elements).
-The element is registered automatically when dialogify is loaded:
+A dialog can also be written straight into the page as a
+[customized built-in element](https://developer.mozilla.org/docs/Web/API/Web_components/Using_custom_elements#customized_built-in_elements),
+with options as attributes and the whole API on the element itself:
 
 ```html
 <dialog is="bahamut-dialogify" dialog-title="Hello">
@@ -385,222 +83,68 @@ The element is registered automatically when dialogify is loaded:
 ```
 
 ```javascript
-const dialog = document.querySelector('dialog[is="bahamut-dialogify"]');
-dialog.showModal();
+document.querySelector('dialog[is="bahamut-dialogify"]').showModal();
 ```
 
-The element name is prefixed because the custom elements spec requires a hyphen
-in the name — `is="dialogify"` is not a valid custom element name.
+## Documentation
 
-Unlike `new Dialogify()`, a declarative dialog is **not** removed from the DOM when
-it closes, so it can be shown again.
+Everything else lives on the documentation site, with a runnable example next to
+each feature:
 
-### Methods
+| Topic                                                                        | What you will find                                             |
+| ---------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| [Getting started](https://oneupnetwork.github.io/dialogify/#getting-started) | Installing and opening a first dialog                          |
+| [Core concepts](https://oneupnetwork.github.io/dialogify/#concepts)          | Modal vs non-modal, chaining, promises, lifecycle              |
+| [Creating a dialog](https://oneupnetwork.github.io/dialogify/#create)        | Every constructor option                                       |
+| [Content](https://oneupnetwork.github.io/dialogify/#content-api)             | Titles, HTML content, ajax loading, loading state              |
+| [Forms](https://oneupnetwork.github.io/dialogify/#forms)                     | Validation and reading values back                             |
+| [Buttons](https://oneupnetwork.github.io/dialogify/#buttons)                 | Defining them and driving them at runtime                      |
+| [Events](https://oneupnetwork.github.io/dialogify/#events)                   | `show`, `close`, `cancel` and intercepting a close             |
+| [Drawer, toast, popover](https://oneupnetwork.github.io/dialogify/#variants) | Edge drawers, notifications and anchored popovers              |
+| [Shortcuts](https://oneupnetwork.github.io/dialogify/#shortcuts)             | `alert`, `confirm`, `prompt`, `toast`                          |
+| [Declarative usage](https://oneupnetwork.github.io/dialogify/#declarative)   | `<dialog is="bahamut-dialogify">`, attributes, buttons, events |
+| [Theming](https://oneupnetwork.github.io/dialogify/#theming)                 | Custom properties, dark theme, `z-index`                       |
+| [Locale](https://oneupnetwork.github.io/dialogify/#locale)                   | Built-in languages and adding your own                         |
+| [API reference](https://oneupnetwork.github.io/dialogify/#api)               | Every method, option and constant                              |
 
-`document.querySelector(...)` returns the element itself, and the dialogify API is
-available on it:
+Content is inserted as **HTML**, which makes rich layouts easy but means any
+user-supplied value has to be escaped before it goes in.
 
-| Method                       | Description                                       |
-| ---------------------------- | ------------------------------------------------- |
-| `show()`                     | Show the dialog (non-modal); resolves on close    |
-| `showModal()`                | Show the dialog as a modal; resolves on close     |
-| `showAt(anchor?, options?)`  | Show anchored to another element                  |
-| `reposition()`               | Recompute the anchored position                   |
-| `close(returnValue?)`        | Close the dialog (fires `beforeclose`)            |
-| `isOpen()`                   | Whether the dialog is open                        |
-| `setTitle(text)`             | Set the dialog title                              |
-| `setContent(html)`           | Replace the body, keeping title and buttons       |
-| `getContent()`               | The current body HTML                             |
-| `load(url, data?)`           | Load body content over ajax, with a loading state |
-| `setLoading(bool)`           | Toggle the loading overlay                        |
-| `isLoading()`                | Whether the loading overlay is shown              |
-| `validate()`                 | Run native form validation                        |
-| `formData()`                 | The dialog form as `FormData`                     |
-| `formValues()`               | The dialog form as a plain object                 |
-| `buttons(buttons, options?)` | Set the buttons programmatically                  |
-| `addButton(button, opts?)`   | Append (or prepend) one button                    |
-| `updateButton(id, changes)`  | Update a button in place                          |
-| `removeButton(id)`           | Remove a button                                   |
-| `getButton(id)`              | A button's jQuery object                          |
-| `on/off(event, handler)`     | Bind/unbind a dialogify instance event            |
-| `.dialogify`                 | The backing `Dialogify` instance                  |
+## Browser support
 
-> `setTitle()` is used instead of `title()` because `HTMLElement.title` is the
-> native tooltip property and must keep its standard behaviour.
+Any browser with a native `<dialog>` element: Chrome 94+, Firefox 98+ and
+Safari 15.4+. The bundles target `es2022`.
 
-### Options as attributes
-
-| Attribute           | Option             | Notes                                                         |
-| ------------------- | ------------------ | ------------------------------------------------------------- |
-| `dialog-title`      | —                  | Dialog title (`title` is the native tooltip)                  |
-| `size="large"`      | `size`             | Maps to `Dialogify.SIZE_LARGE`; any other value is used as-is |
-| `position`          | `position`         | Drawer edge: `left` / `right` / `top` / `bottom`              |
-| `closable`          | `closable`         | Show the close button                                         |
-| `fixed`             | `fixed`            | Use `position: fixed`                                         |
-| `background-scroll` | `backgroundScroll` | Allow scrolling behind the dialog                             |
-| `use-dialog-form`   | `useDialogForm`    | Wrap content in `<form method="dialog">`                      |
-| `src`               | —                  | Load content from this URL instead of the inline markup       |
-| `ajax-prefix`       | `ajaxPrefix`       | Ajax prefix used to resolve `src`                             |
-| `options='{...}'`   | —                  | Any option as a JSON object                                   |
-| `buttons-position`  | —                  | `left` / `center` / `right` (default `right`)                 |
-| `anchor`            | —                  | Selector for the anchor element used by `showAt()`            |
-| `placement`         | —                  | `top` / `bottom` / `left` / `right` for `showAt()`            |
-| `align`             | —                  | `start` / `center` / `end` for `showAt()`                     |
-| `offset`            | —                  | Gap in pixels for `showAt()`                                  |
-
-> ⚠️ Because attributes are strings, these booleans are **value-based**, not
-> presence-based: use `closable="false"` to disable. A bare attribute, `"true"`,
-> or any other value means `true`. This differs from standard HTML boolean
-> attributes.
-
-Options that cannot be expressed as attributes (callbacks, style objects) can be
-assigned before the dialog is first shown:
-
-```javascript
-dialog.options = {
-    ajaxComplete() {
-        /* ... */
-    }
-};
-```
-
-### Buttons
-
-Add a `<button>` with one of the marker attributes inside the dialog content.
-They are collected into a button box that matches the programmatic `buttons()` output:
-
-| Attribute | Style   | Closes the dialog        |
-| --------- | ------- | ------------------------ |
-| `ok`      | primary | ✅                       |
-| `cancel`  | default | ✅ (also fires `cancel`) |
-| `close`   | default | ✅                       |
-| `primary` | primary | ❌                       |
-| `danger`  | danger  | ❌                       |
-
-If the button has no text, a localized default (`Ok` / `Cancel` / `Close`) is used:
+Two optional bundles cover the gaps, and both must be loaded **before**
+dialogify:
 
 ```html
-<dialog is="bahamut-dialogify">
-    Delete this item?
-    <button cancel></button>
-    <button danger onclick="doDelete()">Delete</button>
-</dialog>
-```
-
-> Write `<button ok></button>`, not `<button ok />`. Self-closing syntax is not
-> valid for HTML elements and makes the parser nest the following siblings.
-
-Declarative buttons join the button list too, so they can be driven from
-JavaScript. Give them an `id` to address them by name (otherwise they are keyed
-by index), and a `loading-text` for their busy state:
-
-```html
-<dialog is="bahamut-dialogify">
-    <input name="title" required />
-    <button ok id="save" loading-text="Saving...">Save</button>
-</dialog>
-```
-
-```javascript
-dialog.updateButton('save', { loading: true });
-```
-
-### Events
-
-`close` and `cancel` are native `<dialog>` events; `show` and `beforeclose` are
-dispatched by dialogify. They can all be bound in the usual ways:
-
-```javascript
-dialog.addEventListener('show', () => {});
-dialog.onshow = () => {};
-dialog.onclose = () => {};
-
-dialog.addEventListener('beforeclose', (e) => e.preventDefault()); // keeps it open
-dialog.onbeforeclose = () => false; // same thing
-```
-
-They can also be bound in markup. `onclose` and `oncancel` are native inline
-handlers and behave exactly as the browser defines. In addition, dialogify
-resolves a **function name** on `onshow`, `onclose`, `oncancel` and
-`onbeforeclose`:
-
-```html
-<dialog is="bahamut-dialogify" onshow="myHandler" onclose="MyApp.onClose"></dialog>
-```
-
-The name is looked up in `Dialogify.handlers` first, then on `window` (dotted
-paths are supported), and it is resolved when the event fires — so handlers may be
-defined after the markup. Values that are not plain identifiers are ignored by
-dialogify and left to the browser's native inline handler support, so no code is
-ever evaluated by dialogify itself.
-
-```javascript
-Dialogify.handlers.myHandler = function () {
-    // `this` is the dialog element
-};
-```
-
-### Browser support
-
-Customized built-in elements are not supported in Safari/WebKit, so
-`<dialog is="bahamut-dialogify">` is never upgraded there. An optional bundle of
-[`@ungap/custom-elements`](https://github.com/ungap/custom-elements) ships with
-dialogify; load it **before** dialogify to enable the declarative syntax:
-
-```html
+<!-- <dialog> for older browsers -->
+<script src="path/to/dialog-polyfill.min.js"></script>
+<!-- customized built-in elements, i.e. `is="..."`, for Safari -->
 <script src="path/to/custom-elements.min.js"></script>
 <script src="path/to/dialogify.min.js"></script>
 ```
 
-```javascript
-import '@oneup_network/dialogify/custom-elements';
-import Dialogify from '@oneup_network/dialogify';
-```
-
-It is a no-op in browsers that already support the feature, and the programmatic
-API works everywhere without it.
-
-## Optional legacy polyfill
-
-Modern browsers support `<dialog>` natively, so no polyfill is bundled by default.
-To support legacy browsers, load the optional polyfill **before** dialogify; it
-exposes `window.dialogPolyfill`, which dialogify detects at runtime:
-
-```html
-<script src="path/to/dialog-polyfill.min.js"></script>
-<script src="path/to/dialogify.min.js"></script>
-```
-
-## Usage and examples
-
-[https://oneupnetwork.github.io/dialogify/](https://oneupnetwork.github.io/dialogify/)
-
 ## Dependencies
 
-- [jQuery](https://jquery.com/) (peer dependency, `>=3.0.0`, jQuery 4 included)
-
-## Browser compatibility
-
-Every browser with a native `<dialog>` element (Chrome 94+, Firefox 98+,
-Safari 15.4+); the bundles are built for `es2022`. Older browsers can load the
-optional `dialog-polyfill` bundle.
+- [jQuery](https://jquery.com/) — peer dependency, `>=3.0.0` (jQuery 4 included)
 
 ## Designed by
 
 [Phoebe](https://github.com/Phoebe1226)
 
-## Contribute
+## Contributing
 
-- Fork & clone this repo
-    ```
-    npm install
-    npm run build
-    ```
-- Create branch and commit your changes
-- Open a pull request
+```bash
+npm install
+npm run build
+npm test
+```
 
-Feel free to contribute
+Fork the repo, branch off master, and open a pull request. Contributions are
+welcome.
 
 ## License
 
-MIT
+[MIT](LICENSE)

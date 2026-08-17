@@ -87,6 +87,14 @@ function alignAxis(align, start, anchorSize, boxSize) {
     return start;
 }
 
+// Nudge an anchored dialog back into the viewport, but never so far that it
+// loses contact with its anchor: an anchor scrolled out of view takes the
+// popover with it rather than leaving it stranded against the edge.
+function clampToAnchor(value, limit, size, anchorStart, anchorEnd) {
+    const inViewport = clamp(value, 0, Math.max(0, limit - size));
+    return clamp(inViewport, anchorStart - size, anchorEnd);
+}
+
 // Upper bound for the exit animation, in case `finished` never settles.
 const EXIT_ANIMATION_TIMEOUT = 600;
 
@@ -212,9 +220,7 @@ class Dialogify {
             .on('close', function () {
                 self._teardownAnchor();
                 $(self).triggerHandler('close');
-                if (options.backgroundScroll === false) {
-                    $('body').css({ overflow: '', 'padding-right': '' });
-                }
+                self._unlockScroll();
                 // Keep the dialog rendered while the exit animation plays; it
                 // is already out of the top layer at this point. Normally the
                 // class is already there (see `_markClosing`), this is the
@@ -423,9 +429,9 @@ class Dialogify {
 
     // public methods
     showModal() {
-        if (this.options.backgroundScroll === false) {
-            preventScroll();
-        }
+        // A modal dialog owns the whole page, so the page behind it is frozen
+        // unless the caller explicitly asks for it to stay scrollable.
+        this._lockScroll(this.options.backgroundScroll !== true);
         const promise = this._openPromise();
         nativeDialogCall(this.dialog, 'showModal');
         dispatchDomEvent(this.dialog, 'show');
@@ -434,14 +440,28 @@ class Dialogify {
     }
 
     show() {
-        if (this.options.backgroundScroll === false) {
-            preventScroll();
-        }
+        // A non-modal dialog leaves the page usable, so it only freezes
+        // scrolling when asked to.
+        this._lockScroll(this.options.backgroundScroll === false);
         const promise = this._openPromise();
         nativeDialogCall(this.dialog, 'show');
         dispatchDomEvent(this.dialog, 'show');
         $(this).triggerHandler('show');
         return promise;
+    }
+
+    _lockScroll(wanted) {
+        if (wanted && !this._scrollLocked) {
+            this._scrollLocked = true;
+            lockScroll();
+        }
+    }
+
+    _unlockScroll() {
+        if (this._scrollLocked) {
+            this._scrollLocked = false;
+            unlockScroll();
+        }
     }
 
     // Show the dialog anchored next to `anchor` instead of centred.
@@ -517,29 +537,49 @@ class Dialogify {
         const viewportWidth = window.innerWidth || 0;
         const viewportHeight = window.innerHeight || 0;
 
+        // Flipping is about finding room on screen, so it only applies while the
+        // anchor is actually on screen. Without this an anchor scrolling out of
+        // view would flip sides on its way out.
+        const anchorVisible =
+            rect.bottom > 0 &&
+            rect.top < viewportHeight &&
+            rect.right > 0 &&
+            rect.left < viewportWidth;
+
         let placement = options.placement || 'bottom';
-        if (placement == 'bottom' && rect.bottom + offset + box.height > viewportHeight) {
-            placement = 'top';
-        } else if (placement == 'top' && rect.top - offset - box.height < 0) {
-            placement = 'bottom';
-        } else if (placement == 'right' && rect.right + offset + box.width > viewportWidth) {
-            placement = 'left';
-        } else if (placement == 'left' && rect.left - offset - box.width < 0) {
-            placement = 'right';
+        if (anchorVisible) {
+            if (placement == 'bottom' && rect.bottom + offset + box.height > viewportHeight) {
+                placement = 'top';
+            } else if (placement == 'top' && rect.top - offset - box.height < 0) {
+                placement = 'bottom';
+            } else if (placement == 'right' && rect.right + offset + box.width > viewportWidth) {
+                placement = 'left';
+            } else if (placement == 'left' && rect.left - offset - box.width < 0) {
+                placement = 'right';
+            }
         }
 
         let top;
         let left;
         if (placement == 'top' || placement == 'bottom') {
             top = placement == 'bottom' ? rect.bottom + offset : rect.top - offset - box.height;
-            left = alignAxis(align, rect.left, rect.width, box.width);
+            left = clampToAnchor(
+                alignAxis(align, rect.left, rect.width, box.width),
+                viewportWidth,
+                box.width,
+                rect.left,
+                rect.right
+            );
         } else {
             left = placement == 'right' ? rect.right + offset : rect.left - offset - box.width;
-            top = alignAxis(align, rect.top, rect.height, box.height);
+            top = clampToAnchor(
+                alignAxis(align, rect.top, rect.height, box.height),
+                viewportHeight,
+                box.height,
+                rect.top,
+                rect.bottom
+            );
         }
-
-        left = clamp(left, 0, Math.max(0, viewportWidth - box.width));
-        top = clamp(top, 0, Math.max(0, viewportHeight - box.height));
 
         $(this.dialog)
             .attr('data-placement', placement)
@@ -1242,12 +1282,62 @@ function pruneToastContainers() {
     });
 }
 
-function preventScroll() {
-    // 防止body滾動
-    $('body').css({
-        overflow: 'hidden',
-        'padding-right': window.innerWidth - document.documentElement.clientWidth
-    });
+// Scroll locking is refcounted so that stacked dialogs release the page only
+// once the last of them has closed.
+let scrollLocks = 0;
+let scrollLockStyles = null;
+
+const supportsScrollbarGutter =
+    typeof window !== 'undefined' &&
+    window.CSS &&
+    typeof window.CSS.supports === 'function' &&
+    window.CSS.supports('scrollbar-gutter', 'stable');
+
+// Hiding the overflow takes the classic scrollbar away, and the page jumps
+// sideways to fill the gap it leaves behind. `scrollbar-gutter` keeps that gap
+// reserved, which — unlike padding compensation — also holds `position: fixed`
+// headers still. It is only worth applying when a classic scrollbar is really
+// there: overlay scrollbars leave no gap, and reserving one would shift the
+// page the other way.
+function lockScroll() {
+    if (scrollLocks++) {
+        return;
+    }
+
+    const html = window.document.documentElement;
+    const style = html.style;
+    scrollLockStyles = {
+        overflow: style.overflow,
+        gutter: style.getPropertyValue('scrollbar-gutter'),
+        paddingRight: style.paddingRight
+    };
+
+    const scrollbarWidth = window.innerWidth - html.clientWidth;
+    if (scrollbarWidth > 0) {
+        if (supportsScrollbarGutter) {
+            style.setProperty('scrollbar-gutter', 'stable');
+        } else {
+            style.paddingRight = `${scrollbarWidth}px`;
+        }
+    }
+
+    style.overflow = 'hidden';
+}
+
+function unlockScroll() {
+    if (!scrollLocks || --scrollLocks) {
+        return;
+    }
+
+    const style = window.document.documentElement.style;
+    style.overflow = scrollLockStyles.overflow;
+    style.paddingRight = scrollLockStyles.paddingRight;
+    if (scrollLockStyles.gutter) {
+        style.setProperty('scrollbar-gutter', scrollLockStyles.gutter);
+    } else {
+        style.removeProperty('scrollbar-gutter');
+    }
+    scrollLockStyles = null;
 }
 
 function roundCssTransformMatrix(el) {

@@ -55,7 +55,9 @@ window.DIALOGIFY_DOCS_EN = {
     'opt.closeButton':
         'Custom close button <code>image</code>, <code>className</code> and <code>style</code>',
     'opt.fixed': 'Pin to the viewport with <code>position: fixed</code>',
-    'opt.bgScroll': 'Allow the page behind the dialog to scroll',
+    'opt.bgScroll.default': '<code>false</code> for modal, <code>true</code> otherwise',
+    'opt.bgScroll':
+        'Allow the page behind the dialog to scroll. Modal dialogs freeze the page by default; pass <code>true</code> to let it scroll. Non-modal dialogs leave it alone; pass <code>false</code> to freeze it.',
     'opt.autoRemove': 'Remove the dialog from the DOM once it closes',
     'opt.useForm': 'Wrap the content in <code>&lt;form method="dialog"&gt;</code>',
     'opt.position':
