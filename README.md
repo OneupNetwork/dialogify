@@ -6,7 +6,7 @@
 
 A dialog plugin built on the native `<dialog>` element.
 
-[繁體中文](README.zh-TW.md)
+[中文](README.zh-TW.md)
 
 The browser does the heavy lifting — the top layer, the backdrop, focus trapping
 and <kbd>Esc</kbd> to close all come from `<dialog>` itself. Dialogify adds the
@@ -145,6 +145,3 @@ npm test
 Fork the repo, branch off master, and open a pull request. Contributions are
 welcome.
 
-## License
-
-[MIT](LICENSE)

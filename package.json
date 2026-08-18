@@ -1,7 +1,7 @@
 {
     "name": "@oneup_network/dialogify",
     "version": "2.3.0",
-    "description": "A javascript plugin for creating dialog, implements with HTMLDialogElement.",
+    "description": "A dialog plugin built on the native <dialog> element.",
     "repository": {
         "type": "git",
         "url": "https://github.com/OneupNetwork/dialogify"
