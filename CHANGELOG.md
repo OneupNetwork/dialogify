@@ -3,6 +3,7 @@
 ## 2.3.0
     BREAKING: a modal dialog now freezes the page behind it by default; pass backgroundScroll: true to restore the old behaviour (non-modal dialogs are unchanged)
     fix: locking the page no longer shifts fixed elements sideways, because the scrollbar gutter is reserved instead of padded away
+    fix: the lock now lands on whichever element the viewport takes its overflow from, so a page whose <body> carries an overflow and a definite height is no longer thrown back to the top when a modal opens
     fix: an anchored popover now follows its anchor out of the viewport instead of sticking to the viewport edge
     feat: a dark palette behind data-theme="dark", with data-theme="auto" following prefers-color-scheme; opt-in, so an existing site is unchanged on upgrade
     feat: every colour in the stylesheet is now a --dialogify-* custom property, so a page can retheme the dialog without overriding rules

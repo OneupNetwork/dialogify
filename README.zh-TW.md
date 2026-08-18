@@ -140,4 +140,3 @@ npm test
 ```
 
 Fork 專案、從 master 開新 branch，然後發 pull request。歡迎一起參與。
-
