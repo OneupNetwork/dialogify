@@ -144,4 +144,3 @@ npm test
 
 Fork the repo, branch off master, and open a pull request. Contributions are
 welcome.
-
