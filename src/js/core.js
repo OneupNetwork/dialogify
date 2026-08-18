@@ -1293,35 +1293,56 @@ const supportsScrollbarGutter =
     typeof window.CSS.supports === 'function' &&
     window.CSS.supports('scrollbar-gutter', 'stable');
 
+// The viewport takes its overflow from the root element, unless that computes
+// to `visible`, in which case the value is taken from <body> instead. Writing
+// the lock onto the other element makes the one that was being propagated from
+// a scroll container in its own right, which collapses the viewport's scrollable
+// area and throws the page back to the top -- so the lock has to land on
+// whichever element the viewport is already listening to.
+function scrollLockTarget() {
+    const html = window.document.documentElement;
+    const body = window.document.body;
+
+    if (!body) {
+        return html;
+    }
+
+    const overflow = window.getComputedStyle(html).overflow;
+
+    return !overflow || overflow === 'visible' ? body : html;
+}
+
 // Hiding the overflow takes the classic scrollbar away, and the page jumps
 // sideways to fill the gap it leaves behind. `scrollbar-gutter` keeps that gap
-// reserved, which — unlike padding compensation — also holds `position: fixed`
-// headers still. It is only worth applying when a classic scrollbar is really
-// there: overlay scrollbars leave no gap, and reserving one would shift the
-// page the other way.
+// reserved, which -- unlike padding compensation -- also holds `position: fixed`
+// headers still. It belongs on the root element whichever element carries the
+// lock, and is only worth applying when a classic scrollbar is really there:
+// overlay scrollbars leave no gap, and reserving one would shift the page the
+// other way.
 function lockScroll() {
     if (scrollLocks++) {
         return;
     }
 
     const html = window.document.documentElement;
-    const style = html.style;
+    const target = scrollLockTarget();
     scrollLockStyles = {
-        overflow: style.overflow,
-        gutter: style.getPropertyValue('scrollbar-gutter'),
-        paddingRight: style.paddingRight
+        target,
+        overflow: target.style.overflow,
+        gutter: html.style.getPropertyValue('scrollbar-gutter'),
+        paddingRight: html.style.paddingRight
     };
 
     const scrollbarWidth = window.innerWidth - html.clientWidth;
     if (scrollbarWidth > 0) {
         if (supportsScrollbarGutter) {
-            style.setProperty('scrollbar-gutter', 'stable');
+            html.style.setProperty('scrollbar-gutter', 'stable');
         } else {
-            style.paddingRight = `${scrollbarWidth}px`;
+            html.style.paddingRight = `${scrollbarWidth}px`;
         }
     }
 
-    style.overflow = 'hidden';
+    target.style.overflow = 'hidden';
 }
 
 function unlockScroll() {
@@ -1330,7 +1351,7 @@ function unlockScroll() {
     }
 
     const style = window.document.documentElement.style;
-    style.overflow = scrollLockStyles.overflow;
+    scrollLockStyles.target.style.overflow = scrollLockStyles.overflow;
     style.paddingRight = scrollLockStyles.paddingRight;
     if (scrollLockStyles.gutter) {
         style.setProperty('scrollbar-gutter', scrollLockStyles.gutter);

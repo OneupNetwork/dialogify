@@ -1013,20 +1013,24 @@ describe('exit animation', () => {
 
 describe('background scroll lock', () => {
     const html = document.documentElement;
+    const body = document.body;
 
-    // jsdom reports no scrollbar (innerWidth === clientWidth), so the gutter
-    // compensation stays out of the way of these assertions.
+    // The viewport reads its overflow from <html> only when that is not
+    // `visible`; by default the value comes from <body>, which is where the
+    // lock has to land. jsdom reports no scrollbar (innerWidth === clientWidth),
+    // so the gutter compensation stays out of the way of these assertions.
     afterEach(() => {
         html.style.overflow = '';
         html.style.removeProperty('scrollbar-gutter');
         html.style.paddingRight = '';
+        body.style.overflow = '';
     });
 
     it('freezes the page behind a modal dialog by default', () => {
         const d = new Dialogify('content');
         d.showModal();
 
-        expect(html.style.overflow).toBe('hidden');
+        expect(body.style.overflow).toBe('hidden');
         d.close();
     });
 
@@ -1035,35 +1039,35 @@ describe('background scroll lock', () => {
         d.showModal();
         d.close();
 
-        expect(html.style.overflow).toBe('');
+        expect(body.style.overflow).toBe('');
     });
 
     it('honours backgroundScroll: true on a modal dialog', () => {
         const d = new Dialogify('content', { backgroundScroll: true });
         d.showModal();
 
-        expect(html.style.overflow).toBe('');
+        expect(body.style.overflow).toBe('');
     });
 
     it('leaves the page alone for a non-modal dialog', () => {
         const d = new Dialogify('content');
         d.show();
 
-        expect(html.style.overflow).toBe('');
+        expect(body.style.overflow).toBe('');
     });
 
     it('freezes the page for a non-modal dialog that opts in', () => {
         const d = new Dialogify('content', { backgroundScroll: false });
         d.show();
 
-        expect(html.style.overflow).toBe('hidden');
+        expect(body.style.overflow).toBe('hidden');
         d.close();
     });
 
     it('does not lock toasts out of the page', () => {
         Dialogify.toast('hi');
 
-        expect(html.style.overflow).toBe('');
+        expect(body.style.overflow).toBe('');
     });
 
     it('keeps the page frozen until the last stacked dialog closes', () => {
@@ -1073,18 +1077,33 @@ describe('background scroll lock', () => {
         second.showModal();
 
         second.close();
-        expect(html.style.overflow).toBe('hidden');
+        expect(body.style.overflow).toBe('hidden');
 
         first.close();
-        expect(html.style.overflow).toBe('');
+        expect(body.style.overflow).toBe('');
     });
 
     it('restores whatever the page had set itself', () => {
+        body.style.overflow = 'scroll';
+
+        const d = new Dialogify('content');
+        d.showModal();
+        expect(body.style.overflow).toBe('hidden');
+
+        d.close();
+        expect(body.style.overflow).toBe('scroll');
+    });
+
+    it('locks the root element when the viewport reads its overflow from it', () => {
         html.style.overflow = 'scroll';
 
         const d = new Dialogify('content');
         d.showModal();
+
+        // Locking <body> here would leave the viewport scrollable, and would
+        // turn <body> into a scroll container of its own.
         expect(html.style.overflow).toBe('hidden');
+        expect(body.style.overflow).toBe('');
 
         d.close();
         expect(html.style.overflow).toBe('scroll');
