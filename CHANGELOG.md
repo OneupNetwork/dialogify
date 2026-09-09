@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.1
+    fix: a close vetoed by a submit or cancel handler bound after dialogify's own no longer leaves the dialog stuck in the closing state, where pointer-events: none made it impossible to interact with
+    fix: the closing styles now require the dialog to have actually closed, so a lingering flag can never take an open dialog's pointer events away
+
 ## 2.3.0
     BREAKING: a modal dialog now freezes the page behind it by default; pass backgroundScroll: true to restore the old behaviour (non-modal dialogs are unchanged)
     fix: locking the page no longer shifts fixed elements sideways, because the scrollbar gutter is reserved instead of padded away
