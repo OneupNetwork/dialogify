@@ -976,6 +976,53 @@ describe('exit animation', () => {
         expect(document.body.contains(d.dialog)).toBe(false);
     });
 
+    it('takes the closing state back when a submit handler vetoes the close', async () => {
+        const d = new Dialogify('content');
+        d.showModal();
+
+        // Bound after dialogify's own handler, so it runs later and can still
+        // veto a close the dialog has already been flagged for.
+        d.$form[0].addEventListener('submit', (e) => e.preventDefault());
+        d.$form[0].dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
+
+        expect(d.dialog.classList.contains('dialogify--closing')).toBe(true);
+
+        await new Promise((r) => setTimeout(r, 0));
+
+        expect(d.isOpen()).toBe(true);
+        expect(d.dialog.classList.contains('dialogify--closing')).toBe(false);
+    });
+
+    it('takes the closing state back when a cancel handler vetoes the close', async () => {
+        const d = new Dialogify('content', { useDialogForm: false });
+        d.showModal();
+
+        d.dialog.addEventListener('cancel', (e) => e.preventDefault());
+        d.dialog.dispatchEvent(new window.Event('cancel', { cancelable: true }));
+
+        await new Promise((r) => setTimeout(r, 0));
+
+        expect(d.isOpen()).toBe(true);
+        expect(d.dialog.classList.contains('dialogify--closing')).toBe(false);
+    });
+
+    it('keeps the closing state on a close that goes through', async () => {
+        const d = new Dialogify('content', {
+            position: Dialogify.POSITION_RIGHT,
+            autoRemove: false
+        });
+        d.dialog.getAnimations = () => [{ finished: new Promise(() => {}) }];
+
+        d.showModal();
+        d.close();
+
+        // The guard that takes the flag back must not fire for a real close,
+        // or the exit animation would be cut off after one task.
+        await new Promise((r) => setTimeout(r, 0));
+
+        expect(d.dialog.classList.contains('dialogify--closing')).toBe(true);
+    });
+
     it('drops the closing state when the dialog is reopened', async () => {
         const d = new Dialogify('content', {
             position: Dialogify.POSITION_RIGHT,
@@ -1107,6 +1154,23 @@ describe('background scroll lock', () => {
 
         d.close();
         expect(html.style.overflow).toBe('scroll');
+    });
+});
+
+describe('closing state stylesheet', () => {
+    const css = readFileSync('src/css/dialogify.css', 'utf8');
+
+    it('only withdraws pointer events once the dialog has actually closed', () => {
+        // The class is set optimistically, so an open dialog whose close was
+        // vetoed must keep its pointer events even if the flag lingers.
+        expect(css).toContain(
+            '.dialogify.dialogify--closing:not([open]){display:block;pointer-events:none}'
+        );
+        expect(css).not.toMatch(/\.dialogify\.dialogify--closing\{/);
+    });
+
+    it('hides the dialog under reduced motion only once it has closed', () => {
+        expect(css).toContain('.dialogify.dialogify--closing:not([open]){display:none}');
     });
 });
 

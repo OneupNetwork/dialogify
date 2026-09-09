@@ -221,6 +221,9 @@ class Dialogify {
                 self._teardownAnchor();
                 $(self).triggerHandler('close');
                 self._unlockScroll();
+                // The close went through, so the optimistic flag stands and the
+                // guard that would have taken it back is no longer wanted.
+                self._clearClosingGuard();
                 // Keep the dialog rendered while the exit animation plays; it
                 // is already out of the top layer at this point. Normally the
                 // class is already there (see `_markClosing`), this is the
@@ -418,6 +421,7 @@ class Dialogify {
         const self = this;
         // A dialog reopened during its exit animation must not stay in the
         // closing state.
+        this._clearClosingGuard();
         $(this.dialog).removeClass('dialogify--closing');
         if (!this._closePromise) {
             this._closePromise = new Promise(function (resolve) {
@@ -618,9 +622,33 @@ class Dialogify {
     // the dialog has already lost its `open` attribute and would be hidden by
     // `display: none`. A paint landing in that gap makes the dialog blink out
     // and back in at full opacity before the exit animation runs.
+    //
+    // The flag is optimistic, so it has to be able to take itself back: a
+    // submit or cancel handler bound after ours can still call
+    // `preventDefault()` and leave the dialog open, and a dialog stuck in the
+    // closing state stops accepting input. The dialog has lost its `open`
+    // attribute by the next task whenever the close went through, so anything
+    // still open by then was vetoed.
     _markClosing() {
-        if (this.dialog.open) {
-            $(this.dialog).addClass('dialogify--closing');
+        if (!this.dialog.open) {
+            return;
+        }
+
+        const self = this;
+        $(this.dialog).addClass('dialogify--closing');
+        this._clearClosingGuard();
+        this._closingGuard = window.setTimeout(function () {
+            self._closingGuard = null;
+            if (self.dialog.open) {
+                $(self.dialog).removeClass('dialogify--closing');
+            }
+        }, 0);
+    }
+
+    _clearClosingGuard() {
+        if (this._closingGuard) {
+            window.clearTimeout(this._closingGuard);
+            this._closingGuard = null;
         }
     }
 

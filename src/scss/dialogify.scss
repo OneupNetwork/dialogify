@@ -823,8 +823,11 @@ $dialogify-toast-z-index: 1010;
 }
 
 // The dialog is closed but kept in the DOM until its exit animation ends, so
-// it has to stay rendered while no longer accepting input.
-.dialogify.dialogify--closing {
+// it has to stay rendered while no longer accepting input. Guarded on
+// `:not([open])` because the class is set optimistically, a beat before the
+// dialog actually closes: a handler can still veto that close, and an open
+// dialog must never lose its pointer events.
+.dialogify.dialogify--closing:not([open]) {
     display: block;
     pointer-events: none;
 }
@@ -840,7 +843,7 @@ $dialogify-toast-z-index: 1010;
     }
 
     // without an exit animation there is nothing to wait for, so hide it at once
-    .dialogify.dialogify--closing {
+    .dialogify.dialogify--closing:not([open]) {
         display: none;
     }
 }
