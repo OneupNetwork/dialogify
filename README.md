@@ -105,7 +105,7 @@ each feature:
 | [Declarative usage](https://oneupnetwork.github.io/dialogify/#declarative)   | `<dialog is="bahamut-dialogify">`, attributes, buttons, events |
 | [Theming](https://oneupnetwork.github.io/dialogify/#theming)                 | Custom properties, dark theme, `z-index`                       |
 | [Locale](https://oneupnetwork.github.io/dialogify/#locale)                   | Built-in languages and adding your own                         |
-| [API reference](https://oneupnetwork.github.io/dialogify/#api)               | Every method, option and constant                              |
+| [API reference](https://oneupnetwork.github.io/dialogify/#api)               | Every method, property, option and constant                    |
 
 Content is inserted as **HTML**, which makes rich layouts easy but means any
 user-supplied value has to be escaped before it goes in.

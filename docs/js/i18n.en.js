@@ -155,6 +155,8 @@ window.DIALOGIFY_DOCS_EN = {
         '<strong>Careful:</strong> attributes are strings, so these booleans are <strong>value-based</strong>, not presence-based: write <code>closable="false"</code> to disable. A bare attribute, <code>"true"</code>, or any other value means <code>true</code>. This differs from standard HTML boolean attributes.',
     'decl.objOpts':
         'Options that cannot be expressed as attributes (callbacks, style objects) can be assigned before the dialog is first shown:',
+    'decl.instance':
+        'For instance properties the element does not forward (such as <code>$body</code>), <code>dialog.dialogify</code> returns the backing Dialogify instance, initialising it on first access.',
     'decl.btn.h': 'Buttons',
     'decl.btn.p':
         'Add a <code>&lt;button&gt;</code> with one of the marker attributes inside the content. They are collected into a button box that matches the programmatic <code>buttons()</code> output. Without text, a localized default is used.',
@@ -234,12 +236,24 @@ window.DIALOGIFY_DOCS_EN = {
     'api.updateButton': 'Update a button in place',
     'api.button': 'Remove or fetch a button',
     'api.on': 'Bind or unbind an event',
+    'api.props.h': 'Instance properties',
+    'api.prop.dialog': 'The underlying native <code>&lt;dialog&gt;</code> element',
+    'api.prop.id':
+        "The dialog element's <code>id</code>; an existing <code>id</code> is kept, otherwise <code>dialogify_N</code> is generated",
+    'api.prop.options': 'The options object passed to the constructor',
+    'api.prop.content': 'The content wrapper (jQuery): title, body and button box',
+    'api.prop.body': 'The body (jQuery), without the title and button box',
+    'api.prop.form':
+        'The wrapping <code>&lt;form method="dialog"&gt;</code> (jQuery); empty when <code>useDialogForm: false</code>',
+    'api.prop.buttonList':
+        'Buttons keyed by <code>id</code> (or index); <code>undefined</code> until <code>buttons()</code> or <code>addButton()</code> is called',
     'api.static.h': 'Static members',
     'api.shortcuts': 'Promise-based shortcuts',
     'api.toast': 'Show a toast; returns the dialog instance',
     'api.closeAll': 'Close every open dialog',
     'api.handlers': 'Lookup table for declarative inline handlers',
     'api.locale': 'Locale strings; extend as needed',
+    'api.adopt': 'Build an instance around an existing <code>&lt;dialog&gt;</code> element',
     'api.const1': 'Size and button style constants',
     'api.const2': 'Button box alignment constants',
     'api.const3': 'Drawer edge constants',
@@ -293,14 +307,16 @@ window.DIALOGIFY_DOCS_EN = {
         '};',
 
     'code.setContent':
-        "const dialog = new Dialogify('Step 1').title('Setup wizard').show();\n" +
+        "const dialog = new Dialogify('Step 1').title('Setup wizard');\n" +
+        'dialog.show(); // show() returns a Promise, so keep the instance and open it separately\n' +
         '\n' +
         "dialog.setContent('&lt;p&gt;Step 2&lt;/p&gt;'); // body only, title and buttons stay\n" +
         'dialog.getContent();                // the current body HTML',
 
     'code.ajax':
         '// loaded on construction\n' +
-        "new Dialogify('/ajax/detail', { ajaxData: { id: 7 } }).showModal();\n" +
+        "const dialog = new Dialogify('/ajax/detail', { ajaxData: { id: 7 } });\n" +
+        'dialog.showModal();\n' +
         '\n' +
         '// loaded later, with a loading state while it runs\n' +
         "await dialog.load('/ajax/step2', { id: 7 });",
@@ -330,15 +346,14 @@ window.DIALOGIFY_DOCS_EN = {
         ']);',
 
     'code.buttons':
-        "new Dialogify('Delete this record?')\n" +
-        '    .buttons(\n' +
-        '        [\n' +
-        "            { text: 'Cancel', click: () =&gt; dialog.close() },\n" +
-        "            { id: 'del', text: 'Delete', type: Dialogify.BUTTON_DANGER, loadingText: 'Deleting…' }\n" +
-        '        ],\n' +
-        '        { position: Dialogify.BUTTON_CENTER }\n' +
-        '    )\n' +
-        '    .showModal();',
+        "const dialog = new Dialogify('Delete this record?').buttons(\n" +
+        '    [\n' +
+        "        { text: 'Cancel', click: () =&gt; dialog.close() },\n" +
+        "        { id: 'del', text: 'Delete', type: Dialogify.BUTTON_DANGER, loadingText: 'Deleting…' }\n" +
+        '    ],\n' +
+        '    { position: Dialogify.BUTTON_CENTER }\n' +
+        ');\n' +
+        'dialog.showModal();',
 
     'code.buttonManage':
         "dialog.addButton({ id: 'more', text: 'More' });\n" +

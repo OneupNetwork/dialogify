@@ -19,6 +19,9 @@ declare class Dialogify {
     /** The underlying native `<dialog>` element. */
     dialog: HTMLDialogElement;
 
+    /** The dialog element's id: its existing id, or a generated `dialogify_N`. */
+    id: string;
+
     /** Per-instance options passed to the constructor. */
     options: Dialogify.Options;
 
@@ -31,7 +34,10 @@ declare class Dialogify {
     /** The `<form method="dialog">` wrapper, empty when `useDialogForm` is false. */
     $form: JQueryLike;
 
-    /** Buttons by id (or index when no id was given). */
+    /**
+     * Buttons by id (or index when no id was given). Undefined until
+     * `buttons()` or `addButton()` is called.
+     */
     $buttonList: Record<string, JQueryLike>;
 
     /** Set (or replace) the dialog title. */

@@ -103,7 +103,7 @@ document.querySelector('dialog[is="bahamut-dialogify"]').showModal();
 | [宣告式用法](https://oneupnetwork.github.io/dialogify/#declarative)          | `<dialog is="bahamut-dialogify">`、屬性、按鈕、事件 |
 | [樣式主題](https://oneupnetwork.github.io/dialogify/#theming)                | 自訂屬性、暗色主題、`z-index`                       |
 | [語系](https://oneupnetwork.github.io/dialogify/#locale)                     | 內建語言與自行擴充                                  |
-| [API 參考](https://oneupnetwork.github.io/dialogify/#api)                    | 所有方法、選項與常數                                |
+| [API 參考](https://oneupnetwork.github.io/dialogify/#api)                    | 所有方法、屬性、選項與常數                          |
 
 燈箱內容是以 **HTML** 插入的，因此排版可以很自由，但所有來自使用者的資料都必須
 先做跳脫處理。

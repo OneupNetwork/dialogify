@@ -357,7 +357,8 @@ const answer = await dialog.showModal(); // 'yes' 或 'no'</code></pre>
                             試試看
                         </button>
                     </div>
-                    <pre><code data-i18n="code.setContent" class="language-javascript">const dialog = new Dialogify('第一步').title('設定精靈').show();
+                    <pre><code data-i18n="code.setContent" class="language-javascript">const dialog = new Dialogify('第一步').title('設定精靈');
+dialog.show(); // show() 回傳的是 Promise，所以先存下實例再開啟
 
 dialog.setContent('&lt;p&gt;第二步&lt;/p&gt;'); // 只換內容，保留標題與按鈕
 dialog.getContent();                  // 目前的內容 HTML</code></pre>
@@ -369,7 +370,8 @@ dialog.getContent();                  // 目前的內容 HTML</code></pre>
                         </button>
                     </div>
                     <pre><code data-i18n="code.ajax" class="language-javascript">// 建立時載入
-new Dialogify('/ajax/detail', { ajaxData: { id: 7 } }).showModal();
+const dialog = new Dialogify('/ajax/detail', { ajaxData: { id: 7 } });
+dialog.showModal();
 
 // 開啟後再載入，過程中會顯示載入狀態
 await dialog.load('/ajax/step2', { id: 7 });</code></pre>
@@ -468,15 +470,14 @@ dialog.isLoading();</code></pre>
                             試試看
                         </button>
                     </div>
-                    <pre><code data-i18n="code.buttons" class="language-javascript">new Dialogify('要刪除這筆資料嗎？')
-    .buttons(
-        [
-            { text: '取消', click: () =&gt; dialog.close() },
-            { id: 'del', text: '刪除', type: Dialogify.BUTTON_DANGER, loadingText: '刪除中…' }
-        ],
-        { position: Dialogify.BUTTON_CENTER }
-    )
-    .showModal();</code></pre>
+                    <pre><code data-i18n="code.buttons" class="language-javascript">const dialog = new Dialogify('要刪除這筆資料嗎？').buttons(
+    [
+        { text: '取消', click: () =&gt; dialog.close() },
+        { id: 'del', text: '刪除', type: Dialogify.BUTTON_DANGER, loadingText: '刪除中…' }
+    ],
+    { position: Dialogify.BUTTON_CENTER }
+);
+dialog.showModal();</code></pre>
                     <div class="table-wrap">
                         <table>
                             <thead>
@@ -886,6 +887,12 @@ dialog.showModal();</code></pre>
         /* ... */
     }
 };</code></pre>
+                    <p data-i18n="decl.instance">
+                        需要元素沒有轉接的實例屬性（例如 <code>$body</code>）時，可以透過
+                        <code>dialog.dialogify</code> 取得背後的 Dialogify
+                        實例，第一次存取時才會初始化。
+                    </p>
+                    <pre><code class="language-javascript">dialog.dialogify.$body.find('input').trigger('focus');</code></pre>
 
                     <h3 id="decl-buttons" data-i18n="decl.btn.h">按鈕</h3>
                     <p data-i18n="decl.btn.p">
@@ -1270,6 +1277,64 @@ window.dialogifyConfig = { locale: 'ja_JP' };</code></pre>
                         </table>
                     </div>
 
+                    <h3 id="api-props" data-i18n="api.props.h">實例屬性</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-i18n="th.member">成員</th>
+                                    <th data-i18n="th.desc">說明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>dialog</code></td>
+                                    <td data-i18n="api.prop.dialog">
+                                        背後的原生 <code>&lt;dialog&gt;</code> 元素
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td data-i18n="api.prop.id">
+                                        燈箱元素的 <code>id</code>；沿用元素原本的
+                                        <code>id</code>，否則自動產生 <code>dialogify_N</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><code>options</code></td>
+                                    <td data-i18n="api.prop.options">傳給建構式的選項物件</td>
+                                </tr>
+                                <tr>
+                                    <td><code>$content</code></td>
+                                    <td data-i18n="api.prop.content">
+                                        內容外框（jQuery），包含標題、內容與按鈕區
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><code>$body</code></td>
+                                    <td data-i18n="api.prop.body">
+                                        內容區（jQuery），不含標題與按鈕區
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><code>$form</code></td>
+                                    <td data-i18n="api.prop.form">
+                                        外層的 <code>&lt;form method="dialog"&gt;</code>（jQuery）；
+                                        <code>useDialogForm: false</code> 時為空集合
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><code>$buttonList</code></td>
+                                    <td data-i18n="api.prop.buttonList">
+                                        以 <code>id</code>（沒有時為索引）為鍵的按鈕物件；呼叫
+                                        <code>buttons()</code> 或 <code>addButton()</code> 前為
+                                        <code>undefined</code>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
                     <h3 id="api-static" data-i18n="api.static.h">靜態成員</h3>
                     <div class="table-wrap">
                         <table>
@@ -1301,6 +1366,17 @@ window.dialogifyConfig = { locale: 'ja_JP' };</code></pre>
                                 <tr>
                                     <td><code>Dialogify.LOCALE</code></td>
                                     <td data-i18n="api.locale">語系字串表，可擴充</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <code
+                                            >Dialogify.adopt(dialog, source, options?,
+                                            setupOptions?)</code
+                                        >
+                                    </td>
+                                    <td data-i18n="api.adopt">
+                                        以頁面上既有的 <code>&lt;dialog&gt;</code> 元素建立實例
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>
